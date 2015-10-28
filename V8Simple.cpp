@@ -7,6 +7,7 @@ namespace V8Simple
 
 Function* Context::_instanceOf = nullptr;
 v8::Isolate* Context::_isolate = nullptr;
+v8::Platform* Context::_platform = nullptr;
 
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 {
@@ -136,7 +137,7 @@ v8::Local<v8::Value> Context::Unwrap(
 		return v8::Null(_isolate).As<v8::Value>();
 	}
 
-	switch (value->GetType())
+	switch (value->GetValueType())
 	{
 		case Type::Int:
 			return v8::Int32::New(_isolate, static_cast<const Int*>(value)->GetValue());
@@ -204,17 +205,27 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 	return result;
 }
 
-Context::Context()
+Context::Context() throw(Exception)
 {
-	v8::V8::InitializeICU();
-	_platform = v8::platform::CreateDefaultPlatform();
-	v8::V8::InitializePlatform(_platform);
-	v8::V8::Initialize();
+	if (_platform == nullptr)
+	{
+		v8::V8::InitializeICU();
+		_platform = v8::platform::CreateDefaultPlatform();
+		v8::V8::InitializePlatform(_platform);
+		v8::V8::Initialize();
+	}
 
-	v8::Isolate::CreateParams createParams;
-	static ArrayBufferAllocator arrayBufferAllocator;
-	createParams.array_buffer_allocator = &arrayBufferAllocator;
-	_isolate = v8::Isolate::New(createParams);
+	if (_isolate == nullptr)
+	{
+		v8::Isolate::CreateParams createParams;
+		static ArrayBufferAllocator arrayBufferAllocator;
+		createParams.array_buffer_allocator = &arrayBufferAllocator;
+		_isolate = v8::Isolate::New(createParams);
+	}
+	else
+	{
+		throw Exception("V8Simple Contexts are not re-entrant");
+	}
 
 	v8::Isolate::Scope isolateScope(_isolate);
 	v8::HandleScope handleScope(_isolate);
@@ -223,8 +234,8 @@ Context::Context()
 	localContext->Enter();
 
 	_context = new v8::Persistent<v8::Context>(_isolate, localContext);
-	_instanceOf = static_cast<Function*>(
-		Evaluate("instanceof", "(function(x, y) { return (x instanceof y); })"));
+		_instanceOf = static_cast<Function*>(
+			Evaluate("instanceof", "(function(x, y) { return (x instanceof y); })"));
 }
 
 Context::~Context()
@@ -240,9 +251,14 @@ Context::~Context()
 	delete _context;
 	_context = nullptr;
 
-	v8::V8::Dispose();
-	v8::V8::ShutdownPlatform();
-	delete _platform;
+	_isolate->Dispose();
+	_isolate = nullptr;
+
+	// If we do this we can't create a new context afterwards.
+	//
+	// v8::V8::Dispose();
+	// v8::V8::ShutdownPlatform();
+	// delete _platform;
 }
 
 Value* Context::Evaluate(const std::string& fileName, const std::string& code)
@@ -268,7 +284,7 @@ Object::Object(v8::Local<v8::Object> object)
 	: _object(Context::_isolate, object)
 { }
 
-Type Object::GetType() const { return Type::Object; }
+Type Object::GetValueType() const { return Type::Object; }
 
 Value* Object::Get(const std::string& key) throw(ScriptException, Exception)
 {
@@ -397,7 +413,7 @@ Function::Function(v8::Local<v8::Function> function)
 	: _function(Context::_isolate, function)
 { }
 
-Type Function::GetType() const { return Type::Function; }
+Type Function::GetValueType() const { return Type::Function; }
 
 Value* Function::Call(const std::vector<Value*>& args)
 	throw(ScriptException, Exception)
@@ -456,7 +472,7 @@ Array::Array(v8::Local<v8::Array> array)
 	: _array(Context::_isolate, array)
 { }
 
-Type Array::GetType() const { return Type::Array; }
+Type Array::GetValueType() const { return Type::Array; }
 
 Value* Array::Get(int index)
 	throw(ScriptException, Exception)
@@ -517,6 +533,6 @@ bool Array::Equals(const Array& array)
 
 }
 
-Type Callback::GetType() const { return Type::Callback; }
+Type Callback::GetValueType() const { return Type::Callback; }
 
 } // namespace V8Simple

@@ -189,6 +189,7 @@ public class Context : global::System.IDisposable {
   }
 
   public Context() : this(v8PINVOKE.new_Context(), true) {
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
   public Value Evaluate(string fileName, string code) {
@@ -253,8 +254,56 @@ public class Value : global::System.IDisposable {
     }
   }
 
-  public virtual Type GetType() {
-    Type ret = (Type)v8PINVOKE.Value_GetType(swigCPtr);
+  public virtual Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Value_GetValueType(swigCPtr);
+    return ret;
+  }
+
+  public Int AsInt() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsInt(swigCPtr);
+    Int ret = (cPtr == global::System.IntPtr.Zero) ? null : new Int(cPtr, false);
+    return ret;
+  }
+
+  public Double AsDouble() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsDouble(swigCPtr);
+    Double ret = (cPtr == global::System.IntPtr.Zero) ? null : new Double(cPtr, false);
+    return ret;
+  }
+
+  public String AsString() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsString(swigCPtr);
+    String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, false);
+    return ret;
+  }
+
+  public Bool AsBool() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsBool(swigCPtr);
+    Bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new Bool(cPtr, false);
+    return ret;
+  }
+
+  public Object AsObject() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsObject(swigCPtr);
+    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, false);
+    return ret;
+  }
+
+  public Function AsFunction() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsFunction(swigCPtr);
+    Function ret = (cPtr == global::System.IntPtr.Zero) ? null : new Function(cPtr, false);
+    return ret;
+  }
+
+  public Array AsArray() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsArray(swigCPtr);
+    Array ret = (cPtr == global::System.IntPtr.Zero) ? null : new Array(cPtr, false);
+    return ret;
+  }
+
+  public Callback AsCallback() {
+    global::System.IntPtr cPtr = v8PINVOKE.Value_AsCallback(swigCPtr);
+    Callback ret = (cPtr == global::System.IntPtr.Zero) ? null : new Callback(cPtr, false);
     return ret;
   }
 
@@ -292,8 +341,8 @@ public class Object : Value {
     }
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Object_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Object_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -374,8 +423,8 @@ public class Function : Value {
     }
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Function_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Function_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -433,8 +482,8 @@ public class Array : Value {
     }
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Array_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Array_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -496,8 +545,8 @@ public class Callback : Value {
     }
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Callback_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Callback_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -551,8 +600,8 @@ public class Int : Value {
   public Int(int value) : this(v8PINVOKE.new_Int(value), true) {
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Int_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Int_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -598,8 +647,8 @@ public class Double : Value {
   public Double(double value) : this(v8PINVOKE.new_Double(value), true) {
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Double_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Double_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -646,8 +695,8 @@ public class String : Value {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.String_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.String_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -693,8 +742,8 @@ public class Bool : Value {
   public Bool(bool value) : this(v8PINVOKE.new_Bool(value), true) {
   }
 
-  public override Type GetType() {
-    Type ret = (Type)v8PINVOKE.Bool_GetType(swigCPtr);
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Bool_GetValueType(swigCPtr);
     return ret;
   }
 
@@ -1589,14 +1638,38 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context")]
   public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_GetType")]
-  public static extern int Value_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_GetValueType")]
+  public static extern int Value_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Value")]
   public static extern void delete_Value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_GetType")]
-  public static extern int Object_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsInt")]
+  public static extern global::System.IntPtr Value_AsInt(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsDouble")]
+  public static extern global::System.IntPtr Value_AsDouble(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsString")]
+  public static extern global::System.IntPtr Value_AsString(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsBool")]
+  public static extern global::System.IntPtr Value_AsBool(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsObject")]
+  public static extern global::System.IntPtr Value_AsObject(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsFunction")]
+  public static extern global::System.IntPtr Value_AsFunction(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsArray")]
+  public static extern global::System.IntPtr Value_AsArray(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsCallback")]
+  public static extern global::System.IntPtr Value_AsCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_GetValueType")]
+  public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_Get")]
   public static extern global::System.IntPtr Object_Get(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
@@ -1622,8 +1695,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Object")]
   public static extern void delete_Object(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_GetType")]
-  public static extern int Function_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_GetValueType")]
+  public static extern int Function_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Call")]
   public static extern global::System.IntPtr Function_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -1637,8 +1710,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Function")]
   public static extern void delete_Function(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Array_GetType")]
-  public static extern int Array_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Array_GetValueType")]
+  public static extern int Array_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Array_Get")]
   public static extern global::System.IntPtr Array_Get(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
@@ -1655,8 +1728,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Array")]
   public static extern void delete_Array(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_GetType")]
-  public static extern int Callback_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_GetValueType")]
+  public static extern int Callback_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_Call")]
   public static extern global::System.IntPtr Callback_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -1670,8 +1743,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Int")]
   public static extern global::System.IntPtr new_Int(int jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Int_GetType")]
-  public static extern int Int_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Int_GetValueType")]
+  public static extern int Int_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Int_GetValue")]
   public static extern int Int_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1682,8 +1755,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Double")]
   public static extern global::System.IntPtr new_Double(double jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Double_GetType")]
-  public static extern int Double_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Double_GetValueType")]
+  public static extern int Double_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Double_GetValue")]
   public static extern double Double_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1694,8 +1767,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_String")]
   public static extern global::System.IntPtr new_String(string jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetType")]
-  public static extern int String_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetValueType")]
+  public static extern int String_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetValue")]
   public static extern string String_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1706,8 +1779,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Bool")]
   public static extern global::System.IntPtr new_Bool(bool jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Bool_GetType")]
-  public static extern int Bool_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Bool_GetValueType")]
+  public static extern int Bool_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Bool_GetValue")]
   public static extern bool Bool_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);

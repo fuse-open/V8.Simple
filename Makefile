@@ -1,5 +1,5 @@
-LDFLAGS=-L$(HOME)/v8-lib/lib-osx -stdlib=libstdc++ -lv8_base -lv8_libbase -lv8_libplatform -lv8_nosnapshot -dead_strip
-CPPFLAGS=-stdlib=libstdc++ -std=c++11 -I$(HOME)/v8 -Os
+LDFLAGS= -m32 -fno-rtti -L$(HOME)/v8-lib/lib-osx-32 -stdlib=libstdc++ -lv8_base -lv8_libbase -lv8_libplatform -lv8_nosnapshot -dead_strip
+CPPFLAGS= -Wall -m32 -stdlib=libstdc++ -std=c++11 -I$(HOME)/v8 -Os
 
 FILE=V8Simple
 OBJ_DIR=obj

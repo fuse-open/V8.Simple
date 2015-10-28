@@ -14,9 +14,17 @@
 %newobject V8Simple::Callback::Call(const std::vector<Value*>&);
 %newobject V8Simple::Callback::Copy() const;
 %include "V8Simple.h"
-%template(Int) V8Simple::Primitive<int, V8Simple::Type::Int>;
-%template(Double) V8Simple::Primitive<double, V8Simple::Type::Double>;
-%template(String) V8Simple::Primitive<std::string, V8Simple::Type::String>;
-%template(Bool) V8Simple::Primitive<bool, V8Simple::Type::Bool>;
+%template(Int) V8Simple::Primitive<int>;
+%template(Double) V8Simple::Primitive<double>;
+%template(String) V8Simple::Primitive<std::string>;
+%template(Bool) V8Simple::Primitive<bool>;
 %template(StringVector) std::vector<std::string>;
 %template(ValueVector) std::vector<V8Simple::Value*>;
+%template(AsInt) V8Simple::Value::As<V8Simple::Int>;
+%template(AsDouble) V8Simple::Value::As<V8Simple::Double>;
+%template(AsString) V8Simple::Value::As<V8Simple::String>;
+%template(AsBool) V8Simple::Value::As<V8Simple::Bool>;
+%template(AsObject) V8Simple::Value::As<V8Simple::Object>;
+%template(AsFunction) V8Simple::Value::As<V8Simple::Function>;
+%template(AsArray) V8Simple::Value::As<V8Simple::Array>;
+%template(AsCallback) V8Simple::Value::As<V8Simple::Callback>;

@@ -2,11 +2,12 @@
 #include <include/v8.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
-// Note: Every public function that returns a Value* (or derived class)
-// requires that the caller takes ownership of and deletes the pointer when
-// appropriate. The Values are allocated with `new`, so should be deallocated
-// with `delete`.
+// Note: All public function that returns a Value* (or derived class), save for
+// Value::As<T>(), require that the caller takes ownership of and deletes the
+// pointer when appropriate. The Values are allocated with `new`, so should be
+// deallocated with `delete`.
 
 namespace V8Simple
 {
@@ -16,6 +17,7 @@ class Object;
 class Array;
 class Function;
 class Object;
+class Callback;
 
 struct ScriptException
 {
@@ -47,13 +49,14 @@ struct Exception
 class Context
 {
 public:
-	Context();
+	Context()
+		throw(Exception);
 	Value* Evaluate(const std::string& fileName, const std::string& code)
 		throw(ScriptException, Exception);
 	Object* GlobalObject();
 	~Context();
 private:
-	v8::Platform* _platform;
+	static v8::Platform* _platform;
 	static v8::Isolate* _isolate;
 	v8::Persistent<v8::Context>* _context;
 	static Function* _instanceOf;
@@ -91,33 +94,56 @@ enum class Type
 	Callback,
 };
 
+template<class T> struct TypeTag { };
+
 class Value
 {
 public:
-	virtual Type GetType() const = 0;
-	virtual ~Value() { }
+	virtual Type GetValueType() const = 0;
+	template<typename T>
+	T* As()
+	{
+		if (GetValueType() == TypeTag<T>::Tag)
+		{
+			return static_cast<T*>(this);
+		}
+		return nullptr;
+	}
+	virtual ~Value()
+	{
+		std::cout << "Destructing value " << this << std::endl;
+	}
 };
 
-template<class T, Type type>
+template<class T>
 class Primitive: public Value
 {
 public:
 	Primitive(const T& value) : _value(value) { }
-	virtual Type GetType() const override { return type; }
+	virtual Type GetValueType() const override { return TypeTag<Primitive<T>>::Tag; }
 	T GetValue() const { return _value; }
 private:
 	const T _value;
 };
 
-typedef Primitive<int, Type::Int> Int;
-typedef Primitive<double, Type::Double> Double;
-typedef Primitive<std::string, Type::String> String;
-typedef Primitive<bool, Type::Bool> Bool;
+typedef Primitive<int> Int;
+typedef Primitive<double> Double;
+typedef Primitive<std::string> String;
+typedef Primitive<bool> Bool;
+
+template<> struct TypeTag<Object> { static const Type Tag = Type::Object; };
+template<> struct TypeTag<Array> { static const Type Tag = Type::Array; };
+template<> struct TypeTag<Function> { static const Type Tag = Type::Function; };
+template<> struct TypeTag<Callback> { static const Type Tag = Type::Callback; };
+template<> struct TypeTag<Int> { static const Type Tag = Type::Int; };
+template<> struct TypeTag<Double> { static const Type Tag = Type::Double; };
+template<> struct TypeTag<String> { static const Type Tag = Type::String; };
+template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 
 class Object: public Value
 {
 public:
-	virtual Type GetType() const override;
+	virtual Type GetValueType() const override;
 	Value* Get(const std::string& key)
 		throw(ScriptException, Exception);
 	void Set(const std::string& key, const Value& value)
@@ -142,7 +168,7 @@ private:
 class Function: public Value
 {
 public:
-	virtual Type GetType() const override;
+	virtual Type GetValueType() const override;
 	Value* Call(const std::vector<Value*>& args)
 		throw(ScriptException, Exception);
 	Object* Construct(const std::vector<Value*>& args)
@@ -158,7 +184,7 @@ private:
 class Array: public Value
 {
 public:
-	virtual Type GetType() const override;
+	virtual Type GetValueType() const override;
 	Value* Get(int index)
 		throw(ScriptException, Exception);
 	void Set(int index, const Value& value)
@@ -176,7 +202,7 @@ private:
 class Callback: public Value
 {
 public:
-	virtual Type GetType() const override;
+	virtual Type GetValueType() const override;
 	virtual Value* Call(const std::vector<Value*>& args)
 		throw(ScriptException, Exception) = 0;
 	virtual Callback* Copy() const = 0;
