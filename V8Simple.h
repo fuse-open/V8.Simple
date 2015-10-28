@@ -1,6 +1,5 @@
 #pragma once
 #include <include/v8.h>
-#include <exception>
 #include <string>
 #include <vector>
 
@@ -18,7 +17,7 @@ class Array;
 class Function;
 class Object;
 
-struct ScriptException: std::exception
+struct ScriptException
 {
 	std::string Name, ErrorMessage, FileName, StackTrace;
 	int LineNumber;
@@ -37,7 +36,7 @@ struct ScriptException: std::exception
 	{ }
 };
 
-struct Exception: std::exception
+struct Exception
 {
 	std::string Message;
 	Exception(const std::string message)
@@ -49,7 +48,8 @@ class Context
 {
 public:
 	Context();
-	Value* Evaluate(const std::string& fileName, const std::string& code);
+	Value* Evaluate(const std::string& fileName, const std::string& code)
+		throw(ScriptException, Exception);
 	Object* GlobalObject();
 	~Context();
 private:
@@ -58,17 +58,21 @@ private:
 	v8::Persistent<v8::Context>* _context;
 	static Function* _instanceOf;
 	static Value* Wrap(
-		v8::Local<v8::Value> value,
-		const v8::TryCatch& tryCatch) throw(ScriptException, Exception);
+		const v8::TryCatch& tryCatch,
+		v8::Local<v8::Value> value)
+		throw(ScriptException, Exception);
 	static Value* Wrap(
-		v8::MaybeLocal<v8::Value> mvalue,
-		const v8::TryCatch& tryCatch) throw(ScriptException, Exception);
+		const v8::TryCatch& tryCatch,
+		v8::MaybeLocal<v8::Value> mvalue)
+		throw(ScriptException, Exception);
 	static v8::Local<v8::Value> Unwrap(
-		const Value* value,
-		const v8::TryCatch& tryCatch) throw(ScriptException);
+		const v8::TryCatch& tryCatch,
+		const Value* value)
+		throw(ScriptException);
 	static std::vector<v8::Local<v8::Value>> UnwrapVector(
-		const std::vector<Value*>& values,
-		const v8::TryCatch& tryCatch) throw(ScriptException);
+		const v8::TryCatch& tryCatch,
+		const std::vector<Value*>& values)
+		throw(ScriptException);
 	friend class Value;
 	friend class Array;
 	friend class Function;
@@ -91,7 +95,7 @@ class Value
 {
 public:
 	virtual Type GetType() const = 0;
-	virtual ~Value() { };
+	virtual ~Value() { }
 };
 
 template<class T, Type type>
@@ -114,13 +118,20 @@ class Object: public Value
 {
 public:
 	virtual Type GetType() const override;
-	Value* Get(const std::string& key);
-	void Set(const std::string& key, const Value& value);
-	std::vector<std::string> Keys();
-	bool InstanceOf(Function& type);
-	Value* CallMethod(const std::string& name, const std::vector<Value*>& args);
-	bool ContainsKey(const std::string& key);
-	bool Equals(const Object& object);
+	Value* Get(const std::string& key)
+		throw(ScriptException, Exception);
+	void Set(const std::string& key, const Value& value)
+		throw(ScriptException, Exception);
+	std::vector<std::string> Keys()
+		throw(ScriptException, Exception);
+	bool InstanceOf(Function& type)
+		throw(ScriptException, Exception);
+	Value* CallMethod(const std::string& name, const std::vector<Value*>& args)
+		throw(ScriptException, Exception);
+	bool ContainsKey(const std::string& key)
+		throw(ScriptException, Exception);
+	bool Equals(const Object& object)
+		throw(ScriptException, Exception);
 private:
 	Object(v8::Local<v8::Object> object);
 	v8::Persistent<v8::Object> _object;
@@ -132,9 +143,12 @@ class Function: public Value
 {
 public:
 	virtual Type GetType() const override;
-	Value* Call(const std::vector<Value*>& args);
-	Object* Construct(const std::vector<Value*>& args);
-	bool Equals(const Function& f);
+	Value* Call(const std::vector<Value*>& args)
+		throw(ScriptException, Exception);
+	Object* Construct(const std::vector<Value*>& args)
+		throw(ScriptException, Exception);
+	bool Equals(const Function& f)
+		throw(ScriptException, Exception);
 private:
 	friend class Context;
 	Function(v8::Local<v8::Function> function);
@@ -145,10 +159,14 @@ class Array: public Value
 {
 public:
 	virtual Type GetType() const override;
-	Value* Get(int index);
-	void Set(int index, const Value& value);
-	int Length();
-	bool Equals(const Array& array);
+	Value* Get(int index)
+		throw(ScriptException, Exception);
+	void Set(int index, const Value& value)
+		throw(ScriptException, Exception);
+	int Length()
+		throw(ScriptException, Exception);
+	bool Equals(const Array& array)
+		throw(ScriptException, Exception);
 private:
 	friend class Context;
 	Array(v8::Local<v8::Array> array);
@@ -159,8 +177,11 @@ class Callback: public Value
 {
 public:
 	virtual Type GetType() const override;
-	virtual Value* Call(const std::vector<Value*>& args) = 0;
+	virtual Value* Call(const std::vector<Value*>& args)
+		throw(ScriptException, Exception) = 0;
 	virtual Callback* Copy() const = 0;
+private:
+	friend class Context;
 };
 
 } // namespace V8Simple

@@ -1,6 +1,5 @@
 %module v8
 %{
-#include "V8Simple.h"
 %}
 %include <std_string.i>
 %include <std_vector.i>
@@ -12,6 +11,7 @@
 %newobject V8Simple::Function::Construct(const std::vector<Value*>&);
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::Callback::Call(const std::vector<Value*>&);
+%newobject V8Simple::Callback::Copy() const;
 %include "V8Simple.h"
 %template(Int) V8Simple::Primitive<int, Type::Int>;
 %template(Double) V8Simple::Primitive<double, Type::Double>;
