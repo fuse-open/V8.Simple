@@ -293,6 +293,7 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_v8(SWIG_CSharpStringHelpe
 #define SWIG_contract_assert(nullreturn, expr, msg) if (!(expr)) {SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, msg, ""); return nullreturn; } else
 
 
+#include "V8Simple.h"
 
 
 #include <string>
@@ -1415,11 +1416,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Int(int jarg1) {
   void * jresult ;
   int *arg1 = 0 ;
   int temp1 ;
-  V8Simple::Primitive< int,Type::Int > *result = 0 ;
+  V8Simple::Primitive< int,V8Simple::Type::Int > *result = 0 ;
   
   temp1 = (int)jarg1; 
   arg1 = &temp1; 
-  result = (V8Simple::Primitive< int,Type::Int > *)new V8Simple::Primitive< int,Type::Int >((int const &)*arg1);
+  result = (V8Simple::Primitive< int,V8Simple::Type::Int > *)new V8Simple::Primitive< int,V8Simple::Type::Int >((int const &)*arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1427,11 +1428,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Int(int jarg1) {
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Int_GetType(void * jarg1) {
   int jresult ;
-  V8Simple::Primitive< int,Type::Int > *arg1 = (V8Simple::Primitive< int,Type::Int > *) 0 ;
+  V8Simple::Primitive< int,V8Simple::Type::Int > *arg1 = (V8Simple::Primitive< int,V8Simple::Type::Int > *) 0 ;
   V8Simple::Type result;
   
-  arg1 = (V8Simple::Primitive< int,Type::Int > *)jarg1; 
-  result = (V8Simple::Type)((V8Simple::Primitive< int,Type::Int > const *)arg1)->GetType();
+  arg1 = (V8Simple::Primitive< int,V8Simple::Type::Int > *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::Primitive< int,V8Simple::Type::Int > const *)arg1)->GetType();
   jresult = (int)result; 
   return jresult;
 }
@@ -1439,20 +1440,20 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Int_GetType(void * jarg1) {
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Int_GetValue(void * jarg1) {
   int jresult ;
-  V8Simple::Primitive< int,Type::Int > *arg1 = (V8Simple::Primitive< int,Type::Int > *) 0 ;
+  V8Simple::Primitive< int,V8Simple::Type::Int > *arg1 = (V8Simple::Primitive< int,V8Simple::Type::Int > *) 0 ;
   int result;
   
-  arg1 = (V8Simple::Primitive< int,Type::Int > *)jarg1; 
-  result = (int)((V8Simple::Primitive< int,Type::Int > const *)arg1)->GetValue();
+  arg1 = (V8Simple::Primitive< int,V8Simple::Type::Int > *)jarg1; 
+  result = (int)((V8Simple::Primitive< int,V8Simple::Type::Int > const *)arg1)->GetValue();
   jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_Int(void * jarg1) {
-  V8Simple::Primitive< int,Type::Int > *arg1 = (V8Simple::Primitive< int,Type::Int > *) 0 ;
+  V8Simple::Primitive< int,V8Simple::Type::Int > *arg1 = (V8Simple::Primitive< int,V8Simple::Type::Int > *) 0 ;
   
-  arg1 = (V8Simple::Primitive< int,Type::Int > *)jarg1; 
+  arg1 = (V8Simple::Primitive< int,V8Simple::Type::Int > *)jarg1; 
   delete arg1;
 }
 
@@ -1461,11 +1462,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Double(double jarg1) {
   void * jresult ;
   double *arg1 = 0 ;
   double temp1 ;
-  V8Simple::Primitive< double,Type::Double > *result = 0 ;
+  V8Simple::Primitive< double,V8Simple::Type::Double > *result = 0 ;
   
   temp1 = (double)jarg1; 
   arg1 = &temp1; 
-  result = (V8Simple::Primitive< double,Type::Double > *)new V8Simple::Primitive< double,Type::Double >((double const &)*arg1);
+  result = (V8Simple::Primitive< double,V8Simple::Type::Double > *)new V8Simple::Primitive< double,V8Simple::Type::Double >((double const &)*arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1473,11 +1474,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Double(double jarg1) {
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Double_GetType(void * jarg1) {
   int jresult ;
-  V8Simple::Primitive< double,Type::Double > *arg1 = (V8Simple::Primitive< double,Type::Double > *) 0 ;
+  V8Simple::Primitive< double,V8Simple::Type::Double > *arg1 = (V8Simple::Primitive< double,V8Simple::Type::Double > *) 0 ;
   V8Simple::Type result;
   
-  arg1 = (V8Simple::Primitive< double,Type::Double > *)jarg1; 
-  result = (V8Simple::Type)((V8Simple::Primitive< double,Type::Double > const *)arg1)->GetType();
+  arg1 = (V8Simple::Primitive< double,V8Simple::Type::Double > *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::Primitive< double,V8Simple::Type::Double > const *)arg1)->GetType();
   jresult = (int)result; 
   return jresult;
 }
@@ -1485,20 +1486,20 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Double_GetType(void * jarg1) {
 
 SWIGEXPORT double SWIGSTDCALL CSharp_Double_GetValue(void * jarg1) {
   double jresult ;
-  V8Simple::Primitive< double,Type::Double > *arg1 = (V8Simple::Primitive< double,Type::Double > *) 0 ;
+  V8Simple::Primitive< double,V8Simple::Type::Double > *arg1 = (V8Simple::Primitive< double,V8Simple::Type::Double > *) 0 ;
   double result;
   
-  arg1 = (V8Simple::Primitive< double,Type::Double > *)jarg1; 
-  result = (double)((V8Simple::Primitive< double,Type::Double > const *)arg1)->GetValue();
+  arg1 = (V8Simple::Primitive< double,V8Simple::Type::Double > *)jarg1; 
+  result = (double)((V8Simple::Primitive< double,V8Simple::Type::Double > const *)arg1)->GetValue();
   jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_Double(void * jarg1) {
-  V8Simple::Primitive< double,Type::Double > *arg1 = (V8Simple::Primitive< double,Type::Double > *) 0 ;
+  V8Simple::Primitive< double,V8Simple::Type::Double > *arg1 = (V8Simple::Primitive< double,V8Simple::Type::Double > *) 0 ;
   
-  arg1 = (V8Simple::Primitive< double,Type::Double > *)jarg1; 
+  arg1 = (V8Simple::Primitive< double,V8Simple::Type::Double > *)jarg1; 
   delete arg1;
 }
 
@@ -1506,7 +1507,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Double(void * jarg1) {
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_String(char * jarg1) {
   void * jresult ;
   std::string *arg1 = 0 ;
-  V8Simple::Primitive< std::string,Type::String > *result = 0 ;
+  V8Simple::Primitive< std::string,V8Simple::Type::String > *result = 0 ;
   
   if (!jarg1) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
@@ -1514,7 +1515,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_String(char * jarg1) {
   }
   std::string arg1_str(jarg1);
   arg1 = &arg1_str; 
-  result = (V8Simple::Primitive< std::string,Type::String > *)new V8Simple::Primitive< std::string,Type::String >((std::string const &)*arg1);
+  result = (V8Simple::Primitive< std::string,V8Simple::Type::String > *)new V8Simple::Primitive< std::string,V8Simple::Type::String >((std::string const &)*arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1522,11 +1523,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_String(char * jarg1) {
 
 SWIGEXPORT int SWIGSTDCALL CSharp_String_GetType(void * jarg1) {
   int jresult ;
-  V8Simple::Primitive< std::string,Type::String > *arg1 = (V8Simple::Primitive< std::string,Type::String > *) 0 ;
+  V8Simple::Primitive< std::string,V8Simple::Type::String > *arg1 = (V8Simple::Primitive< std::string,V8Simple::Type::String > *) 0 ;
   V8Simple::Type result;
   
-  arg1 = (V8Simple::Primitive< std::string,Type::String > *)jarg1; 
-  result = (V8Simple::Type)((V8Simple::Primitive< std::string,Type::String > const *)arg1)->GetType();
+  arg1 = (V8Simple::Primitive< std::string,V8Simple::Type::String > *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::Primitive< std::string,V8Simple::Type::String > const *)arg1)->GetType();
   jresult = (int)result; 
   return jresult;
 }
@@ -1534,20 +1535,20 @@ SWIGEXPORT int SWIGSTDCALL CSharp_String_GetType(void * jarg1) {
 
 SWIGEXPORT char * SWIGSTDCALL CSharp_String_GetValue(void * jarg1) {
   char * jresult ;
-  V8Simple::Primitive< std::string,Type::String > *arg1 = (V8Simple::Primitive< std::string,Type::String > *) 0 ;
+  V8Simple::Primitive< std::string,V8Simple::Type::String > *arg1 = (V8Simple::Primitive< std::string,V8Simple::Type::String > *) 0 ;
   std::string result;
   
-  arg1 = (V8Simple::Primitive< std::string,Type::String > *)jarg1; 
-  result = ((V8Simple::Primitive< std::string,Type::String > const *)arg1)->GetValue();
+  arg1 = (V8Simple::Primitive< std::string,V8Simple::Type::String > *)jarg1; 
+  result = ((V8Simple::Primitive< std::string,V8Simple::Type::String > const *)arg1)->GetValue();
   jresult = SWIG_csharp_string_callback((&result)->c_str()); 
   return jresult;
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_String(void * jarg1) {
-  V8Simple::Primitive< std::string,Type::String > *arg1 = (V8Simple::Primitive< std::string,Type::String > *) 0 ;
+  V8Simple::Primitive< std::string,V8Simple::Type::String > *arg1 = (V8Simple::Primitive< std::string,V8Simple::Type::String > *) 0 ;
   
-  arg1 = (V8Simple::Primitive< std::string,Type::String > *)jarg1; 
+  arg1 = (V8Simple::Primitive< std::string,V8Simple::Type::String > *)jarg1; 
   delete arg1;
 }
 
@@ -1556,11 +1557,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Bool(unsigned int jarg1) {
   void * jresult ;
   bool *arg1 = 0 ;
   bool temp1 ;
-  V8Simple::Primitive< bool,Type::Bool > *result = 0 ;
+  V8Simple::Primitive< bool,V8Simple::Type::Bool > *result = 0 ;
   
   temp1 = jarg1 ? true : false; 
   arg1 = &temp1; 
-  result = (V8Simple::Primitive< bool,Type::Bool > *)new V8Simple::Primitive< bool,Type::Bool >((bool const &)*arg1);
+  result = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *)new V8Simple::Primitive< bool,V8Simple::Type::Bool >((bool const &)*arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1568,11 +1569,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Bool(unsigned int jarg1) {
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Bool_GetType(void * jarg1) {
   int jresult ;
-  V8Simple::Primitive< bool,Type::Bool > *arg1 = (V8Simple::Primitive< bool,Type::Bool > *) 0 ;
+  V8Simple::Primitive< bool,V8Simple::Type::Bool > *arg1 = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *) 0 ;
   V8Simple::Type result;
   
-  arg1 = (V8Simple::Primitive< bool,Type::Bool > *)jarg1; 
-  result = (V8Simple::Type)((V8Simple::Primitive< bool,Type::Bool > const *)arg1)->GetType();
+  arg1 = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::Primitive< bool,V8Simple::Type::Bool > const *)arg1)->GetType();
   jresult = (int)result; 
   return jresult;
 }
@@ -1580,20 +1581,20 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Bool_GetType(void * jarg1) {
 
 SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Bool_GetValue(void * jarg1) {
   unsigned int jresult ;
-  V8Simple::Primitive< bool,Type::Bool > *arg1 = (V8Simple::Primitive< bool,Type::Bool > *) 0 ;
+  V8Simple::Primitive< bool,V8Simple::Type::Bool > *arg1 = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *) 0 ;
   bool result;
   
-  arg1 = (V8Simple::Primitive< bool,Type::Bool > *)jarg1; 
-  result = (bool)((V8Simple::Primitive< bool,Type::Bool > const *)arg1)->GetValue();
+  arg1 = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *)jarg1; 
+  result = (bool)((V8Simple::Primitive< bool,V8Simple::Type::Bool > const *)arg1)->GetValue();
   jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_Bool(void * jarg1) {
-  V8Simple::Primitive< bool,Type::Bool > *arg1 = (V8Simple::Primitive< bool,Type::Bool > *) 0 ;
+  V8Simple::Primitive< bool,V8Simple::Type::Bool > *arg1 = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *) 0 ;
   
-  arg1 = (V8Simple::Primitive< bool,Type::Bool > *)jarg1; 
+  arg1 = (V8Simple::Primitive< bool,V8Simple::Type::Bool > *)jarg1; 
   delete arg1;
 }
 
@@ -2510,19 +2511,19 @@ SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Callback_SWIGUpcast(V8Simple::Ca
     return (V8Simple::Value *)jarg1;
 }
 
-SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Int_SWIGUpcast(V8Simple::Primitive< int,Type::Int > *jarg1) {
+SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Int_SWIGUpcast(V8Simple::Primitive< int,V8Simple::Type::Int > *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
 
-SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Double_SWIGUpcast(V8Simple::Primitive< double,Type::Double > *jarg1) {
+SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Double_SWIGUpcast(V8Simple::Primitive< double,V8Simple::Type::Double > *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
 
-SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_String_SWIGUpcast(V8Simple::Primitive< std::string,Type::String > *jarg1) {
+SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_String_SWIGUpcast(V8Simple::Primitive< std::string,V8Simple::Type::String > *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
 
-SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Bool_SWIGUpcast(V8Simple::Primitive< bool,Type::Bool > *jarg1) {
+SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Bool_SWIGUpcast(V8Simple::Primitive< bool,V8Simple::Type::Bool > *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
 

@@ -5,6 +5,9 @@
 namespace V8Simple
 {
 
+Function* Context::_instanceOf = nullptr;
+v8::Isolate* Context::_isolate = nullptr;
+
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 {
 	virtual void* Allocate(size_t length)
@@ -324,7 +327,9 @@ bool Object::InstanceOf(Function& type)
 	throw(ScriptException, Exception)
 {
 	Value* thisValue = static_cast<Value*>(this);
-	std::vector<Value*> args{thisValue, static_cast<Value*>(&type)};
+	std::vector<Value*> args(2);
+	args.push_back(thisValue);
+	args.push_back(static_cast<Value*>(&type));
 	Bool* callResult = static_cast<Bool*>(Context::_instanceOf->Call(args));
 	bool result = callResult->GetValue();
 	delete callResult;
