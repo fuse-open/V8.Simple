@@ -219,7 +219,8 @@ v8::Local<v8::Value> Context::Unwrap(
 					v8::HandleScope handleScope(info.GetIsolate());
 					v8::TryCatch tryCatch(info.GetIsolate());
 
-					std::vector<Value*> wrappedArgs(info.Length());
+					std::vector<Value*> wrappedArgs;
+					wrappedArgs.reserve(info.Length());
 					for (int i = 0; i < info.Length(); ++i)
 					{
 						wrappedArgs.push_back(Wrap(
@@ -249,7 +250,8 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 	const v8::TryCatch& tryCatch,
 	const std::vector<Value*>& values) throw(ScriptException)
 {
-	std::vector<v8::Local<v8::Value>> result(values.size());
+	std::vector<v8::Local<v8::Value>> result;
+	result.reserve(values.size());
 	for (Value* value: values)
 	{
 		result.push_back(Unwrap(tryCatch, value));
@@ -420,7 +422,8 @@ std::vector<std::string> Object::Keys()
 		_object.Get(Context::_isolate)->GetPropertyNames(context));
 
 	auto length = (int)propArr->Length();
-	std::vector<std::string> result(length);
+	std::vector<std::string> result;
+	result.reserve(length);
 	for (int i = 0; i < length; ++i)
 	{
 		result.push_back(ToString(FromJust(
@@ -435,7 +438,8 @@ bool Object::InstanceOf(Function& type)
 	throw(ScriptException, Exception)
 {
 	Value* thisValue = static_cast<Value*>(this);
-	std::vector<Value*> args(2);
+	std::vector<Value*> args;
+	args.reserve(2);
 	args.push_back(thisValue);
 	args.push_back(static_cast<Value*>(&type));
 	Bool* callResult =
