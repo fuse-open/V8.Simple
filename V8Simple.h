@@ -21,7 +21,7 @@ class Callback;
 
 struct ScriptException
 {
-	std::string Name, ErrorMessage, FileName, StackTrace;
+	std::string Name, ErrorMessage, FileName, StackTrace, SourceLine;
 	int LineNumber;
 
 	ScriptException(
@@ -29,11 +29,13 @@ struct ScriptException
 		const std::string& errorMessage,
 		const std::string& fileName,
 		int lineNumber,
-		const std::string& stackTrace)
+		const std::string& stackTrace,
+		const std::string& sourceLine)
 		: Name(name)
 		, ErrorMessage(errorMessage)
 		, FileName(fileName)
 		, StackTrace(stackTrace)
+		, SourceLine(sourceLine)
 		, LineNumber(lineNumber)
 	{ }
 };

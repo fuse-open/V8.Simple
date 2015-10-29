@@ -651,6 +651,33 @@ SWIGEXPORT char * SWIGSTDCALL CSharp_ScriptException_StackTrace_get(void * jarg1
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_ScriptException_SourceLine_set(void * jarg1, char * jarg2) {
+  V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (V8Simple::ScriptException *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (arg1) (arg1)->SourceLine = *arg2;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_ScriptException_SourceLine_get(void * jarg1) {
+  char * jresult ;
+  V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
+  std::string *result = 0 ;
+  
+  arg1 = (V8Simple::ScriptException *)jarg1; 
+  result = (std::string *) & ((arg1)->SourceLine);
+  jresult = SWIG_csharp_string_callback(result->c_str()); 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_ScriptException_LineNumber_set(void * jarg1, int jarg2) {
   V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
   int arg2 ;
@@ -673,13 +700,14 @@ SWIGEXPORT int SWIGSTDCALL CSharp_ScriptException_LineNumber_get(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScriptException(char * jarg1, char * jarg2, char * jarg3, int jarg4, char * jarg5) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScriptException(char * jarg1, char * jarg2, char * jarg3, int jarg4, char * jarg5, char * jarg6) {
   void * jresult ;
   std::string *arg1 = 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   int arg4 ;
   std::string *arg5 = 0 ;
+  std::string *arg6 = 0 ;
   V8Simple::ScriptException *result = 0 ;
   
   if (!jarg1) {
@@ -707,7 +735,13 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScriptException(char * jarg1, char * ja
   }
   std::string arg5_str(jarg5);
   arg5 = &arg5_str; 
-  result = (V8Simple::ScriptException *)new V8Simple::ScriptException((std::string const &)*arg1,(std::string const &)*arg2,(std::string const &)*arg3,arg4,(std::string const &)*arg5);
+  if (!jarg6) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg6_str(jarg6);
+  arg6 = &arg6_str; 
+  result = (V8Simple::ScriptException *)new V8Simple::ScriptException((std::string const &)*arg1,(std::string const &)*arg2,(std::string const &)*arg3,arg4,(std::string const &)*arg5,(std::string const &)*arg6);
   jresult = (void *)result; 
   return jresult;
 }

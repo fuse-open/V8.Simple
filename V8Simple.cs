@@ -88,6 +88,18 @@ public class ScriptException : global::System.IDisposable {
     } 
   }
 
+  public string SourceLine {
+    set {
+      v8PINVOKE.ScriptException_SourceLine_set(swigCPtr, value);
+      if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+    } 
+    get {
+      string ret = v8PINVOKE.ScriptException_SourceLine_get(swigCPtr);
+      if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    } 
+  }
+
   public int LineNumber {
     set {
       v8PINVOKE.ScriptException_LineNumber_set(swigCPtr, value);
@@ -98,7 +110,7 @@ public class ScriptException : global::System.IDisposable {
     } 
   }
 
-  public ScriptException(string name, string errorMessage, string fileName, int lineNumber, string stackTrace) : this(v8PINVOKE.new_ScriptException(name, errorMessage, fileName, lineNumber, stackTrace), true) {
+  public ScriptException(string name, string errorMessage, string fileName, int lineNumber, string stackTrace, string sourceLine) : this(v8PINVOKE.new_ScriptException(name, errorMessage, fileName, lineNumber, stackTrace, sourceLine), true) {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -1602,6 +1614,12 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_StackTrace_get")]
   public static extern string ScriptException_StackTrace_get(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_SourceLine_set")]
+  public static extern void ScriptException_SourceLine_set(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_SourceLine_get")]
+  public static extern string ScriptException_SourceLine_get(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_LineNumber_set")]
   public static extern void ScriptException_LineNumber_set(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
@@ -1609,7 +1627,7 @@ class v8PINVOKE {
   public static extern int ScriptException_LineNumber_get(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_ScriptException")]
-  public static extern global::System.IntPtr new_ScriptException(string jarg1, string jarg2, string jarg3, int jarg4, string jarg5);
+  public static extern global::System.IntPtr new_ScriptException(string jarg1, string jarg2, string jarg3, int jarg4, string jarg5, string jarg6);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptException")]
   public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);

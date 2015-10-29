@@ -42,16 +42,19 @@ static void Throw(v8::Local<v8::Context> context, const v8::TryCatch& tryCatch) 
 {
 	std::string exception(ToString(tryCatch.Exception()));
 	auto message = tryCatch.Message();
+	auto isolate = context->GetIsolate();
+	auto emptyString = v8::String::Empty(isolate);
 	auto stackTrace = ToString(
 		tryCatch
 		.StackTrace(context)
-		.FromMaybe(ToV8String(context->GetIsolate(), "").As<v8::Value>()));
+		.FromMaybe(emptyString.As<v8::Value>()));
 	throw ScriptException(
 		exception,
 		ToString(message->Get()),
 		ToString(message->GetScriptOrigin().ResourceName()),
 		message->GetLineNumber(context).FromMaybe(-1),
-		stackTrace);
+		stackTrace,
+		ToString(message->GetSourceLine(context).FromMaybe(emptyString)));
 }
 
 template<class A>
