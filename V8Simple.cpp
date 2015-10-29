@@ -27,7 +27,9 @@ struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 	}
 };
 
-static v8::Local<v8::String> ToV8String(v8::Isolate* isolate, const std::string& str)
+static v8::Local<v8::String> ToV8String(
+	v8::Isolate* isolate,
+	const std::string& str)
 {
 	return v8::String::NewFromUtf8(isolate, str.c_str());
 }
@@ -38,7 +40,9 @@ static std::string ToString(const T& t)
 	return *v8::String::Utf8Value(t);
 }
 
-static void Throw(v8::Local<v8::Context> context, const v8::TryCatch& tryCatch) throw(ScriptException)
+static void Throw(
+	v8::Local<v8::Context> context,
+	const v8::TryCatch& tryCatch) throw(ScriptException)
 {
 	std::string exception(ToString(tryCatch.Exception()));
 	auto message = tryCatch.Message();
@@ -48,13 +52,17 @@ static void Throw(v8::Local<v8::Context> context, const v8::TryCatch& tryCatch) 
 		tryCatch
 		.StackTrace(context)
 		.FromMaybe(emptyString.As<v8::Value>()));
+	auto sourceLine = ToString(
+		message->GetSourceLine(context)
+		.FromMaybe(emptyString));
+
 	throw ScriptException(
 		exception,
 		ToString(message->Get()),
 		ToString(message->GetScriptOrigin().ResourceName()),
 		message->GetLineNumber(context).FromMaybe(-1),
 		stackTrace,
-		ToString(message->GetSourceLine(context).FromMaybe(emptyString)));
+		sourceLine);
 }
 
 template<class A>
@@ -90,31 +98,52 @@ Value* Context::Wrap(
 	auto context = _isolate->GetCurrentContext();
 	if (value->IsInt32())
 	{
-		return new Int(FromJust(context, tryCatch, value->Int32Value(context)));
+		return new Int(FromJust(
+			context,
+			tryCatch,
+			value->Int32Value(context)));
 	}
 	if (value->IsNumber() || value->IsNumberObject())
 	{
-		return new Double(FromJust(context, tryCatch, value->NumberValue(context)));
+		return new Double(FromJust(
+			context,
+			tryCatch,
+			value->NumberValue(context)));
 	}
 	if (value->IsBoolean() || value->IsBooleanObject())
 	{
-		return new Bool(FromJust(context, tryCatch, value->BooleanValue(context)));
+		return new Bool(FromJust(
+			context,
+			tryCatch,
+			value->BooleanValue(context)));
 	}
 	if (value->IsString() || value->IsStringObject())
 	{
-		return new String(ToString(FromJust(context, tryCatch, value->ToString(context))));
+		return new String(ToString(FromJust(
+			context,
+			tryCatch,
+			value->ToString(context))));
 	}
 	if (value->IsArray())
 	{
-		return new Array(FromJust(context, tryCatch, value->ToObject(context)).As<v8::Array>());
+		return new Array(FromJust(
+			context,
+			tryCatch,
+			value->ToObject(context)).As<v8::Array>());
 	}
 	if (value->IsFunction())
 	{
-		return new Function(FromJust(context, tryCatch, value->ToObject(context)).As<v8::Function>());
+		return new Function(FromJust(
+			context,
+			tryCatch,
+			value->ToObject(context)).As<v8::Function>());
 	}
 	if (value->IsObject())
 	{
-		return new Object(FromJust(context, tryCatch, value->ToObject(context)));
+		return new Object(FromJust(
+			context,
+			tryCatch,
+			value->ToObject(context)));
 	}
 	if (value->IsUndefined() || value->IsNull())
 	{
@@ -143,19 +172,30 @@ v8::Local<v8::Value> Context::Unwrap(
 	switch (value->GetValueType())
 	{
 		case Type::Int:
-			return v8::Int32::New(_isolate, static_cast<const Int*>(value)->GetValue());
+			return v8::Int32::New(
+				_isolate,
+				static_cast<const Int*>(value)->GetValue());
 		case Type::Double:
-			return v8::Number::New(_isolate, static_cast<const Double*>(value)->GetValue());
+			return v8::Number::New(
+				_isolate,
+				static_cast<const Double*>(value)->GetValue());
 		case Type::String:
-			return ToV8String(_isolate, static_cast<const String*>(value)->GetValue());
+			return ToV8String(
+				_isolate,
+				static_cast<const String*>(value)->GetValue());
 		case Type::Bool:
-			return v8::Boolean::New(_isolate, static_cast<const Bool*>(value)->GetValue());
+			return v8::Boolean::New(
+				_isolate,
+				static_cast<const Bool*>(value)->GetValue());
 		case Type::Object:
-			return static_cast<const Object*>(value)->_object.Get(_isolate);
+			return static_cast<const Object*>(value)
+				->_object.Get(_isolate);
 		case Type::Array:
-			return static_cast<const Array*>(value)->_array.Get(_isolate);
+			return static_cast<const Array*>(value)
+				->_array.Get(_isolate);
 		case Type::Function:
-			return static_cast<const Function*>(value)->_function.Get(_isolate);
+			return static_cast<const Function*>(value)
+				->_function.Get(_isolate);
 		case Type::Callback:
 			Callback* callback = static_cast<const Callback*>(value)->Copy();
 			auto localCallback = v8::External::New(_isolate, callback);
@@ -180,17 +220,24 @@ v8::Local<v8::Value> Context::Unwrap(
 					std::vector<Value*> wrappedArgs(info.Length());
 					for (int i = 0; i < info.Length(); ++i)
 					{
-						wrappedArgs.push_back(Wrap(tryCatch, info[i]));
+						wrappedArgs.push_back(Wrap(
+							tryCatch,
+							info[i]));
 					}
 
-					Callback* callback = static_cast<Callback*>(info.Data().As<v8::External>()->Value());
+					Callback* callback = 
+						static_cast<Callback*>(info.Data()
+							.As<v8::External>()
+							->Value());
 					Value* result = callback->Call(wrappedArgs);
 
 					for (Value* value: wrappedArgs)
 					{
 						delete value;
 					}
-					info.GetReturnValue().Set(Unwrap(tryCatch, result));
+					info.GetReturnValue().Set(Unwrap(
+						tryCatch,
+						result));
 				},
 				localCallback.As<v8::Value>()));
 	}
@@ -237,8 +284,10 @@ Context::Context() throw(Exception)
 	localContext->Enter();
 
 	_context = new v8::Persistent<v8::Context>(_isolate, localContext);
-		_instanceOf = static_cast<Function*>(
-			Evaluate("instanceof", "(function(x, y) { return (x instanceof y); })"));
+	_instanceOf = static_cast<Function*>(
+		Evaluate(
+			"instanceof",
+			"(function(x, y) { return (x instanceof y); })"));
 }
 
 Context::~Context()
@@ -271,7 +320,9 @@ Value* Context::Evaluate(const std::string& fileName, const std::string& code)
 	v8::HandleScope handleScope(_isolate);
 	v8::TryCatch tryCatch(_isolate);
 
-	auto script = v8::Script::Compile(ToV8String(_isolate, code), ToV8String(_isolate, fileName));
+	auto script = v8::Script::Compile(
+		ToV8String(_isolate, code),
+		ToV8String(_isolate, fileName));
 	return Wrap(tryCatch, script->Run());
 }
 
@@ -349,13 +400,16 @@ bool Object::InstanceOf(Function& type)
 	std::vector<Value*> args(2);
 	args.push_back(thisValue);
 	args.push_back(static_cast<Value*>(&type));
-	Bool* callResult = static_cast<Bool*>(Context::_instanceOf->Call(args));
+	Bool* callResult =
+		static_cast<Bool*>(Context::_instanceOf->Call(args));
 	bool result = callResult->GetValue();
 	delete callResult;
 	return result;
 }
 
-Value* Object::CallMethod(const std::string& name, const std::vector<Value*>& args)
+Value* Object::CallMethod(
+	const std::string& name,
+	const std::vector<Value*>& args)
 	throw(ScriptException, Exception)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);

@@ -4,8 +4,8 @@
 #include <vector>
 #include <iostream>
 
-// Note: All public function that returns a Value* (or derived class), save for
-// Value::As<T>(), require that the caller takes ownership of and deletes the
+// Note: All public functions that return a Value* (or derived class), save for
+// Value::As<T>(), require that the caller takes ownership of and delete the
 // pointer when appropriate. The Values are allocated with `new`, so should be
 // deallocated with `delete`.
 
