@@ -401,12 +401,6 @@ public class Value : global::System.IDisposable {
     return ret;
   }
 
-  public Callback AsCallback() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsCallback(swigCPtr);
-    Callback ret = (cPtr == global::System.IntPtr.Zero) ? null : new Callback(cPtr, false);
-    return ret;
-  }
-
 }
 
 }
@@ -1790,9 +1784,6 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsArray")]
   public static extern global::System.IntPtr Value_AsArray(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsCallback")]
-  public static extern global::System.IntPtr Value_AsCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_GetValueType")]
   public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);

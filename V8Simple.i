@@ -27,4 +27,3 @@
 %template(AsObject) V8Simple::Value::As<V8Simple::Object>;
 %template(AsFunction) V8Simple::Value::As<V8Simple::Function>;
 %template(AsArray) V8Simple::Value::As<V8Simple::Array>;
-%template(AsCallback) V8Simple::Value::As<V8Simple::Callback>;

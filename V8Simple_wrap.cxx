@@ -1052,18 +1052,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsArray(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsCallback(void * jarg1) {
-  void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Callback *result = 0 ;
-  
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Callback *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Callback >();
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT int SWIGSTDCALL CSharp_Object_GetValueType(void * jarg1) {
   int jresult ;
   V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
