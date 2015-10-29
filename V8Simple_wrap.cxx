@@ -883,6 +883,71 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Context(void * jarg1) {
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_Context_Debug_SetMessageHandler(void * jarg1) {
+  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
+  
+  arg1 = (V8Simple::MessageHandler *)jarg1; 
+  V8Simple::Context::Debug::SetMessageHandler(arg1);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Context_Debug_SendCommand(char * jarg1) {
+  std::string arg1 ;
+  
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  (&arg1)->assign(jarg1); 
+  V8Simple::Context::Debug::SendCommand(arg1);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Context_Debug_ProcessDebugMessages() {
+  V8Simple::Context::Debug::ProcessDebugMessages();
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Context_Debug() {
+  void * jresult ;
+  V8Simple::Context::Debug *result = 0 ;
+  
+  result = (V8Simple::Context::Debug *)new V8Simple::Context::Debug();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_Context_Debug(void * jarg1) {
+  V8Simple::Context::Debug *arg1 = (V8Simple::Context::Debug *) 0 ;
+  
+  arg1 = (V8Simple::Context::Debug *)jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_Handle(void * jarg1, char * jarg2) {
+  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
+  std::string arg2 ;
+  
+  arg1 = (V8Simple::MessageHandler *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  (&arg2)->assign(jarg2); 
+  (arg1)->Handle(arg2);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MessageHandler(void * jarg1) {
+  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
+  
+  arg1 = (V8Simple::MessageHandler *)jarg1; 
+  delete arg1;
+}
+
+
 SWIGEXPORT int SWIGSTDCALL CSharp_Value_GetValueType(void * jarg1) {
   int jresult ;
   V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;

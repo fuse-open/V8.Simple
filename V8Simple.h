@@ -48,6 +48,8 @@ struct Exception
 	{ }
 };
 
+struct MessageHandler;
+
 class Context
 {
 public:
@@ -57,6 +59,15 @@ public:
 		throw(ScriptException, Exception);
 	Object* GlobalObject();
 	~Context();
+
+	struct Debug
+	{
+		static void SetMessageHandler(MessageHandler* messageHandler);
+		static void SendCommand(std::string command);
+		static void ProcessDebugMessages();
+	private:
+		static MessageHandler* _messageHandler;
+	};
 private:
 	static v8::Platform* _platform;
 	static v8::Isolate* _isolate;
@@ -82,6 +93,12 @@ private:
 	friend class Array;
 	friend class Function;
 	friend class Object;
+};
+
+struct MessageHandler
+{
+	virtual void Handle(std::string jsonMessage) = 0;
+	virtual ~MessageHandler() { };
 };
 
 enum class Type

@@ -217,6 +217,94 @@ public class Context : global::System.IDisposable {
     return ret;
   }
 
+  public class Debug : global::System.IDisposable {
+    private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+    protected bool swigCMemOwn;
+  
+    internal Debug(global::System.IntPtr cPtr, bool cMemoryOwn) {
+      swigCMemOwn = cMemoryOwn;
+      swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+    }
+  
+    internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Debug obj) {
+      return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+    }
+  
+    ~Debug() {
+      Dispose();
+    }
+  
+    public virtual void Dispose() {
+      lock(this) {
+        if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+          if (swigCMemOwn) {
+            swigCMemOwn = false;
+            v8PINVOKE.delete_Context_Debug(swigCPtr);
+          }
+          swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+        }
+        global::System.GC.SuppressFinalize(this);
+      }
+    }
+  
+    public static void SetMessageHandler(MessageHandler messageHandler) {
+      v8PINVOKE.Context_Debug_SetMessageHandler(MessageHandler.getCPtr(messageHandler));
+    }
+  
+    public static void SendCommand(string command) {
+      v8PINVOKE.Context_Debug_SendCommand(command);
+      if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+    }
+  
+    public static void ProcessDebugMessages() {
+      v8PINVOKE.Context_Debug_ProcessDebugMessages();
+    }
+  
+    public Debug() : this(v8PINVOKE.new_Context_Debug(), true) {
+    }
+  
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class MessageHandler : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal MessageHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(MessageHandler obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~MessageHandler() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_MessageHandler(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+
+  public virtual void Handle(string jsonMessage) {
+    v8PINVOKE.MessageHandler_Handle(swigCPtr, jsonMessage);
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
 }
 
 }
@@ -1654,6 +1742,27 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context")]
   public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Debug_SetMessageHandler")]
+  public static extern void Context_Debug_SetMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Debug_SendCommand")]
+  public static extern void Context_Debug_SendCommand(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Debug_ProcessDebugMessages")]
+  public static extern void Context_Debug_ProcessDebugMessages();
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Context_Debug")]
+  public static extern global::System.IntPtr new_Context_Debug();
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context_Debug")]
+  public static extern void delete_Context_Debug(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_Handle")]
+  public static extern void MessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_MessageHandler")]
+  public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_GetValueType")]
   public static extern int Value_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);

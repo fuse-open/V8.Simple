@@ -1,4 +1,5 @@
 #include "V8Simple.h"
+#include <include/v8-debug.h>
 #include <include/libplatform/libplatform.h>
 #include <stdlib.h>
 
@@ -8,6 +9,7 @@ namespace V8Simple
 Function* Context::_instanceOf = nullptr;
 v8::Isolate* Context::_isolate = nullptr;
 v8::Platform* Context::_platform = nullptr;
+MessageHandler* Context::Debug::_messageHandler = nullptr;
 
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 {
@@ -253,6 +255,42 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 		result.push_back(Unwrap(tryCatch, value));
 	}
 	return result;
+}
+
+void Context::Debug::SetMessageHandler(MessageHandler* messageHandler)
+{
+	v8::Isolate::Scope isolateScope(_isolate);
+	_messageHandler = messageHandler;
+	if (_messageHandler == nullptr)
+	{
+		v8::Debug::SetMessageHandler(nullptr);
+	}
+	else
+	{
+		v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
+		{
+			_messageHandler->Handle(ToString(message.GetJSON()));
+		});
+	}
+}
+
+void Context::Debug::SendCommand(std::string command)
+{
+	v8::Isolate::Scope isolateScope(_isolate);
+	v8::HandleScope handleScope(_isolate);
+
+	auto str = ToV8String(_isolate, command);
+	auto len = str->Length();
+	uint16_t* buffer = new uint16_t[len];
+	str->Write(buffer);
+	v8::Debug::SendCommand(_isolate, buffer, len);
+	delete[] buffer;
+}
+
+void Context::Debug::ProcessDebugMessages()
+{
+	v8::Isolate::Scope isolateScope(_isolate);
+	v8::Debug::ProcessDebugMessages();
 }
 
 Context::Context() throw(Exception)
