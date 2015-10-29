@@ -303,7 +303,7 @@ Value* Object::Get(const std::string& key) throw(ScriptException, Exception)
 }
 
 void Object::Set(const std::string& key, const Value& value)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -318,7 +318,7 @@ void Object::Set(const std::string& key, const Value& value)
 }
 
 std::vector<std::string> Object::Keys()
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -381,7 +381,7 @@ Value* Object::CallMethod(const std::string& name, const std::vector<Value*>& ar
 }
 
 bool Object::ContainsKey(const std::string& key)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -397,7 +397,7 @@ bool Object::ContainsKey(const std::string& key)
 }
 
 bool Object::Equals(const Object& o)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -437,7 +437,7 @@ Value* Function::Call(const std::vector<Value*>& args)
 }
 
 Object* Function::Construct(const std::vector<Value*>& args)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -456,7 +456,7 @@ Object* Function::Construct(const std::vector<Value*>& args)
 }
 
 bool Function::Equals(const Function& function)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -493,7 +493,7 @@ Value* Array::Get(int index)
 }
 
 void Array::Set(int index, const Value& value)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -510,17 +510,15 @@ void Array::Set(int index, const Value& value)
 }
 
 int Array::Length()
-	throw(ScriptException, Exception)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
-	v8::TryCatch tryCatch(Context::_isolate);
 
 	return static_cast<int>(_array.Get(Context::_isolate)->Length());
 }
 
 bool Array::Equals(const Array& array)
-	throw(ScriptException, Exception)
+	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);

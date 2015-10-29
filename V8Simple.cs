@@ -513,7 +513,6 @@ public class Array : Value {
 
   public int Length() {
     int ret = v8PINVOKE.Array_Length(swigCPtr);
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 

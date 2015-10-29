@@ -1068,11 +1068,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Object_Set(void * jarg1, char * jarg2, void *
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
     return ; 
   }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
-    return ; 
-  }
   
 }
 
@@ -1089,11 +1084,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Object_Keys(void * jarg1) {
   catch(V8Simple::ScriptException &_e) {
     (void)_e;
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
-    return 0; 
-  }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
     return 0; 
   }
   
@@ -1192,11 +1182,6 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_ContainsKey(void * jarg1, char
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
     return 0; 
   }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
-    return 0; 
-  }
   
   jresult = result; 
   return jresult;
@@ -1221,11 +1206,6 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_Equals(void * jarg1, void * ja
   catch(V8Simple::ScriptException &_e) {
     (void)_e;
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
-    return 0; 
-  }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
     return 0; 
   }
   
@@ -1305,11 +1285,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Function_Construct(void * jarg1, void * jar
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
     return 0; 
   }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
-    return 0; 
-  }
   
   jresult = (void *)result; 
   return jresult;
@@ -1334,11 +1309,6 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Function_Equals(void * jarg1, void * 
   catch(V8Simple::ScriptException &_e) {
     (void)_e;
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
-    return 0; 
-  }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
     return 0; 
   }
   
@@ -1414,11 +1384,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Array_Set(void * jarg1, int jarg2, void * jar
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
     return ; 
   }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
-    return ; 
-  }
   
 }
 
@@ -1429,20 +1394,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Array_Length(void * jarg1) {
   int result;
   
   arg1 = (V8Simple::Array *)jarg1; 
-  try {
-    result = (int)(arg1)->Length();
-  }
-  catch(V8Simple::ScriptException &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
-    return 0; 
-  }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
-    return 0; 
-  }
-  
+  result = (int)(arg1)->Length();
   jresult = result; 
   return jresult;
 }
@@ -1466,11 +1418,6 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Array_Equals(void * jarg1, void * jar
   catch(V8Simple::ScriptException &_e) {
     (void)_e;
     SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
-    return 0; 
-  }
-  catch(V8Simple::Exception &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
     return 0; 
   }
   

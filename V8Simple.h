@@ -149,17 +149,17 @@ public:
 	Value* Get(const std::string& key)
 		throw(ScriptException, Exception);
 	void Set(const std::string& key, const Value& value)
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 	std::vector<std::string> Keys()
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 	bool InstanceOf(Function& type)
 		throw(ScriptException, Exception);
 	Value* CallMethod(const std::string& name, const std::vector<Value*>& args)
 		throw(ScriptException, Exception);
 	bool ContainsKey(const std::string& key)
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 	bool Equals(const Object& object)
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 private:
 	Object(v8::Local<v8::Object> object);
 	v8::Persistent<v8::Object> _object;
@@ -174,9 +174,9 @@ public:
 	Value* Call(const std::vector<Value*>& args)
 		throw(ScriptException, Exception);
 	Object* Construct(const std::vector<Value*>& args)
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 	bool Equals(const Function& f)
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 private:
 	friend class Context;
 	Function(v8::Local<v8::Function> function);
@@ -190,11 +190,10 @@ public:
 	Value* Get(int index)
 		throw(ScriptException, Exception);
 	void Set(int index, const Value& value)
-		throw(ScriptException, Exception);
-	int Length()
-		throw(ScriptException, Exception);
+		throw(ScriptException);
+	int Length();
 	bool Equals(const Array& array)
-		throw(ScriptException, Exception);
+		throw(ScriptException);
 private:
 	friend class Context;
 	Array(v8::Local<v8::Array> array);
