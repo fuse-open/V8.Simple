@@ -630,6 +630,22 @@ bool Array::Equals(const Array& array)
 
 }
 
+Callback::Callback()
+{
+}
+
+Value* Callback::Call(const std::vector<Value*>& args)
+	throw(ScriptException, Exception)
+{
+	throw Exception("Callback.Call not implemented");
+}
+
+Callback* Callback::Copy() const
+	throw(Exception)
+{
+	throw Exception("Callback.Copy not implemented");
+}
+
 Type Callback::GetValueType() const { return Type::Callback; }
 
 } // namespace V8Simple

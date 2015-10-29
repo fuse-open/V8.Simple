@@ -19,7 +19,7 @@ class Function;
 class Object;
 class Callback;
 
-struct ScriptException
+struct ScriptException: std::exception
 {
 	std::string Name, ErrorMessage, FileName, StackTrace, SourceLine;
 	int LineNumber;
@@ -38,14 +38,25 @@ struct ScriptException
 		, SourceLine(sourceLine)
 		, LineNumber(lineNumber)
 	{ }
+
+	virtual const char* what() const throw()
+	{
+		// TODO
+		return Name.c_str();
+	}
 };
 
-struct Exception
+struct Exception: std::exception
 {
 	std::string Message;
 	Exception(const std::string message)
 		: Message(message)
 	{ }
+
+	virtual const char* what() const throw()
+	{
+		return Message.c_str();
+	}
 };
 
 struct MessageHandler;
@@ -139,7 +150,7 @@ class Primitive: public Value
 {
 public:
 	Primitive(const T& value) : _value(value) { }
-	virtual Type GetValueType() const override { return TypeTag<Primitive<T>>::Tag; }
+	virtual Type GetValueType() const override final { return TypeTag<Primitive<T>>::Tag; }
 	T GetValue() const { return _value; }
 private:
 	const T _value;
@@ -162,7 +173,7 @@ template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 class Object: public Value
 {
 public:
-	virtual Type GetValueType() const override;
+	virtual Type GetValueType() const override final;
 	Value* Get(const std::string& key)
 		throw(ScriptException, Exception);
 	void Set(const std::string& key, const Value& value)
@@ -187,7 +198,7 @@ private:
 class Function: public Value
 {
 public:
-	virtual Type GetValueType() const override;
+	virtual Type GetValueType() const override final;
 	Value* Call(const std::vector<Value*>& args)
 		throw(ScriptException, Exception);
 	Object* Construct(const std::vector<Value*>& args)
@@ -203,7 +214,7 @@ private:
 class Array: public Value
 {
 public:
-	virtual Type GetValueType() const override;
+	virtual Type GetValueType() const override final;
 	Value* Get(int index)
 		throw(ScriptException, Exception);
 	void Set(int index, const Value& value)
@@ -220,10 +231,12 @@ private:
 class Callback: public Value
 {
 public:
+	Callback();
 	virtual Type GetValueType() const override;
 	virtual Value* Call(const std::vector<Value*>& args)
-		throw(ScriptException, Exception) = 0;
-	virtual Callback* Copy() const = 0;
+		throw(ScriptException, Exception);
+	virtual Callback* Copy() const
+		throw(Exception);
 private:
 	friend class Context;
 };

@@ -9,6 +9,7 @@
  * ----------------------------------------------------------------------------- */
 
 #define SWIGCSHARP
+#define SWIG_DIRECTORS
 
 
 #ifdef __cplusplus
@@ -292,6 +293,67 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_v8(SWIG_CSharpStringHelpe
 
 #define SWIG_contract_assert(nullreturn, expr, msg) if (!(expr)) {SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, msg, ""); return nullreturn; } else
 
+/* -----------------------------------------------------------------------------
+ * director_common.swg
+ *
+ * This file contains support for director classes which is common between
+ * languages.
+ * ----------------------------------------------------------------------------- */
+
+/*
+  Use -DSWIG_DIRECTOR_STATIC if you prefer to avoid the use of the
+  'Swig' namespace. This could be useful for multi-modules projects.
+*/
+#ifdef SWIG_DIRECTOR_STATIC
+/* Force anonymous (static) namespace */
+#define Swig
+#endif
+/* -----------------------------------------------------------------------------
+ * director.swg
+ *
+ * This file contains support for director classes so that C# proxy
+ * methods can be called from C++.
+ * ----------------------------------------------------------------------------- */
+
+#if defined(DEBUG_DIRECTOR_OWNED)
+#include <iostream>
+#endif
+#include <string>
+#include <exception>
+
+namespace Swig {
+  /* Director base class - not currently used in C# directors */
+  class Director {
+  };
+
+  /* Base class for director exceptions */
+  class DirectorException : public std::exception {
+  protected:
+    std::string swig_msg;
+
+  public:
+    DirectorException(const char *msg) : swig_msg(msg) {
+    }
+
+    DirectorException(const std::string &msg) : swig_msg(msg) {
+    }
+
+    virtual ~DirectorException() throw() {
+    }
+
+    const char *what() const throw() {
+      return swig_msg.c_str();
+    }
+  };
+
+  /* Pure virtual method exception */
+  class DirectorPureVirtualException : public DirectorException {
+  public:
+    DirectorPureVirtualException(const char *msg) : DirectorException(std::string("Attempt to invoke pure virtual method ") + msg) {
+    }
+  };
+}
+
 
 #include "V8Simple.h"
 
@@ -539,6 +601,104 @@ SWIGINTERN bool std_vector_Sl_V8Simple_Value_Sm__Sg__Remove(std::vector< V8Simpl
         return false;
       }
 
+
+/* ---------------------------------------------------
+ * C++ director class methods
+ * --------------------------------------------------- */
+
+#include "V8Simple_wrap.h"
+
+SwigDirector_MessageHandler::SwigDirector_MessageHandler() : V8Simple::MessageHandler(), Swig::Director() {
+  swig_init_callbacks();
+}
+
+void SwigDirector_MessageHandler::Handle(std::string jsonMessage) {
+  char * jjsonMessage  ;
+  
+  if (!swig_callbackHandle) {
+    throw Swig::DirectorPureVirtualException("V8Simple::MessageHandler::Handle");
+  } else {
+    jjsonMessage = SWIG_csharp_string_callback((&jsonMessage)->c_str()); 
+    swig_callbackHandle(jjsonMessage);
+  }
+}
+
+SwigDirector_MessageHandler::~SwigDirector_MessageHandler() {
+  
+}
+
+
+void SwigDirector_MessageHandler::swig_connect_director(SWIG_Callback0_t callbackHandle) {
+  swig_callbackHandle = callbackHandle;
+}
+
+void SwigDirector_MessageHandler::swig_init_callbacks() {
+  swig_callbackHandle = 0;
+}
+
+SwigDirector_Callback::SwigDirector_Callback() : V8Simple::Callback(), Swig::Director() {
+  swig_init_callbacks();
+}
+
+V8Simple::Type SwigDirector_Callback::GetValueType() const {
+  V8Simple::Type c_result = SwigValueInit< V8Simple::Type >() ;
+  int jresult = 0 ;
+  
+  if (!swig_callbackGetValueType) {
+    return V8Simple::Callback::GetValueType();
+  } else {
+    jresult = (int) swig_callbackGetValueType();
+    c_result = (V8Simple::Type)jresult; 
+  }
+  return c_result;
+}
+
+SwigDirector_Callback::~SwigDirector_Callback() {
+  
+}
+
+
+V8Simple::Value *SwigDirector_Callback::Call(std::vector< V8Simple::Value * > const &args) throw(V8Simple::ScriptException, V8Simple::Exception) {
+  V8Simple::Value *c_result = 0 ;
+  void * jresult = 0 ;
+  void * jargs = 0 ;
+  
+  if (!swig_callbackCall) {
+    return V8Simple::Callback::Call(args);
+  } else {
+    jargs = (std::vector< V8Simple::Value * > *) &args; 
+    jresult = (void *) swig_callbackCall(jargs);
+    c_result = (V8Simple::Value *)jresult; 
+  }
+  return c_result;
+}
+
+V8Simple::Callback *SwigDirector_Callback::Copy() const throw(V8Simple::Exception) {
+  V8Simple::Callback *c_result = 0 ;
+  void * jresult = 0 ;
+  
+  if (!swig_callbackCopy) {
+    return V8Simple::Callback::Copy();
+  } else {
+    jresult = (void *) swig_callbackCopy();
+    c_result = (V8Simple::Callback *)jresult; 
+  }
+  return c_result;
+}
+
+void SwigDirector_Callback::swig_connect_director(SWIG_Callback0_t callbackGetValueType, SWIG_Callback1_t callbackCall, SWIG_Callback2_t callbackCopy) {
+  swig_callbackGetValueType = callbackGetValueType;
+  swig_callbackCall = callbackCall;
+  swig_callbackCopy = callbackCopy;
+}
+
+void SwigDirector_Callback::swig_init_callbacks() {
+  swig_callbackGetValueType = 0;
+  swig_callbackCall = 0;
+  swig_callbackCopy = 0;
+}
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -747,6 +907,18 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScriptException(char * jarg1, char * ja
 }
 
 
+SWIGEXPORT char * SWIGSTDCALL CSharp_ScriptException_what(void * jarg1) {
+  char * jresult ;
+  V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
+  char *result = 0 ;
+  
+  arg1 = (V8Simple::ScriptException *)jarg1; 
+  result = (char *)((V8Simple::ScriptException const *)arg1)->what();
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_ScriptException(void * jarg1) {
   V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
   
@@ -794,6 +966,18 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_Exception(char * jarg1) {
   (&arg1)->assign(jarg1); 
   result = (V8Simple::Exception *)new V8Simple::Exception(arg1);
   jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Exception_what(void * jarg1) {
+  char * jresult ;
+  V8Simple::Exception *arg1 = (V8Simple::Exception *) 0 ;
+  char *result = 0 ;
+  
+  arg1 = (V8Simple::Exception *)jarg1; 
+  result = (char *)((V8Simple::Exception const *)arg1)->what();
+  jresult = SWIG_csharp_string_callback((const char *)result); 
   return jresult;
 }
 
@@ -945,6 +1129,25 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_MessageHandler(void * jarg1) {
   
   arg1 = (V8Simple::MessageHandler *)jarg1; 
   delete arg1;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MessageHandler() {
+  void * jresult ;
+  V8Simple::MessageHandler *result = 0 ;
+  
+  result = (V8Simple::MessageHandler *)new SwigDirector_MessageHandler();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_director_connect(void *objarg, SwigDirector_MessageHandler::SWIG_Callback0_t callback0) {
+  V8Simple::MessageHandler *obj = (V8Simple::MessageHandler *)objarg;
+  SwigDirector_MessageHandler *director = dynamic_cast<SwigDirector_MessageHandler *>(obj);
+  if (director) {
+    director->swig_connect_director(callback0);
+  }
 }
 
 
@@ -1487,6 +1690,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Array(void * jarg1) {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Callback() {
+  void * jresult ;
+  V8Simple::Callback *result = 0 ;
+  
+  result = (V8Simple::Callback *)new SwigDirector_Callback();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT int SWIGSTDCALL CSharp_Callback_GetValueType(void * jarg1) {
   int jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
@@ -1494,6 +1707,18 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Callback_GetValueType(void * jarg1) {
   
   arg1 = (V8Simple::Callback *)jarg1; 
   result = (V8Simple::Type)((V8Simple::Callback const *)arg1)->GetValueType();
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Callback_GetValueTypeSwigExplicitCallback(void * jarg1) {
+  int jresult ;
+  V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
+  V8Simple::Type result;
+  
+  arg1 = (V8Simple::Callback *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::Callback const *)arg1)->V8Simple::Callback::GetValueType();
   jresult = (int)result; 
   return jresult;
 }
@@ -1530,13 +1755,72 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CallSwigExplicitCallback(void * jarg1, void * jarg2) {
+  void * jresult ;
+  V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
+  std::vector< V8Simple::Value * > *arg2 = 0 ;
+  V8Simple::Value *result = 0 ;
+  
+  arg1 = (V8Simple::Callback *)jarg1; 
+  arg2 = (std::vector< V8Simple::Value * > *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< V8Simple::Value * > const & type is null", 0);
+    return 0;
+  } 
+  try {
+    result = (V8Simple::Value *)(arg1)->V8Simple::Callback::Call((std::vector< V8Simple::Value * > const &)*arg2);
+  }
+  catch(V8Simple::ScriptException &_e) {
+    (void)_e;
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::ScriptException exception thrown");
+    return 0; 
+  }
+  catch(V8Simple::Exception &_e) {
+    (void)_e;
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
+    return 0; 
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Copy(void * jarg1) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
   V8Simple::Callback *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  result = (V8Simple::Callback *)((V8Simple::Callback const *)arg1)->Copy();
+  try {
+    result = (V8Simple::Callback *)((V8Simple::Callback const *)arg1)->Copy();
+  }
+  catch(V8Simple::Exception &_e) {
+    (void)_e;
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
+    return 0; 
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CopySwigExplicitCallback(void * jarg1) {
+  void * jresult ;
+  V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
+  V8Simple::Callback *result = 0 ;
+  
+  arg1 = (V8Simple::Callback *)jarg1; 
+  try {
+    result = (V8Simple::Callback *)((V8Simple::Callback const *)arg1)->V8Simple::Callback::Copy();
+  }
+  catch(V8Simple::Exception &_e) {
+    (void)_e;
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ V8Simple::Exception exception thrown");
+    return 0; 
+  }
+  
   jresult = (void *)result; 
   return jresult;
 }
@@ -1547,6 +1831,15 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Callback(void * jarg1) {
   
   arg1 = (V8Simple::Callback *)jarg1; 
   delete arg1;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Callback_director_connect(void *objarg, SwigDirector_Callback::SWIG_Callback0_t callback0, SwigDirector_Callback::SWIG_Callback1_t callback1, SwigDirector_Callback::SWIG_Callback2_t callback2) {
+  V8Simple::Callback *obj = (V8Simple::Callback *)objarg;
+  SwigDirector_Callback *director = dynamic_cast<SwigDirector_Callback *>(obj);
+  if (director) {
+    director->swig_connect_director(callback0, callback1, callback2);
+  }
 }
 
 

@@ -1,4 +1,4 @@
-%module v8
+%module(directors="1") v8
 %{
 #include "V8Simple.h"
 %}
@@ -13,6 +13,8 @@
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::Callback::Call(const std::vector<Value*>&);
 %newobject V8Simple::Callback::Copy() const;
+%feature("director") V8Simple::MessageHandler;
+%feature("director") V8Simple::Callback;
 %include "V8Simple.h"
 %template(Int) V8Simple::Primitive<int>;
 %template(Double) V8Simple::Primitive<double>;

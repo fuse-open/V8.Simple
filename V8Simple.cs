@@ -114,6 +114,11 @@ public class ScriptException : global::System.IDisposable {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public virtual string what() {
+    string ret = v8PINVOKE.ScriptException_what(swigCPtr);
+    return ret;
+  }
+
 }
 
 }
@@ -163,6 +168,11 @@ public class Exception : global::System.IDisposable {
 
   public Exception(string message) : this(v8PINVOKE.new_Exception(message), true) {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public virtual string what() {
+    string ret = v8PINVOKE.Exception_what(swigCPtr);
+    return ret;
   }
 
 }
@@ -305,6 +315,31 @@ public class MessageHandler : global::System.IDisposable {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public MessageHandler() : this(v8PINVOKE.new_MessageHandler(), true) {
+    SwigDirectorConnect();
+  }
+
+  private void SwigDirectorConnect() {
+    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0))
+      swigDelegate0 = new SwigDelegateMessageHandler_0(SwigDirectorHandle);
+    v8PINVOKE.MessageHandler_director_connect(swigCPtr, swigDelegate0);
+  }
+
+  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
+    global::System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(methodName, global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, methodTypes, null);
+    bool hasDerivedMethod = methodInfo.DeclaringType.IsSubclassOf(typeof(MessageHandler));
+    return hasDerivedMethod;
+  }
+
+  private void SwigDirectorHandle(string jsonMessage) {
+    Handle(jsonMessage);
+  }
+
+  public delegate void SwigDelegateMessageHandler_0(string jsonMessage);
+
+  private SwigDelegateMessageHandler_0 swigDelegate0;
+
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(string) };
 }
 
 }
@@ -638,24 +673,68 @@ public class Callback : Value {
     }
   }
 
+  public Callback() : this(v8PINVOKE.new_Callback(), true) {
+    SwigDirectorConnect();
+  }
+
   public override Type GetValueType() {
-    Type ret = (Type)v8PINVOKE.Callback_GetValueType(swigCPtr);
+    Type ret = (Type)(SwigDerivedClassHasMethod("GetValueType", swigMethodTypes0) ? v8PINVOKE.Callback_GetValueTypeSwigExplicitCallback(swigCPtr) : v8PINVOKE.Callback_GetValueType(swigCPtr));
     return ret;
   }
 
   public virtual Value Call(ValueVector args) {
-    global::System.IntPtr cPtr = v8PINVOKE.Callback_Call(swigCPtr, ValueVector.getCPtr(args));
+    global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Call", swigMethodTypes1) ? v8PINVOKE.Callback_CallSwigExplicitCallback(swigCPtr, ValueVector.getCPtr(args)) : v8PINVOKE.Callback_Call(swigCPtr, ValueVector.getCPtr(args)));
     Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public virtual Callback Copy() {
-    global::System.IntPtr cPtr = v8PINVOKE.Callback_Copy(swigCPtr);
+    global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Copy", swigMethodTypes2) ? v8PINVOKE.Callback_CopySwigExplicitCallback(swigCPtr) : v8PINVOKE.Callback_Copy(swigCPtr));
     Callback ret = (cPtr == global::System.IntPtr.Zero) ? null : new Callback(cPtr, true);
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
+  private void SwigDirectorConnect() {
+    if (SwigDerivedClassHasMethod("GetValueType", swigMethodTypes0))
+      swigDelegate0 = new SwigDelegateCallback_0(SwigDirectorGetValueType);
+    if (SwigDerivedClassHasMethod("Call", swigMethodTypes1))
+      swigDelegate1 = new SwigDelegateCallback_1(SwigDirectorCall);
+    if (SwigDerivedClassHasMethod("Copy", swigMethodTypes2))
+      swigDelegate2 = new SwigDelegateCallback_2(SwigDirectorCopy);
+    v8PINVOKE.Callback_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2);
+  }
+
+  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
+    global::System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(methodName, global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, methodTypes, null);
+    bool hasDerivedMethod = methodInfo.DeclaringType.IsSubclassOf(typeof(Callback));
+    return hasDerivedMethod;
+  }
+
+  private int SwigDirectorGetValueType() {
+    return (int)GetValueType();
+  }
+
+  private global::System.IntPtr SwigDirectorCall(global::System.IntPtr args) {
+    return Value.getCPtr(Call(new ValueVector(args, false))).Handle;
+  }
+
+  private global::System.IntPtr SwigDirectorCopy() {
+    return Callback.getCPtr(Copy()).Handle;
+  }
+
+  public delegate int SwigDelegateCallback_0();
+  public delegate global::System.IntPtr SwigDelegateCallback_1(global::System.IntPtr args);
+  public delegate global::System.IntPtr SwigDelegateCallback_2();
+
+  private SwigDelegateCallback_0 swigDelegate0;
+  private SwigDelegateCallback_1 swigDelegate1;
+  private SwigDelegateCallback_2 swigDelegate2;
+
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] {  };
+  private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] { typeof(ValueVector) };
+  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
 }
 
 }
@@ -1710,6 +1789,9 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_ScriptException")]
   public static extern global::System.IntPtr new_ScriptException(string jarg1, string jarg2, string jarg3, int jarg4, string jarg5, string jarg6);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_what")]
+  public static extern string ScriptException_what(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptException")]
   public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -1721,6 +1803,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Exception")]
   public static extern global::System.IntPtr new_Exception(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Exception_what")]
+  public static extern string Exception_what(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Exception")]
   public static extern void delete_Exception(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1757,6 +1842,12 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_MessageHandler")]
   public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_MessageHandler")]
+  public static extern global::System.IntPtr new_MessageHandler();
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_director_connect")]
+  public static extern void MessageHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, MessageHandler.SwigDelegateMessageHandler_0 delegate0);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_GetValueType")]
   public static extern int Value_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1845,17 +1936,32 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Array")]
   public static extern void delete_Array(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Callback")]
+  public static extern global::System.IntPtr new_Callback();
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_GetValueType")]
   public static extern int Callback_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_GetValueTypeSwigExplicitCallback")]
+  public static extern int Callback_GetValueTypeSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_Call")]
   public static extern global::System.IntPtr Callback_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_CallSwigExplicitCallback")]
+  public static extern global::System.IntPtr Callback_CallSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_Copy")]
   public static extern global::System.IntPtr Callback_Copy(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_CopySwigExplicitCallback")]
+  public static extern global::System.IntPtr Callback_CopySwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Callback")]
   public static extern void delete_Callback(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_director_connect")]
+  public static extern void Callback_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, Callback.SwigDelegateCallback_0 delegate0, Callback.SwigDelegateCallback_1 delegate1, Callback.SwigDelegateCallback_2 delegate2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Int")]
   public static extern global::System.IntPtr new_Int(int jarg1);
