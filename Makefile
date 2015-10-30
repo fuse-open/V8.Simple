@@ -26,5 +26,6 @@ $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
 .PHONY: clean
 
 clean:
+	$(RM) $(FILE)_wrap.cxx
 	$(RM) -r $(LIB_DIR)
 	$(RM) -r $(OBJ_DIR)

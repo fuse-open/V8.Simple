@@ -5,7 +5,7 @@
 #include <iostream>
 
 // Note: All public functions that return a Value* (or derived class), save for
-// Value::As<T>(), require that the caller takes ownership of and delete the
+// Value::As<T>(), require that the caller takes ownership of and deletes the
 // pointer when appropriate. The Values are allocated with `new`, so should be
 // deallocated with `delete`.
 
@@ -69,6 +69,7 @@ public:
 	Value* Evaluate(const std::string& fileName, const std::string& code)
 		throw(ScriptException, Exception);
 	Object* GlobalObject();
+	bool IdleNotificationDeadline(double deadline_in_seconds);
 	~Context();
 
 	struct Debug
@@ -124,6 +125,8 @@ enum class Type
 	Callback,
 };
 
+// const std::string TypeNames[] = { "Int", "Double", "String", "Bool", "Object", "Array", "Function", "Callback" };
+
 template<class T> struct TypeTag { };
 
 class Value
@@ -141,7 +144,12 @@ public:
 	}
 	virtual ~Value()
 	{
-		std::cout << "Destructing value " << this << std::endl;
+		// std::cout << "- " << this << std::endl;
+	}
+protected:
+	Value(Type t)
+	{
+		// std::cout << "+ " << TypeNames[static_cast<int>(t)] << " " << this << std::endl;
 	}
 };
 
@@ -149,7 +157,7 @@ template<class T>
 class Primitive: public Value
 {
 public:
-	Primitive(const T& value) : _value(value) { }
+	Primitive(const T& value) : Value(TypeTag<Primitive<T>>::Tag), _value(value) { }
 	virtual Type GetValueType() const override final { return TypeTag<Primitive<T>>::Tag; }
 	T GetValue() const { return _value; }
 private:
@@ -235,8 +243,10 @@ public:
 	virtual Type GetValueType() const override;
 	virtual Value* Call(const std::vector<Value*>& args)
 		throw(ScriptException, Exception);
-	virtual Callback* Copy() const
+	virtual Callback* Clone() const
 		throw(Exception);
+	virtual void Retain() const;
+	virtual void Release() const;
 private:
 	friend class Context;
 };

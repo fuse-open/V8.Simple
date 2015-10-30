@@ -36,12 +36,9 @@ static class Test
 
 	class CB : Callback
 	{
-		// static List<CB> _cbs = new List<CB>();
+		static HashSet<CB> _retained = new HashSet<CB>();
 
-		public CB()
-		{
-			//_cbs.Add(this);
-		}
+		public CB() : base() { Console.WriteLine("constructing CB"); }
 
 		public override Value Call(ValueVector args)
 		{
@@ -53,29 +50,62 @@ static class Test
 			return new V8Simple.String("callback return value");
 		}
 
-		public override Callback Copy()
+		public override Callback Clone()
 		{
+			Console.WriteLine("Callback.Clone()");
 			return new CB();
+		}
+
+		public override void Retain()
+		{
+			Console.WriteLine("Callback.Retain()");
+			_retained.Add(this);
+		}
+
+		public override void Release()
+		{
+			Console.WriteLine("Callback.Release()");
+			_retained.Remove(this);
 		}
 	}
 
-	static void DoStuff3()
+	static void DoStuff3(Context context)
 	{
-		using (var context = new Context())
+		string result = null;
 		{
-			Function f = context.Evaluate("hej.js", "(function(f) { f(1, \"abc\", {}, [1, 2, 3]); })").AsFunction();
-			Console.WriteLine(f == null ? "f is null" : f.ToString());
-			ValueVector args = new ValueVector { new CB() };
-			string result = f.Call(args).AsString().GetValue();
-			Console.WriteLine(result);
+			Value fresult = null;
+			{
+				Value vf = context.Evaluate("hej.js", "(function(f) { return f(); })");
+				Console.WriteLine("vf");
+				Function f = vf.AsFunction();
+				Console.WriteLine(f == null ? "f is null" : f.ToString());
+				ValueVector args = new ValueVector { new CB() };
+				Console.WriteLine("Before call");
+				fresult = f.Call(args);
+			}
+			Console.WriteLine("After call");
+			Console.WriteLine(fresult.GetValueType());
+			result = fresult.AsString().GetValue();
 		}
+		GC.Collect();
+		GC.WaitForPendingFinalizers();
+		// Console.WriteLine(result.AsString().GetValue());
 	}
 
 	static void Main(string[] args)
 	{
 		DoStuff();
 		DoStuff2();
-		DoStuff3();
+		using (var context = new Context())
+		{
+			DoStuff3(context);
+			while (true)
+			{
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				context.IdleNotificationDeadline(1);
+			}
+		}
 		GC.Collect();
 		GC.WaitForPendingFinalizers();
 	}

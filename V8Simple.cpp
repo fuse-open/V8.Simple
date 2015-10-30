@@ -199,7 +199,8 @@ v8::Local<v8::Value> Context::Unwrap(
 			return static_cast<const Function*>(value)
 				->_function.Get(_isolate);
 		case Type::Callback:
-			Callback* callback = static_cast<const Callback*>(value)->Copy();
+			Callback* callback = static_cast<const Callback*>(value)->Clone();
+			callback->Retain();
 			auto localCallback = v8::External::New(_isolate, callback);
 			v8::Persistent<v8::External> persistentCallback(_isolate, localCallback);
 
@@ -207,7 +208,8 @@ v8::Local<v8::Value> Context::Unwrap(
 				callback,
 				[] (const v8::WeakCallbackInfo<Callback>& data)
 				{
-					delete data.GetParameter();
+					auto cb = data.GetParameter();
+					cb->Release();
 				},
 				v8::WeakCallbackType::kParameter);
 
@@ -228,7 +230,7 @@ v8::Local<v8::Value> Context::Unwrap(
 							info[i]));
 					}
 
-					Callback* callback = 
+					Callback* callback =
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
@@ -297,6 +299,8 @@ void Context::Debug::ProcessDebugMessages()
 
 Context::Context() throw(Exception)
 {
+	// TODO remove
+	v8::V8::SetFlagsFromString("--expose-gc", 11);
 	if (_platform == nullptr)
 	{
 		v8::V8::InitializeICU();
@@ -363,6 +367,7 @@ Value* Context::Evaluate(const std::string& fileName, const std::string& code)
 	auto script = v8::Script::Compile(
 		ToV8String(_isolate, code),
 		ToV8String(_isolate, fileName));
+
 	return Wrap(tryCatch, script->Run());
 }
 
@@ -374,8 +379,16 @@ Object* Context::GlobalObject()
 	return new Object(_context->Get(_isolate)->Global());
 }
 
+bool Context::IdleNotificationDeadline(double deadline_in_seconds)
+{
+	// TODO remove
+	_isolate->RequestGarbageCollectionForTesting(v8::Isolate::kFullGarbageCollection);
+	return _isolate->IdleNotificationDeadline(deadline_in_seconds);
+}
+
 Object::Object(v8::Local<v8::Object> object)
-	: _object(Context::_isolate, object)
+	: Value(Type::Object)
+	, _object(Context::_isolate, object)
 { }
 
 Type Object::GetValueType() const { return Type::Object; }
@@ -509,7 +522,8 @@ bool Object::Equals(const Object& o)
 }
 
 Function::Function(v8::Local<v8::Function> function)
-	: _function(Context::_isolate, function)
+	: Value(Type::Function)
+	, _function(Context::_isolate, function)
 { }
 
 Type Function::GetValueType() const { return Type::Function; }
@@ -568,7 +582,8 @@ bool Function::Equals(const Function& function)
 }
 
 Array::Array(v8::Local<v8::Array> array)
-	: _array(Context::_isolate, array)
+	: Value(Type::Array)
+	, _array(Context::_isolate, array)
 { }
 
 Type Array::GetValueType() const { return Type::Array; }
@@ -631,6 +646,7 @@ bool Array::Equals(const Array& array)
 }
 
 Callback::Callback()
+	: Value(Type::Callback)
 {
 }
 
@@ -640,12 +656,20 @@ Value* Callback::Call(const std::vector<Value*>& args)
 	throw Exception("Callback.Call not implemented");
 }
 
-Callback* Callback::Copy() const
+Callback* Callback::Clone() const
 	throw(Exception)
 {
-	throw Exception("Callback.Copy not implemented");
+	throw Exception("Callback.Clone not implemented");
 }
 
 Type Callback::GetValueType() const { return Type::Callback; }
+
+void Callback::Retain() const
+{
+}
+
+void Callback::Release() const
+{
+}
 
 } // namespace V8Simple
