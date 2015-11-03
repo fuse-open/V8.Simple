@@ -17,12 +17,39 @@ public:
     SwigDirector_MessageHandler();
     virtual void Handle(std::string jsonMessage);
     virtual ~SwigDirector_MessageHandler();
+    virtual void Retain() const;
+    virtual void Release() const;
 
     typedef void (SWIGSTDCALL* SWIG_Callback0_t)(char *);
-    void swig_connect_director(SWIG_Callback0_t callbackHandle);
+    typedef void (SWIGSTDCALL* SWIG_Callback1_t)();
+    typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
+    void swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease);
 
 private:
     SWIG_Callback0_t swig_callbackHandle;
+    SWIG_Callback1_t swig_callbackRetain;
+    SWIG_Callback2_t swig_callbackRelease;
+    void swig_init_callbacks();
+};
+
+struct SwigDirector_ScriptExceptionHandler : public V8Simple::ScriptExceptionHandler, public Swig::Director {
+
+public:
+    SwigDirector_ScriptExceptionHandler();
+    virtual void Handle(V8Simple::ScriptException const &e);
+    virtual ~SwigDirector_ScriptExceptionHandler();
+    virtual void Retain() const;
+    virtual void Release() const;
+
+    typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);
+    typedef void (SWIGSTDCALL* SWIG_Callback1_t)();
+    typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
+    void swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease);
+
+private:
+    SWIG_Callback0_t swig_callbackHandle;
+    SWIG_Callback1_t swig_callbackRetain;
+    SWIG_Callback2_t swig_callbackRelease;
     void swig_init_callbacks();
 };
 
@@ -32,8 +59,8 @@ public:
     SwigDirector_Callback();
     virtual V8Simple::Type GetValueType() const;
     virtual ~SwigDirector_Callback();
-    virtual V8Simple::Value *Call(std::vector< V8Simple::Value * > const &args) throw(V8Simple::ScriptException, V8Simple::Exception);
-    virtual V8Simple::Callback *Clone() const throw(V8Simple::Exception);
+    virtual V8Simple::Value *Call(std::vector< V8Simple::Value * > const &args) throw(std::runtime_error);
+    virtual V8Simple::Callback *Clone() const throw(std::runtime_error);
     virtual void Retain() const;
     virtual void Release() const;
 

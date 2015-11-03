@@ -1,8 +1,9 @@
 #pragma once
 #include <include/v8.h>
+#include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Note: All public functions that return a Value* (or derived class), save for
 // Value::As<T>(), require that the caller takes ownership of and deletes the
@@ -46,28 +47,16 @@ struct ScriptException: std::exception
 	}
 };
 
-struct Exception: std::exception
-{
-	std::string Message;
-	Exception(const std::string message)
-		: Message(message)
-	{ }
-
-	virtual const char* what() const throw()
-	{
-		return Message.c_str();
-	}
-};
-
 struct MessageHandler;
+struct ScriptExceptionHandler;
 
 class Context
 {
 public:
-	Context()
-		throw(Exception);
+	Context(ScriptExceptionHandler* scriptExceptionHandler)
+		throw(std::runtime_error);
 	Value* Evaluate(const std::string& fileName, const std::string& code)
-		throw(ScriptException, Exception);
+		throw(std::runtime_error);
 	Object* GlobalObject();
 	bool IdleNotificationDeadline(double deadline_in_seconds);
 	~Context();
@@ -85,22 +74,37 @@ private:
 	static v8::Isolate* _isolate;
 	v8::Persistent<v8::Context>* _context;
 	static Function* _instanceOf;
+	static ScriptExceptionHandler* _scriptExceptionHandler;
 	static Value* Wrap(
 		const v8::TryCatch& tryCatch,
 		v8::Local<v8::Value> value)
-		throw(ScriptException, Exception);
+		throw(std::runtime_error);
 	static Value* Wrap(
 		const v8::TryCatch& tryCatch,
 		v8::MaybeLocal<v8::Value> mvalue)
-		throw(ScriptException, Exception);
+		throw(std::runtime_error);
 	static v8::Local<v8::Value> Unwrap(
 		const v8::TryCatch& tryCatch,
-		const Value* value)
-		throw(ScriptException);
+		const Value* value);
 	static std::vector<v8::Local<v8::Value>> UnwrapVector(
 		const v8::TryCatch& tryCatch,
-		const std::vector<Value*>& values)
-		throw(ScriptException);
+		const std::vector<Value*>& values);
+	static void Throw(
+		v8::Local<v8::Context> context,
+		const v8::TryCatch& tryCatch);
+	template<class A>
+	static v8::Local<A> FromJust(
+		v8::Local<v8::Context> context,
+		const v8::TryCatch& tryCatch,
+		v8::MaybeLocal<A> a);
+	template<class A>
+	static A FromJust(
+		v8::Local<v8::Context> context,
+		const v8::TryCatch& tryCatch,
+		v8::Maybe<A> a);
+	static void HandleScriptException(
+		const ScriptException& e);
+
 	friend class Value;
 	friend class Array;
 	friend class Function;
@@ -110,7 +114,17 @@ private:
 struct MessageHandler
 {
 	virtual void Handle(std::string jsonMessage) = 0;
-	virtual ~MessageHandler() { };
+	virtual ~MessageHandler() { }
+	virtual void Retain() const { }
+	virtual void Release() const { }
+};
+
+struct ScriptExceptionHandler
+{
+	virtual void Handle(const ScriptException& e) = 0;
+	virtual ~ScriptExceptionHandler() { }
+	virtual void Retain() const { }
+	virtual void Release() const { }
 };
 
 enum class Type
@@ -183,19 +197,15 @@ class Object: public Value
 public:
 	virtual Type GetValueType() const override final;
 	Value* Get(const std::string& key)
-		throw(ScriptException, Exception);
-	void Set(const std::string& key, const Value& value)
-		throw(ScriptException);
-	std::vector<std::string> Keys()
-		throw(ScriptException);
+		throw(std::runtime_error);
+	void Set(const std::string& key, const Value& value);
+	std::vector<std::string> Keys();
 	bool InstanceOf(Function& type)
-		throw(ScriptException, Exception);
+		throw(std::runtime_error);
 	Value* CallMethod(const std::string& name, const std::vector<Value*>& args)
-		throw(ScriptException, Exception);
-	bool ContainsKey(const std::string& key)
-		throw(ScriptException);
-	bool Equals(const Object& object)
-		throw(ScriptException);
+		throw(std::runtime_error);
+	bool ContainsKey(const std::string& key);
+	bool Equals(const Object& object);
 private:
 	Object(v8::Local<v8::Object> object);
 	v8::Persistent<v8::Object> _object;
@@ -208,11 +218,9 @@ class Function: public Value
 public:
 	virtual Type GetValueType() const override final;
 	Value* Call(const std::vector<Value*>& args)
-		throw(ScriptException, Exception);
-	Object* Construct(const std::vector<Value*>& args)
-		throw(ScriptException);
-	bool Equals(const Function& f)
-		throw(ScriptException);
+		throw(std::runtime_error);
+	Object* Construct(const std::vector<Value*>& args);
+	bool Equals(const Function& f);
 private:
 	friend class Context;
 	Function(v8::Local<v8::Function> function);
@@ -224,12 +232,10 @@ class Array: public Value
 public:
 	virtual Type GetValueType() const override final;
 	Value* Get(int index)
-		throw(ScriptException, Exception);
-	void Set(int index, const Value& value)
-		throw(ScriptException);
+		throw(std::runtime_error);
+	void Set(int index, const Value& value);
 	int Length();
-	bool Equals(const Array& array)
-		throw(ScriptException);
+	bool Equals(const Array& array);
 private:
 	friend class Context;
 	Array(v8::Local<v8::Array> array);
@@ -242,11 +248,11 @@ public:
 	Callback();
 	virtual Type GetValueType() const override;
 	virtual Value* Call(const std::vector<Value*>& args)
-		throw(ScriptException, Exception);
+		throw(std::runtime_error);
 	virtual Callback* Clone() const
-		throw(Exception);
-	virtual void Retain() const;
-	virtual void Release() const;
+		throw(std::runtime_error);
+	virtual void Retain() const { }
+	virtual void Release() const { }
 private:
 	friend class Context;
 };

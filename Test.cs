@@ -7,7 +7,7 @@ static class Test
 {
 	static void DoStuff()
 	{
-		using (var context = new Context())
+		using (var context = new Context(new ExceptionHandler()))
 		{
 			Value val = context.Evaluate("hej.js", "12 + 13");
 			Value val2 = context.Evaluate("hej.js", "12.3 + 13.5");
@@ -24,7 +24,7 @@ static class Test
 
 	static void DoStuff2()
 	{
-		using (var context = new Context())
+		using (var context = new Context(new ExceptionHandler()))
 		{
 			Function f = context.Evaluate("hej.js", "(function(x, y) { return x + y; })").AsFunction();
 			Console.WriteLine(f == null ? "f is null" : f.ToString());
@@ -34,9 +34,31 @@ static class Test
 		}
 	}
 
+	class ExceptionHandler : ScriptExceptionHandler
+	{
+		static HashSet<object> _retained = new HashSet<object>();
+
+		public ExceptionHandler() : base() { }
+
+		public override void Handle(ScriptException e)
+		{
+			throw new Exception(e.Name);
+		}
+
+		public override void Retain()
+		{
+			_retained.Add(this);
+		}
+
+		public override void Release()
+		{
+			_retained.Remove(this);
+		}
+	}
+
 	class CB : Callback
 	{
-		static HashSet<CB> _retained = new HashSet<CB>();
+		static HashSet<object> _retained = new HashSet<object>();
 
 		public CB() : base() { Console.WriteLine("constructing CB"); }
 
@@ -92,11 +114,27 @@ static class Test
 		// Console.WriteLine(result.AsString().GetValue());
 	}
 
+	static void DoStuff4()
+	{
+		using (var context = new Context(new ExceptionHandler()))
+		{
+			try
+			{
+				context.Evaluate("exceptions.js", "a...");
+			}
+			catch (System.Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
+		}
+	}
+
 	static void Main(string[] args)
 	{
 		DoStuff();
 		DoStuff2();
-		using (var context = new Context())
+		DoStuff4();
+		using (var context = new Context(new ExceptionHandler()))
 		{
 			DoStuff3(context);
 			while (true)

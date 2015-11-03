@@ -10,6 +10,7 @@ Function* Context::_instanceOf = nullptr;
 v8::Isolate* Context::_isolate = nullptr;
 v8::Platform* Context::_platform = nullptr;
 MessageHandler* Context::Debug::_messageHandler = nullptr;
+ScriptExceptionHandler* Context::_scriptExceptionHandler = nullptr;
 
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 {
@@ -42,9 +43,9 @@ static std::string ToString(const T& t)
 	return *v8::String::Utf8Value(t);
 }
 
-static void Throw(
+void Context::Throw(
 	v8::Local<v8::Context> context,
-	const v8::TryCatch& tryCatch) throw(ScriptException)
+	const v8::TryCatch& tryCatch)
 {
 	std::string exception(ToString(tryCatch.Exception()));
 	auto message = tryCatch.Message();
@@ -67,11 +68,20 @@ static void Throw(
 		sourceLine);
 }
 
+void Context::HandleScriptException(const ScriptException& e)
+{
+	std::cout << "handle script exception" << std::endl;
+	if (_scriptExceptionHandler != nullptr)
+	{
+		_scriptExceptionHandler->Handle(e);
+	}
+}
+
 template<class A>
-static v8::Local<A> FromJust(
+v8::Local<A> Context::FromJust(
 	v8::Local<v8::Context> context,
 	const v8::TryCatch& tryCatch,
-	v8::MaybeLocal<A> a) throw(ScriptException)
+	v8::MaybeLocal<A> a)
 {
 	if (a.IsEmpty())
 	{
@@ -81,10 +91,10 @@ static v8::Local<A> FromJust(
 }
 
 template<class A>
-static A FromJust(
+A Context::FromJust(
 	v8::Local<v8::Context> context,
 	const v8::TryCatch& tryCatch,
-	v8::Maybe<A> a) throw(ScriptException)
+	v8::Maybe<A> a)
 {
 	if (a.IsNothing())
 	{
@@ -95,76 +105,92 @@ static A FromJust(
 
 Value* Context::Wrap(
 	const v8::TryCatch& tryCatch,
-	v8::Local<v8::Value> value) throw(ScriptException, Exception)
+	v8::Local<v8::Value> value) throw(std::runtime_error)
 {
-	auto context = _isolate->GetCurrentContext();
-	if (value->IsInt32())
+	try
 	{
-		return new Int(FromJust(
-			context,
-			tryCatch,
-			value->Int32Value(context)));
+		auto context = _isolate->GetCurrentContext();
+		if (value->IsInt32())
+		{
+			return new Int(FromJust(
+				context,
+				tryCatch,
+				value->Int32Value(context)));
+		}
+		if (value->IsNumber() || value->IsNumberObject())
+		{
+			return new Double(FromJust(
+				context,
+				tryCatch,
+				value->NumberValue(context)));
+		}
+		if (value->IsBoolean() || value->IsBooleanObject())
+		{
+			return new Bool(FromJust(
+				context,
+				tryCatch,
+				value->BooleanValue(context)));
+		}
+		if (value->IsString() || value->IsStringObject())
+		{
+			return new String(ToString(FromJust(
+				context,
+				tryCatch,
+				value->ToString(context))));
+		}
+		if (value->IsArray())
+		{
+			return new Array(FromJust(
+				context,
+				tryCatch,
+				value->ToObject(context)).As<v8::Array>());
+		}
+		if (value->IsFunction())
+		{
+			return new Function(FromJust(
+				context,
+				tryCatch,
+				value->ToObject(context)).As<v8::Function>());
+		}
+		if (value->IsObject())
+		{
+			return new Object(FromJust(
+				context,
+				tryCatch,
+				value->ToObject(context)));
+		}
+		if (value->IsUndefined() || value->IsNull())
+		{
+			return nullptr;
+		}
 	}
-	if (value->IsNumber() || value->IsNumberObject())
+	catch (ScriptException& e)
 	{
-		return new Double(FromJust(
-			context,
-			tryCatch,
-			value->NumberValue(context)));
-	}
-	if (value->IsBoolean() || value->IsBooleanObject())
-	{
-		return new Bool(FromJust(
-			context,
-			tryCatch,
-			value->BooleanValue(context)));
-	}
-	if (value->IsString() || value->IsStringObject())
-	{
-		return new String(ToString(FromJust(
-			context,
-			tryCatch,
-			value->ToString(context))));
-	}
-	if (value->IsArray())
-	{
-		return new Array(FromJust(
-			context,
-			tryCatch,
-			value->ToObject(context)).As<v8::Array>());
-	}
-	if (value->IsFunction())
-	{
-		return new Function(FromJust(
-			context,
-			tryCatch,
-			value->ToObject(context)).As<v8::Function>());
-	}
-	if (value->IsObject())
-	{
-		return new Object(FromJust(
-			context,
-			tryCatch,
-			value->ToObject(context)));
-	}
-	if (value->IsUndefined() || value->IsNull())
-	{
+		Context::HandleScriptException(e);
 		return nullptr;
 	}
-	throw Exception("Unhandled type in V8Simple");
+	throw std::runtime_error("Unhandled type in V8Simple");
 }
 
 Value* Context::Wrap(
 	const v8::TryCatch& tryCatch,
-	v8::MaybeLocal<v8::Value> mvalue) throw(ScriptException, Exception)
+	v8::MaybeLocal<v8::Value> mvalue) throw(std::runtime_error)
 {
-	auto context = _isolate->GetCurrentContext();
-	return Wrap(tryCatch, FromJust(context, tryCatch, mvalue));
+	try
+	{
+		auto context = _isolate->GetCurrentContext();
+		return Wrap(tryCatch, FromJust(context, tryCatch, mvalue));
+	}
+	catch (ScriptException& e)
+	{
+		HandleScriptException(e);
+		return nullptr;
+	}
 }
 
 v8::Local<v8::Value> Context::Unwrap(
 	const v8::TryCatch& tryCatch,
-	const Value* value) throw(ScriptException)
+	const Value* value)
 {
 	if (value == nullptr)
 	{
@@ -214,43 +240,52 @@ v8::Local<v8::Value> Context::Unwrap(
 				v8::WeakCallbackType::kParameter);
 
 			auto context = _isolate->GetCurrentContext();
-			return FromJust(context, tryCatch, v8::Function::New(
-				context,
-				[] (const v8::FunctionCallbackInfo<v8::Value>& info)
-				{
-					v8::HandleScope handleScope(info.GetIsolate());
-					v8::TryCatch tryCatch(info.GetIsolate());
-
-					std::vector<Value*> wrappedArgs;
-					wrappedArgs.reserve(info.Length());
-					for (int i = 0; i < info.Length(); ++i)
+			try
+			{
+				return FromJust(context, tryCatch, v8::Function::New(
+					context,
+					[] (const v8::FunctionCallbackInfo<v8::Value>& info)
 					{
-						wrappedArgs.push_back(Wrap(
+						v8::HandleScope handleScope(info.GetIsolate());
+						v8::TryCatch tryCatch(info.GetIsolate());
+
+						std::vector<Value*> wrappedArgs;
+						wrappedArgs.reserve(info.Length());
+						for (int i = 0; i < info.Length(); ++i)
+						{
+							wrappedArgs.push_back(Wrap(
+								tryCatch,
+								info[i]));
+						}
+
+						Callback* callback =
+							static_cast<Callback*>(info.Data()
+								.As<v8::External>()
+								->Value());
+						Value* result = callback->Call(wrappedArgs);
+
+						for (Value* value: wrappedArgs)
+						{
+							delete value;
+						}
+						info.GetReturnValue().Set(Unwrap(
 							tryCatch,
-							info[i]));
-					}
-
-					Callback* callback =
-						static_cast<Callback*>(info.Data()
-							.As<v8::External>()
-							->Value());
-					Value* result = callback->Call(wrappedArgs);
-
-					for (Value* value: wrappedArgs)
-					{
-						delete value;
-					}
-					info.GetReturnValue().Set(Unwrap(
-						tryCatch,
-						result));
-				},
-				localCallback.As<v8::Value>()));
-	}
+							result));
+					},
+					localCallback.As<v8::Value>()));
+			}
+			catch (ScriptException& e)
+			{
+				HandleScriptException(e);
+				break;
+			}
+		}
+	return v8::Null(_isolate).As<v8::Value>();
 }
 
 std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 	const v8::TryCatch& tryCatch,
-	const std::vector<Value*>& values) throw(ScriptException)
+	const std::vector<Value*>& values)
 {
 	std::vector<v8::Local<v8::Value>> result;
 	result.reserve(values.size());
@@ -264,8 +299,11 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 void Context::Debug::SetMessageHandler(MessageHandler* messageHandler)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
-	_messageHandler = messageHandler;
-	if (_messageHandler == nullptr)
+	if (_messageHandler != nullptr)
+	{
+		_messageHandler->Release();
+	}
+	if (messageHandler == nullptr)
 	{
 		v8::Debug::SetMessageHandler(nullptr);
 	}
@@ -275,7 +313,9 @@ void Context::Debug::SetMessageHandler(MessageHandler* messageHandler)
 		{
 			_messageHandler->Handle(ToString(message.GetJSON()));
 		});
+		messageHandler->Retain();
 	}
+	_messageHandler = messageHandler;
 }
 
 void Context::Debug::SendCommand(std::string command)
@@ -297,7 +337,7 @@ void Context::Debug::ProcessDebugMessages()
 	v8::Debug::ProcessDebugMessages();
 }
 
-Context::Context() throw(Exception)
+Context::Context(ScriptExceptionHandler* scriptExceptionHandler) throw(std::runtime_error)
 {
 	// TODO remove
 	v8::V8::SetFlagsFromString("--expose-gc", 11);
@@ -318,7 +358,7 @@ Context::Context() throw(Exception)
 	}
 	else
 	{
-		throw Exception("V8Simple Contexts are not re-entrant");
+		throw std::runtime_error("V8Simple Contexts are not re-entrant");
 	}
 
 	v8::Isolate::Scope isolateScope(_isolate);
@@ -326,6 +366,9 @@ Context::Context() throw(Exception)
 
 	auto localContext = v8::Context::New(_isolate);
 	localContext->Enter();
+
+	_scriptExceptionHandler = scriptExceptionHandler;
+	_scriptExceptionHandler->Retain();
 
 	_context = new v8::Persistent<v8::Context>(_isolate, localContext);
 	_instanceOf = static_cast<Function*>(
@@ -338,6 +381,9 @@ Context::~Context()
 {
 	delete _instanceOf;
 	_instanceOf = nullptr;
+
+	_scriptExceptionHandler->Release();
+	_scriptExceptionHandler = nullptr;
 
 	{
 		v8::Isolate::Scope isolateScope(_isolate);
@@ -358,17 +404,31 @@ Context::~Context()
 }
 
 Value* Context::Evaluate(const std::string& fileName, const std::string& code)
-	throw (ScriptException, Exception)
+	throw (std::runtime_error)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
 	v8::HandleScope handleScope(_isolate);
 	v8::TryCatch tryCatch(_isolate);
+	auto context = _context->Get(_isolate);
 
-	auto script = v8::Script::Compile(
-		ToV8String(_isolate, code),
-		ToV8String(_isolate, fileName));
+	try
+	{
+		v8::ScriptOrigin origin(ToV8String(_isolate, fileName));
+		auto script = FromJust(
+			context,
+			tryCatch,
+			v8::Script::Compile(
+				context,
+				ToV8String(_isolate, code),
+				&origin));
 
-	return Wrap(tryCatch, script->Run());
+		return Wrap(tryCatch, script->Run(context));
+	}
+	catch (ScriptException& e)
+	{
+		HandleScriptException(e);
+		return nullptr;
+	}
 }
 
 Object* Context::GlobalObject()
@@ -393,7 +453,7 @@ Object::Object(v8::Local<v8::Object> object)
 
 Type Object::GetValueType() const { return Type::Object; }
 
-Value* Object::Get(const std::string& key) throw(ScriptException, Exception)
+Value* Object::Get(const std::string& key) throw(std::runtime_error)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -407,48 +467,61 @@ Value* Object::Get(const std::string& key) throw(ScriptException, Exception)
 }
 
 void Object::Set(const std::string& key, const Value& value)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 	auto context = Context::_isolate->GetCurrentContext();
 
-	auto ret = _object.Get(Context::_isolate)->Set(
-		context,
-		ToV8String(Context::_isolate, key),
-		Context::Unwrap(tryCatch, &value));
-	FromJust(context, tryCatch, ret);
+	try
+	{
+		auto ret = _object.Get(Context::_isolate)->Set(
+			context,
+			ToV8String(Context::_isolate, key),
+			Context::Unwrap(tryCatch, &value));
+		Context::FromJust(context, tryCatch, ret);
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+	}
 }
 
 std::vector<std::string> Object::Keys()
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 	auto context = Context::_isolate->GetCurrentContext();
 
-	auto propArr = FromJust(
-		context,
-		tryCatch,
-		_object.Get(Context::_isolate)->GetPropertyNames(context));
-
-	auto length = (int)propArr->Length();
-	std::vector<std::string> result;
-	result.reserve(length);
-	for (int i = 0; i < length; ++i)
+	try
 	{
-		result.push_back(ToString(FromJust(
+		auto propArr = Context::FromJust(
 			context,
 			tryCatch,
-			propArr->Get(context, i))));
+			_object.Get(Context::_isolate)->GetPropertyNames(context));
+
+		auto length = propArr->Length();
+		std::vector<std::string> result;
+		result.reserve(length);
+		for (int i = 0; i < static_cast<int>(length); ++i)
+		{
+			result.push_back(ToString(Context::FromJust(
+				context,
+				tryCatch,
+				propArr->Get(context, static_cast<uint32_t>(i)))));
+		}
+		return result;
 	}
-	return result;
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return std::vector<std::string>();
+	}
 }
 
 bool Object::InstanceOf(Function& type)
-	throw(ScriptException, Exception)
+	throw(std::runtime_error)
 {
 	Value* thisValue = static_cast<Value*>(this);
 	std::vector<Value*> args;
@@ -465,60 +538,82 @@ bool Object::InstanceOf(Function& type)
 Value* Object::CallMethod(
 	const std::string& name,
 	const std::vector<Value*>& args)
-	throw(ScriptException, Exception)
+	throw(std::runtime_error)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 
-	auto context = Context::_isolate->GetCurrentContext();
-	auto localObject = _object.Get(Context::_isolate);
-	auto fun = FromJust(
-		context,
-		tryCatch,
-		localObject->Get(
+	try
+	{
+		auto context = Context::_isolate->GetCurrentContext();
+		auto localObject = _object.Get(Context::_isolate);
+		auto fun = Context::FromJust(
 			context,
-			ToV8String(Context::_isolate, name).As<v8::Value>()))
-		.As<v8::Function>();
-	auto unwrappedArgs = Context::UnwrapVector(tryCatch, args);
-	return Context::Wrap(
-		tryCatch,
-		fun->Call(
-			localObject,
-			static_cast<int>(unwrappedArgs.size()),
-			unwrappedArgs.data()));
+			tryCatch,
+			localObject->Get(
+				context,
+				ToV8String(Context::_isolate, name).As<v8::Value>()))
+			.As<v8::Function>();
+		auto unwrappedArgs = Context::UnwrapVector(tryCatch, args);
+		return Context::Wrap(
+			tryCatch,
+			fun->Call(
+				localObject,
+				static_cast<int>(unwrappedArgs.size()),
+				unwrappedArgs.data()));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return nullptr;
+	}
 }
 
 bool Object::ContainsKey(const std::string& key)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 
-	auto context = Context::_isolate->GetCurrentContext();
-	return FromJust(
-		context,
-		tryCatch,
-		_object.Get(Context::_isolate)->Has(
+	try
+	{
+		auto context = Context::_isolate->GetCurrentContext();
+		return Context::FromJust(
 			context,
-			ToV8String(Context::_isolate, key)));
+			tryCatch,
+			_object.Get(Context::_isolate)->Has(
+				context,
+				ToV8String(Context::_isolate, key)));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return false;
+	}
 }
 
 bool Object::Equals(const Object& o)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 
 	auto context = Context::_isolate->GetCurrentContext();
-	return FromJust(
-		context,
-		tryCatch,
-		_object.Get(Context::_isolate)->Equals(
+	try
+	{
+		return Context::FromJust(
 			context,
-			o._object.Get(Context::_isolate)));
+			tryCatch,
+			_object.Get(Context::_isolate)->Equals(
+				context,
+				o._object.Get(Context::_isolate)));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return false;
+	}
 }
 
 Function::Function(v8::Local<v8::Function> function)
@@ -529,7 +624,7 @@ Function::Function(v8::Local<v8::Function> function)
 Type Function::GetValueType() const { return Type::Function; }
 
 Value* Function::Call(const std::vector<Value*>& args)
-	throw(ScriptException, Exception)
+	throw(std::runtime_error)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -547,7 +642,6 @@ Value* Function::Call(const std::vector<Value*>& args)
 }
 
 Object* Function::Construct(const std::vector<Value*>& args)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -555,30 +649,45 @@ Object* Function::Construct(const std::vector<Value*>& args)
 
 	auto context = Context::_isolate->GetCurrentContext();
 	auto unwrappedArgs = Context::UnwrapVector(tryCatch, args);
-	return new Object(
-		FromJust(
-			context,
-			tryCatch,
-			_function.Get(Context::_isolate)->NewInstance(
+	try
+	{
+		return new Object(
+			Context::FromJust(
 				context,
-				unwrappedArgs.size(),
-				unwrappedArgs.data())));
+				tryCatch,
+				_function.Get(Context::_isolate)->NewInstance(
+					context,
+					unwrappedArgs.size(),
+					unwrappedArgs.data())));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return nullptr;
+	}
 }
 
 bool Function::Equals(const Function& function)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 
 	auto context = Context::_isolate->GetCurrentContext();
-	return FromJust(
-		context,
-		tryCatch,
-		_function.Get(Context::_isolate)->Equals(
+	try
+	{
+		return Context::FromJust(
 			context,
-			function._function.Get(Context::_isolate)));
+			tryCatch,
+			_function.Get(Context::_isolate)->Equals(
+				context,
+				function._function.Get(Context::_isolate)));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return false;
+	}
 }
 
 Array::Array(v8::Local<v8::Array> array)
@@ -589,7 +698,7 @@ Array::Array(v8::Local<v8::Array> array)
 Type Array::GetValueType() const { return Type::Array; }
 
 Value* Array::Get(int index)
-	throw(ScriptException, Exception)
+	throw(std::runtime_error)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
@@ -604,20 +713,26 @@ Value* Array::Get(int index)
 }
 
 void Array::Set(int index, const Value& value)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 
 	auto context = Context::_isolate->GetCurrentContext();
-	FromJust(
-		context,
-		tryCatch,
-		_array.Get(Context::_isolate)->Set(
+	try
+	{
+		Context::FromJust(
 			context,
-			static_cast<uint32_t>(index),
-			Context::Unwrap(tryCatch, &value)));
+			tryCatch,
+			_array.Get(Context::_isolate)->Set(
+				context,
+				static_cast<uint32_t>(index),
+				Context::Unwrap(tryCatch, &value)));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+	}
 }
 
 int Array::Length()
@@ -629,19 +744,26 @@ int Array::Length()
 }
 
 bool Array::Equals(const Array& array)
-	throw(ScriptException)
 {
 	v8::Isolate::Scope isolateScope(Context::_isolate);
 	v8::HandleScope handleScope(Context::_isolate);
 	v8::TryCatch tryCatch(Context::_isolate);
 
-	auto context = Context::_isolate->GetCurrentContext();
-	return FromJust(
-		context,
-		tryCatch,
-		_array.Get(Context::_isolate)->Equals(
+	try
+	{
+		auto context = Context::_isolate->GetCurrentContext();
+		return Context::FromJust(
 			context,
-			array._array.Get(Context::_isolate)));
+			tryCatch,
+			_array.Get(Context::_isolate)->Equals(
+				context,
+				array._array.Get(Context::_isolate)));
+	}
+	catch (ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+		return false;
+	}
 
 }
 
@@ -651,25 +773,17 @@ Callback::Callback()
 }
 
 Value* Callback::Call(const std::vector<Value*>& args)
-	throw(ScriptException, Exception)
+	throw(std::runtime_error)
 {
-	throw Exception("Callback.Call not implemented");
+	throw std::runtime_error("Callback.Call not implemented");
 }
 
 Callback* Callback::Clone() const
-	throw(Exception)
+	throw(std::runtime_error)
 {
-	throw Exception("Callback.Clone not implemented");
+	throw std::runtime_error("Callback.Clone not implemented");
 }
 
 Type Callback::GetValueType() const { return Type::Callback; }
-
-void Callback::Retain() const
-{
-}
-
-void Callback::Release() const
-{
-}
 
 } // namespace V8Simple
