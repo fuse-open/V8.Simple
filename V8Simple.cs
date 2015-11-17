@@ -127,51 +127,16 @@ public class Context : global::System.IDisposable {
     return ret;
   }
 
-  public class Debug : global::System.IDisposable {
-    private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-    protected bool swigCMemOwn;
-  
-    internal Debug(global::System.IntPtr cPtr, bool cMemoryOwn) {
-      swigCMemOwn = cMemoryOwn;
-      swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-    }
-  
-    internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Debug obj) {
-      return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-    }
-  
-    ~Debug() {
-      Dispose();
-    }
-  
-    public virtual void Dispose() {
-      lock(this) {
-        if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-          if (swigCMemOwn) {
-            swigCMemOwn = false;
-            v8PINVOKE.delete_Context_Debug(swigCPtr);
-          }
-          swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-        }
-        global::System.GC.SuppressFinalize(this);
-      }
-    }
-  
-    public static void SetMessageHandler(MessageHandler messageHandler) {
-      v8PINVOKE.Context_Debug_SetMessageHandler(MessageHandler.getCPtr(messageHandler));
-    }
-  
-    public static void SendCommand(string command) {
-      v8PINVOKE.Context_Debug_SendCommand(command);
-    }
-  
-    public static void ProcessDebugMessages() {
-      v8PINVOKE.Context_Debug_ProcessDebugMessages();
-    }
-  
-    public Debug() : this(v8PINVOKE.new_Context_Debug(), true) {
-    }
-  
+  public static void SetDebugMessageHandler(DebugMessageHandler debugMessageHandler) {
+    v8PINVOKE.Context_SetDebugMessageHandler(DebugMessageHandler.getCPtr(debugMessageHandler));
+  }
+
+  public static void SendDebugCommand(string command) {
+    v8PINVOKE.Context_SendDebugCommand(command);
+  }
+
+  public static void ProcessDebugMessages() {
+    v8PINVOKE.Context_ProcessDebugMessages();
   }
 
 }
@@ -179,20 +144,20 @@ public class Context : global::System.IDisposable {
 }
 namespace Fuse.Scripting.V8.Simple {
 
-public class MessageHandler : global::System.IDisposable {
+public class DebugMessageHandler : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal MessageHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
+  internal DebugMessageHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(MessageHandler obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(DebugMessageHandler obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~MessageHandler() {
+  ~DebugMessageHandler() {
     Dispose();
   }
 
@@ -201,7 +166,7 @@ public class MessageHandler : global::System.IDisposable {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          v8PINVOKE.delete_MessageHandler(swigCPtr);
+          v8PINVOKE.delete_DebugMessageHandler(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -210,60 +175,17 @@ public class MessageHandler : global::System.IDisposable {
   }
 
   public virtual void Handle(string jsonMessage) {
-    v8PINVOKE.MessageHandler_Handle(swigCPtr, jsonMessage);
+    v8PINVOKE.DebugMessageHandler_Handle(swigCPtr, jsonMessage);
   }
 
   public virtual void Retain() {
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1)) v8PINVOKE.MessageHandler_RetainSwigExplicitMessageHandler(swigCPtr); else v8PINVOKE.MessageHandler_Retain(swigCPtr);
+    v8PINVOKE.DebugMessageHandler_Retain(swigCPtr);
   }
 
   public virtual void Release() {
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2)) v8PINVOKE.MessageHandler_ReleaseSwigExplicitMessageHandler(swigCPtr); else v8PINVOKE.MessageHandler_Release(swigCPtr);
+    v8PINVOKE.DebugMessageHandler_Release(swigCPtr);
   }
 
-  public MessageHandler() : this(v8PINVOKE.new_MessageHandler(), true) {
-    SwigDirectorConnect();
-  }
-
-  private void SwigDirectorConnect() {
-    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0))
-      swigDelegate0 = new SwigDelegateMessageHandler_0(SwigDirectorHandle);
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1))
-      swigDelegate1 = new SwigDelegateMessageHandler_1(SwigDirectorRetain);
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2))
-      swigDelegate2 = new SwigDelegateMessageHandler_2(SwigDirectorRelease);
-    v8PINVOKE.MessageHandler_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2);
-  }
-
-  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
-    global::System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(methodName, global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, methodTypes, null);
-    bool hasDerivedMethod = methodInfo.DeclaringType.IsSubclassOf(typeof(MessageHandler));
-    return hasDerivedMethod;
-  }
-
-  private void SwigDirectorHandle(string jsonMessage) {
-    Handle(jsonMessage);
-  }
-
-  private void SwigDirectorRetain() {
-    Retain();
-  }
-
-  private void SwigDirectorRelease() {
-    Release();
-  }
-
-  public delegate void SwigDelegateMessageHandler_0(string jsonMessage);
-  public delegate void SwigDelegateMessageHandler_1();
-  public delegate void SwigDelegateMessageHandler_2();
-
-  private SwigDelegateMessageHandler_0 swigDelegate0;
-  private SwigDelegateMessageHandler_1 swigDelegate1;
-  private SwigDelegateMessageHandler_2 swigDelegate2;
-
-  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(string) };
-  private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
 }
 
 }
@@ -1819,44 +1741,26 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context")]
   public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Debug_SetMessageHandler")]
-  public static extern void Context_Debug_SetMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
+  public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Debug_SendCommand")]
-  public static extern void Context_Debug_SendCommand(string jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_SendDebugCommand")]
+  public static extern void Context_SendDebugCommand(string jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Debug_ProcessDebugMessages")]
-  public static extern void Context_Debug_ProcessDebugMessages();
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_ProcessDebugMessages")]
+  public static extern void Context_ProcessDebugMessages();
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Context_Debug")]
-  public static extern global::System.IntPtr new_Context_Debug();
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Handle")]
+  public static extern void DebugMessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context_Debug")]
-  public static extern void delete_Context_Debug(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_DebugMessageHandler")]
+  public static extern void delete_DebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_Handle")]
-  public static extern void MessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Retain")]
+  public static extern void DebugMessageHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_MessageHandler")]
-  public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_Retain")]
-  public static extern void MessageHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_RetainSwigExplicitMessageHandler")]
-  public static extern void MessageHandler_RetainSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_Release")]
-  public static extern void MessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_ReleaseSwigExplicitMessageHandler")]
-  public static extern void MessageHandler_ReleaseSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_MessageHandler")]
-  public static extern global::System.IntPtr new_MessageHandler();
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_MessageHandler_director_connect")]
-  public static extern void MessageHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, MessageHandler.SwigDelegateMessageHandler_0 delegate0, MessageHandler.SwigDelegateMessageHandler_1 delegate1, MessageHandler.SwigDelegateMessageHandler_2 delegate2);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Release")]
+  public static extern void DebugMessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
   public static extern void ScriptExceptionHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);

@@ -43,7 +43,7 @@ private:
 	friend class Context;
 };
 
-struct MessageHandler;
+struct DebugMessageHandler;
 struct ScriptExceptionHandler;
 
 class Context
@@ -57,15 +57,11 @@ public:
 	bool IdleNotificationDeadline(double deadline_in_seconds);
 	~Context();
 
-	struct Debug
-	{
-		static void SetMessageHandler(MessageHandler* messageHandler);
-		static void SendCommand(const char* command);
-		static void ProcessDebugMessages();
-	private:
-		static MessageHandler* _messageHandler;
-	};
+	static void SetDebugMessageHandler(DebugMessageHandler* debugMessageHandler);
+	static void SendDebugCommand(const char* command);
+	static void ProcessDebugMessages();
 private:
+	static DebugMessageHandler* _debugMessageHandler;
 	static v8::Platform* _platform;
 	static v8::Isolate* _isolate;
 	v8::Persistent<v8::Context>* _context;
@@ -107,10 +103,10 @@ private:
 	friend class Object;
 };
 
-struct MessageHandler
+struct DebugMessageHandler
 {
 	virtual void Handle(const char* jsonMessage) = 0;
-	virtual ~MessageHandler() { }
+	virtual ~DebugMessageHandler() { }
 	virtual void Retain() const { }
 	virtual void Release() const { }
 };

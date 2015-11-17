@@ -11,27 +11,6 @@
 #ifndef SWIG_v8_WRAP_H_
 #define SWIG_v8_WRAP_H_
 
-struct SwigDirector_MessageHandler : public V8Simple::MessageHandler, public Swig::Director {
-
-public:
-    SwigDirector_MessageHandler();
-    virtual void Handle(char const *jsonMessage);
-    virtual ~SwigDirector_MessageHandler();
-    virtual void Retain() const;
-    virtual void Release() const;
-
-    typedef void (SWIGSTDCALL* SWIG_Callback0_t)(char *);
-    typedef void (SWIGSTDCALL* SWIG_Callback1_t)();
-    typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
-    void swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease);
-
-private:
-    SWIG_Callback0_t swig_callbackHandle;
-    SWIG_Callback1_t swig_callbackRetain;
-    SWIG_Callback2_t swig_callbackRelease;
-    void swig_init_callbacks();
-};
-
 struct SwigDirector_ScriptExceptionHandler : public V8Simple::ScriptExceptionHandler, public Swig::Director {
 
 public:

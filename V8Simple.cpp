@@ -9,7 +9,7 @@ namespace V8Simple
 Function* Context::_instanceOf = nullptr;
 v8::Isolate* Context::_isolate = nullptr;
 v8::Platform* Context::_platform = nullptr;
-MessageHandler* Context::Debug::_messageHandler = nullptr;
+DebugMessageHandler* Context::_debugMessageHandler = nullptr;
 ScriptExceptionHandler* Context::_scriptExceptionHandler = nullptr;
 
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
@@ -309,14 +309,14 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 	return result;
 }
 
-void Context::Debug::SetMessageHandler(MessageHandler* messageHandler)
+void Context::SetDebugMessageHandler(DebugMessageHandler* debugMessageHandler)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
-	if (_messageHandler != nullptr)
+	if (_debugMessageHandler != nullptr)
 	{
-		_messageHandler->Release();
+		_debugMessageHandler->Release();
 	}
-	if (messageHandler == nullptr)
+	if (debugMessageHandler == nullptr)
 	{
 		v8::Debug::SetMessageHandler(nullptr);
 	}
@@ -324,14 +324,14 @@ void Context::Debug::SetMessageHandler(MessageHandler* messageHandler)
 	{
 		v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
 		{
-			_messageHandler->Handle(ToString(message.GetJSON()));
+			_debugMessageHandler->Handle(ToString(message.GetJSON()));
 		});
-		messageHandler->Retain();
+		debugMessageHandler->Retain();
 	}
-	_messageHandler = messageHandler;
+	_debugMessageHandler = debugMessageHandler;
 }
 
-void Context::Debug::SendCommand(const char* command)
+void Context::SendDebugCommand(const char* command)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
 	v8::HandleScope handleScope(_isolate);
@@ -344,7 +344,7 @@ void Context::Debug::SendCommand(const char* command)
 	delete[] buffer;
 }
 
-void Context::Debug::ProcessDebugMessages()
+void Context::ProcessDebugMessages()
 {
 	v8::Isolate::Scope isolateScope(_isolate);
 	v8::Debug::ProcessDebugMessages();
