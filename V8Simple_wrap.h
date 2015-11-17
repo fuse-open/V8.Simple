@@ -15,7 +15,7 @@ struct SwigDirector_MessageHandler : public V8Simple::MessageHandler, public Swi
 
 public:
     SwigDirector_MessageHandler();
-    virtual void Handle(std::string jsonMessage);
+    virtual void Handle(char const *jsonMessage);
     virtual ~SwigDirector_MessageHandler();
     virtual void Retain() const;
     virtual void Release() const;

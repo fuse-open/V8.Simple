@@ -32,37 +32,74 @@ struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 
 static v8::Local<v8::String> ToV8String(
 	v8::Isolate* isolate,
-	const std::string& str)
+	const char* str)
 {
-	return v8::String::NewFromUtf8(isolate, str.c_str());
+	return v8::String::NewFromUtf8(isolate, str);
 }
 
 template<class T>
-static std::string ToString(const T& t)
+static const char* ToString(const T& t)
 {
 	return *v8::String::Utf8Value(t);
+}
+
+static const char* NewString(const v8::String::Utf8Value& v8str)
+{
+	int len = v8str.length() + 1; // includes null termination
+	const char* src = *v8str;
+	if (src == nullptr)
+	{
+		return nullptr;
+	}
+	char* dest = new char[len];
+	memcpy(dest, src, len);
+	return dest;
+}
+ScriptException::ScriptException(
+	const ::v8::String::Utf8Value& name,
+	const ::v8::String::Utf8Value& errorMessage,
+	const ::v8::String::Utf8Value& fileName,
+	int lineNumber,
+	const ::v8::String::Utf8Value& stackTrace,
+	const ::v8::String::Utf8Value& sourceLine)
+	: Name(NewString(name))
+	, ErrorMessage(NewString(errorMessage))
+	, FileName(NewString(fileName))
+	, StackTrace(NewString(stackTrace))
+	, SourceLine(NewString(sourceLine))
+	, LineNumber(lineNumber)
+{
+}
+
+ScriptException::~ScriptException()
+{
+	delete[] SourceLine;
+	delete[] StackTrace;
+	delete[] FileName;
+	delete[] ErrorMessage;
+	delete[] Name;
 }
 
 void Context::Throw(
 	v8::Local<v8::Context> context,
 	const v8::TryCatch& tryCatch)
 {
-	std::string exception(ToString(tryCatch.Exception()));
+	v8::String::Utf8Value exception(tryCatch.Exception());
 	auto message = tryCatch.Message();
 	auto isolate = context->GetIsolate();
 	auto emptyString = v8::String::Empty(isolate);
-	auto stackTrace = ToString(
+	v8::String::Utf8Value stackTrace(
 		tryCatch
 		.StackTrace(context)
 		.FromMaybe(emptyString.As<v8::Value>()));
-	auto sourceLine = ToString(
+	v8::String::Utf8Value sourceLine(
 		message->GetSourceLine(context)
 		.FromMaybe(emptyString));
 
 	throw ScriptException(
 		exception,
-		ToString(message->Get()),
-		ToString(message->GetScriptOrigin().ResourceName()),
+		v8::String::Utf8Value(message->Get()),
+		v8::String::Utf8Value(message->GetScriptOrigin().ResourceName()),
 		message->GetLineNumber(context).FromMaybe(-1),
 		stackTrace,
 		sourceLine);
@@ -294,7 +331,7 @@ void Context::Debug::SetMessageHandler(MessageHandler* messageHandler)
 	_messageHandler = messageHandler;
 }
 
-void Context::Debug::SendCommand(std::string command)
+void Context::Debug::SendCommand(const char* command)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
 	v8::HandleScope handleScope(_isolate);
@@ -379,7 +416,7 @@ Context::~Context()
 	// delete _platform;
 }
 
-Value* Context::Evaluate(const std::string& fileName, const std::string& code)
+Value* Context::Evaluate(const char* fileName, const char* code)
 	throw (std::runtime_error)
 {
 	try
@@ -429,7 +466,7 @@ Object::Object(v8::Local<v8::Object> object)
 
 Type Object::GetValueType() const { return Type::Object; }
 
-Value* Object::Get(const std::string& key) throw(std::runtime_error)
+Value* Object::Get(const char* key) throw(std::runtime_error)
 {
 	try
 	{
@@ -450,7 +487,7 @@ Value* Object::Get(const std::string& key) throw(std::runtime_error)
 	}
 }
 
-void Object::Set(const std::string& key, const Value& value)
+void Object::Set(const char* key, const Value& value)
 {
 
 	try
@@ -472,7 +509,7 @@ void Object::Set(const std::string& key, const Value& value)
 	}
 }
 
-std::vector<std::string> Object::Keys()
+std::vector<const char*> Object::Keys()
 {
 	try
 	{
@@ -487,7 +524,7 @@ std::vector<std::string> Object::Keys()
 			_object.Get(Context::_isolate)->GetPropertyNames(context));
 
 		auto length = propArr->Length();
-		std::vector<std::string> result;
+		std::vector<const char*> result;
 		result.reserve(length);
 		for (int i = 0; i < static_cast<int>(length); ++i)
 		{
@@ -501,7 +538,7 @@ std::vector<std::string> Object::Keys()
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
-		return std::vector<std::string>();
+		return std::vector<const char*>();
 	}
 }
 
@@ -521,7 +558,7 @@ bool Object::InstanceOf(Function& type)
 }
 
 Value* Object::CallMethod(
-	const std::string& name,
+	const char* name,
 	const std::vector<Value*>& args)
 	throw(std::runtime_error)
 {
@@ -555,7 +592,7 @@ Value* Object::CallMethod(
 	}
 }
 
-bool Object::ContainsKey(const std::string& key)
+bool Object::ContainsKey(const char* key)
 {
 	try
 	{

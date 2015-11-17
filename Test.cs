@@ -42,7 +42,12 @@ static class Test
 
 		public override void Handle(ScriptException e)
 		{
-			throw new Exception(e.Name);
+			throw new Exception(e.GetName() + "\n" +
+				e.GetErrorMessage() + "\n" +
+				e.GetFileName() + "\n" +
+				e.GetLineNumber() + "\n" +
+				e.GetStackTrace() + "\n" +
+				e.GetSourceLine());
 		}
 
 		public override void Retain()
@@ -120,7 +125,7 @@ static class Test
 		{
 			try
 			{
-				context.Evaluate("exceptions.js", "a...");
+				context.Evaluate("exceptions.js", "\n\na...");
 			}
 			catch (System.Exception e)
 			{

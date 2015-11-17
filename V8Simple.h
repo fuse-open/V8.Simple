@@ -2,7 +2,6 @@
 #include <include/v8.h>
 #include <iostream>
 #include <stdexcept>
-#include <string>
 #include <vector>
 
 // Note: All public functions that return a Value* (or derived class), save for
@@ -20,31 +19,28 @@ class Function;
 class Object;
 class Callback;
 
-struct ScriptException: std::exception
+struct ScriptException
 {
-	std::string Name, ErrorMessage, FileName, StackTrace, SourceLine;
+	const char* GetName() { return Name; }
+	const char* GetErrorMessage() { return ErrorMessage; }
+	const char* GetFileName() { return FileName; }
+	int GetLineNumber() { return LineNumber; }
+	const char* GetStackTrace() { return StackTrace; }
+	const char* GetSourceLine() { return SourceLine; }
+
+	~ScriptException();
+private:
+	const char *Name, *ErrorMessage, *FileName, *StackTrace, *SourceLine;
 	int LineNumber;
 
 	ScriptException(
-		const std::string& name,
-		const std::string& errorMessage,
-		const std::string& fileName,
+		const ::v8::String::Utf8Value& name,
+		const ::v8::String::Utf8Value& errorMessage,
+		const ::v8::String::Utf8Value& fileName,
 		int lineNumber,
-		const std::string& stackTrace,
-		const std::string& sourceLine)
-		: Name(name)
-		, ErrorMessage(errorMessage)
-		, FileName(fileName)
-		, StackTrace(stackTrace)
-		, SourceLine(sourceLine)
-		, LineNumber(lineNumber)
-	{ }
-
-	virtual const char* what() const throw()
-	{
-		// TODO
-		return Name.c_str();
-	}
+		const ::v8::String::Utf8Value& stackTrace,
+		const ::v8::String::Utf8Value& sourceLine);
+	friend class Context;
 };
 
 struct MessageHandler;
@@ -55,7 +51,7 @@ class Context
 public:
 	Context(ScriptExceptionHandler* scriptExceptionHandler)
 		throw(std::runtime_error);
-	Value* Evaluate(const std::string& fileName, const std::string& code)
+	Value* Evaluate(const char* fileName, const char* code)
 		throw(std::runtime_error);
 	Object* GlobalObject();
 	bool IdleNotificationDeadline(double deadline_in_seconds);
@@ -64,7 +60,7 @@ public:
 	struct Debug
 	{
 		static void SetMessageHandler(MessageHandler* messageHandler);
-		static void SendCommand(std::string command);
+		static void SendCommand(const char* command);
 		static void ProcessDebugMessages();
 	private:
 		static MessageHandler* _messageHandler;
@@ -113,7 +109,7 @@ private:
 
 struct MessageHandler
 {
-	virtual void Handle(std::string jsonMessage) = 0;
+	virtual void Handle(const char* jsonMessage) = 0;
 	virtual ~MessageHandler() { }
 	virtual void Retain() const { }
 	virtual void Release() const { }
@@ -180,7 +176,7 @@ private:
 
 typedef Primitive<int> Int;
 typedef Primitive<double> Double;
-typedef Primitive<std::string> String;
+typedef Primitive<const char*> String;
 typedef Primitive<bool> Bool;
 
 template<> struct TypeTag<Object> { static const Type Tag = Type::Object; };
@@ -196,15 +192,15 @@ class Object: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
-	Value* Get(const std::string& key)
+	Value* Get(const char* key)
 		throw(std::runtime_error);
-	void Set(const std::string& key, const Value& value);
-	std::vector<std::string> Keys();
+	void Set(const char* key, const Value& value);
+	std::vector<const char*> Keys();
 	bool InstanceOf(Function& type)
 		throw(std::runtime_error);
-	Value* CallMethod(const std::string& name, const std::vector<Value*>& args)
+	Value* CallMethod(const char* name, const std::vector<Value*>& args)
 		throw(std::runtime_error);
-	bool ContainsKey(const std::string& key);
+	bool ContainsKey(const char* key);
 	bool Equals(const Object& object);
 private:
 	Object(v8::Local<v8::Object> object);
