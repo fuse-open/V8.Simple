@@ -1,5 +1,6 @@
 #pragma once
 #include <include/v8.h>
+// TODO remove
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -76,7 +77,7 @@ private:
 		throw(std::runtime_error);
 	static v8::Local<v8::Value> Unwrap(
 		const v8::TryCatch& tryCatch,
-		const Value* value);
+		Value* value);
 	static std::vector<v8::Local<v8::Value>> UnwrapVector(
 		const v8::TryCatch& tryCatch,
 		const std::vector<Value*>& values);
@@ -130,7 +131,8 @@ enum class Type
 	Callback,
 };
 
-// const std::string TypeNames[] = { "Int", "Double", "String", "Bool", "Object", "Array", "Function", "Callback" };
+// TODO remove
+const std::string TypeNames[] = { "Int", "Double", "String", "Bool", "Object", "Array", "Function", "Callback" };
 
 template<class T> struct TypeTag { };
 
@@ -138,27 +140,27 @@ class Value
 {
 public:
 	virtual Type GetValueType() const = 0;
+	/*
 	template<typename T>
 	T* As()
 	{
+		std::cout << "cast " << TypeNames[static_cast<int>(GetValueType())] << " " << this << std::endl;
 		if (GetValueType() == TypeTag<T>::Tag)
 		{
 			return new T(*static_cast<T*>(this));
 		}
 		return nullptr;
 	}
+	*/
 	virtual ~Value()
 	{
-		// std::cout << "- " << this << std::endl;
-	}
-	static void Deallocate(Value* v)
-	{
-		delete v;
+		std::cout << "- " << this << std::endl;
 	}
 protected:
+	// TODO remove
 	Value(Type t)
 	{
-		// std::cout << "+ " << TypeNames[static_cast<int>(t)] << " " << this << std::endl;
+		std::cout << "+ " << TypeNames[static_cast<int>(t)] << " " << this << std::endl;
 	}
 };
 
@@ -175,8 +177,21 @@ private:
 
 typedef Primitive<int> Int;
 typedef Primitive<double> Double;
-typedef Primitive<const char*> String;
 typedef Primitive<bool> Bool;
+
+class String: public Value
+{
+public:
+	String(const char* value);
+	String(const char* value, int length);
+	String(const String& str);
+	virtual Type GetValueType() const override final;
+	const char* GetValue() const;
+	virtual ~String();
+private:
+	char* _value;
+	const int _length;
+};
 
 template<> struct TypeTag<Object> { static const Type Tag = Type::Object; };
 template<> struct TypeTag<Array> { static const Type Tag = Type::Array; };
@@ -187,13 +202,14 @@ template<> struct TypeTag<Double> { static const Type Tag = Type::Double; };
 template<> struct TypeTag<String> { static const Type Tag = Type::String; };
 template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 
+
 class Object: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
 	Value* Get(const char* key)
 		throw(std::runtime_error);
-	void Set(const char* key, const Value& value);
+	void Set(const char* key, Value& value);
 	std::vector<const char*> Keys();
 	bool InstanceOf(Function& type)
 		throw(std::runtime_error);
@@ -204,7 +220,7 @@ public:
 protected:
 	Object(v8::Local<v8::Object> object);
 private:
-	v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>> _object;
+	v8::Persistent<v8::Object> _object;
 	friend class Context;
 	friend class Function;
 };
@@ -217,11 +233,17 @@ public:
 		throw(std::runtime_error);
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function& f);
+	virtual ~Function()
+	{
+		// TODO remove
+		std::cout << "Function destructor " << this << " " << &_function << std::endl;
+		// delete _function;
+	}
 protected:
 	Function(v8::Local<v8::Function> function);
 private:
 	friend class Context;
-	v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>> _function;
+	v8::Persistent<v8::Function> _function;
 };
 
 class Array: public Value
@@ -230,14 +252,14 @@ public:
 	virtual Type GetValueType() const override final;
 	Value* Get(int index)
 		throw(std::runtime_error);
-	void Set(int index, const Value& value);
+	void Set(int index, Value& value);
 	int Length();
 	bool Equals(const Array& array);
 protected:
 	Array(v8::Local<v8::Array> array);
 private:
 	friend class Context;
-	v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array>> _array;
+	v8::Persistent<v8::Array> _array;
 };
 
 class Callback: public Value
@@ -246,8 +268,6 @@ public:
 	Callback();
 	virtual Type GetValueType() const override;
 	virtual Value* Call(const std::vector<Value*>& args)
-		throw(std::runtime_error);
-	virtual Callback* Clone() const
 		throw(std::runtime_error);
 	virtual void Retain() const { }
 	virtual void Release() const { }

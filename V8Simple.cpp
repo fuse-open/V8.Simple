@@ -52,9 +52,10 @@ static const char* NewString(const v8::String::Utf8Value& v8str)
 		return nullptr;
 	}
 	char* dest = new char[len];
-	memcpy(dest, src, len);
+	std::memcpy(dest, src, len);
 	return dest;
 }
+
 ScriptException::ScriptException(
 	const ::v8::String::Utf8Value& name,
 	const ::v8::String::Utf8Value& errorMessage,
@@ -168,10 +169,11 @@ Value* Context::Wrap(
 	}
 	if (value->IsString() || value->IsStringObject())
 	{
-		return new String(ToString(FromJust(
+		v8::String::Utf8Value str(FromJust(
 			context,
 			tryCatch,
-			value->ToString(context))));
+			value->ToString(context)));
+		return new String(*str, str.length());
 	}
 	if (value->IsArray())
 	{
@@ -211,7 +213,7 @@ Value* Context::Wrap(
 
 v8::Local<v8::Value> Context::Unwrap(
 	const v8::TryCatch& tryCatch,
-	const Value* value)
+	Value* value)
 {
 	if (value == nullptr)
 	{
@@ -223,30 +225,30 @@ v8::Local<v8::Value> Context::Unwrap(
 		case Type::Int:
 			return v8::Int32::New(
 				_isolate,
-				static_cast<const Int*>(value)->GetValue());
+				static_cast<Int*>(value)->GetValue());
 		case Type::Double:
 			return v8::Number::New(
 				_isolate,
-				static_cast<const Double*>(value)->GetValue());
+				static_cast<Double*>(value)->GetValue());
 		case Type::String:
 			return ToV8String(
 				_isolate,
-				static_cast<const String*>(value)->GetValue());
+				static_cast<String*>(value)->GetValue());
 		case Type::Bool:
 			return v8::Boolean::New(
 				_isolate,
-				static_cast<const Bool*>(value)->GetValue());
+				static_cast<Bool*>(value)->GetValue());
 		case Type::Object:
-			return static_cast<const Object*>(value)
+			return static_cast<Object*>(value)
 				->_object.Get(_isolate);
 		case Type::Array:
-			return static_cast<const Array*>(value)
+			return static_cast<Array*>(value)
 				->_array.Get(_isolate);
 		case Type::Function:
-			return static_cast<const Function*>(value)
+			return static_cast<Function*>(value)
 				->_function.Get(_isolate);
 		case Type::Callback:
-			Callback* callback = static_cast<const Callback*>(value)->Clone();
+			Callback* callback = static_cast<Callback*>(value);
 			callback->Retain();
 			auto localCallback = v8::External::New(_isolate, callback);
 			v8::Persistent<v8::External> persistentCallback(_isolate, localCallback);
@@ -459,6 +461,34 @@ bool Context::IdleNotificationDeadline(double deadline_in_seconds)
 	return _isolate->IdleNotificationDeadline(deadline_in_seconds);
 }
 
+String::String(const char* value)
+	: String(value, std::strlen(value))
+{
+}
+
+String::String(const char* value, int length)
+	: Value(Type::String)
+	, _value(new char[length + 1])
+	, _length(length)
+{
+	std::cout << "String constructor" << std::endl;
+	std::memcpy(_value, value, _length + 1);
+}
+
+String::String(const String& str)
+	: String(str._value, str._length)
+{
+}
+
+Type String::GetValueType() const { return Type::String; }
+const char* String::GetValue() const { return _value; }
+
+String::~String()
+{
+	std::cout << "String destructor " << this << std::endl;
+	delete[] _value;
+}
+
 Object::Object(v8::Local<v8::Object> object)
 	: Value(Type::Object)
 	, _object(Context::_isolate, object)
@@ -487,9 +517,8 @@ Value* Object::Get(const char* key) throw(std::runtime_error)
 	}
 }
 
-void Object::Set(const char* key, const Value& value)
+void Object::Set(const char* key, Value& value)
 {
-
 	try
 	{
 		v8::Isolate::Scope isolateScope(Context::_isolate);
@@ -528,10 +557,10 @@ std::vector<const char*> Object::Keys()
 		result.reserve(length);
 		for (int i = 0; i < static_cast<int>(length); ++i)
 		{
-			result.push_back(ToString(Context::FromJust(
+			result.push_back(NewString(v8::String::Utf8Value(Context::FromJust(
 				context,
 				tryCatch,
-				propArr->Get(context, static_cast<uint32_t>(i)))));
+				propArr->Get(context, static_cast<uint32_t>(i))))));
 		}
 		return result;
 	}
@@ -642,7 +671,8 @@ bool Object::Equals(const Object& o)
 Function::Function(v8::Local<v8::Function> function)
 	: Value(Type::Function)
 	, _function(Context::_isolate, function)
-{ }
+{
+}
 
 Type Function::GetValueType() const { return Type::Function; }
 
@@ -753,7 +783,7 @@ Value* Array::Get(int index)
 	}
 }
 
-void Array::Set(int index, const Value& value)
+void Array::Set(int index, Value& value)
 {
 	try
 	{
@@ -817,12 +847,6 @@ Value* Callback::Call(const std::vector<Value*>& args)
 	throw(std::runtime_error)
 {
 	throw std::runtime_error("Callback.Call not implemented");
-}
-
-Callback* Callback::Clone() const
-	throw(std::runtime_error)
-{
-	throw std::runtime_error("Callback.Clone not implemented");
 }
 
 Type Callback::GetValueType() const { return Type::Callback; }

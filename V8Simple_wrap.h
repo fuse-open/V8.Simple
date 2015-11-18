@@ -39,23 +39,20 @@ public:
     virtual V8Simple::Type GetValueType() const;
     virtual ~SwigDirector_Callback();
     virtual V8Simple::Value *Call(std::vector< V8Simple::Value * > const &args) throw(std::runtime_error);
-    virtual V8Simple::Callback *Clone() const throw(std::runtime_error);
     virtual void Retain() const;
     virtual void Release() const;
 
     typedef int (SWIGSTDCALL* SWIG_Callback0_t)();
     typedef void * (SWIGSTDCALL* SWIG_Callback1_t)(void *);
-    typedef void * (SWIGSTDCALL* SWIG_Callback2_t)();
+    typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
     typedef void (SWIGSTDCALL* SWIG_Callback3_t)();
-    typedef void (SWIGSTDCALL* SWIG_Callback4_t)();
-    void swig_connect_director(SWIG_Callback0_t callbackGetValueType, SWIG_Callback1_t callbackCall, SWIG_Callback2_t callbackClone, SWIG_Callback3_t callbackRetain, SWIG_Callback4_t callbackRelease);
+    void swig_connect_director(SWIG_Callback0_t callbackGetValueType, SWIG_Callback1_t callbackCall, SWIG_Callback2_t callbackRetain, SWIG_Callback3_t callbackRelease);
 
 private:
     SWIG_Callback0_t swig_callbackGetValueType;
     SWIG_Callback1_t swig_callbackCall;
-    SWIG_Callback2_t swig_callbackClone;
-    SWIG_Callback3_t swig_callbackRetain;
-    SWIG_Callback4_t swig_callbackRelease;
+    SWIG_Callback2_t swig_callbackRetain;
+    SWIG_Callback3_t swig_callbackRelease;
     void swig_init_callbacks();
 };
 

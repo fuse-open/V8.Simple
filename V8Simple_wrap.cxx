@@ -692,19 +692,6 @@ V8Simple::Value *SwigDirector_Callback::Call(std::vector< V8Simple::Value * > co
   return c_result;
 }
 
-V8Simple::Callback *SwigDirector_Callback::Clone() const throw(std::runtime_error) {
-  V8Simple::Callback *c_result = 0 ;
-  void * jresult = 0 ;
-  
-  if (!swig_callbackClone) {
-    return V8Simple::Callback::Clone();
-  } else {
-    jresult = (void *) swig_callbackClone();
-    c_result = (V8Simple::Callback *)jresult; 
-  }
-  return c_result;
-}
-
 void SwigDirector_Callback::Retain() const {
   if (!swig_callbackRetain) {
     V8Simple::Callback::Retain();
@@ -723,10 +710,9 @@ void SwigDirector_Callback::Release() const {
   }
 }
 
-void SwigDirector_Callback::swig_connect_director(SWIG_Callback0_t callbackGetValueType, SWIG_Callback1_t callbackCall, SWIG_Callback2_t callbackClone, SWIG_Callback3_t callbackRetain, SWIG_Callback4_t callbackRelease) {
+void SwigDirector_Callback::swig_connect_director(SWIG_Callback0_t callbackGetValueType, SWIG_Callback1_t callbackCall, SWIG_Callback2_t callbackRetain, SWIG_Callback3_t callbackRelease) {
   swig_callbackGetValueType = callbackGetValueType;
   swig_callbackCall = callbackCall;
-  swig_callbackClone = callbackClone;
   swig_callbackRetain = callbackRetain;
   swig_callbackRelease = callbackRelease;
 }
@@ -734,7 +720,6 @@ void SwigDirector_Callback::swig_connect_director(SWIG_Callback0_t callbackGetVa
 void SwigDirector_Callback::swig_init_callbacks() {
   swig_callbackGetValueType = 0;
   swig_callbackCall = 0;
-  swig_callbackClone = 0;
   swig_callbackRetain = 0;
   swig_callbackRelease = 0;
 }
@@ -1032,6 +1017,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_director_connect(void 
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_TypeNames_get() {
+  void * jresult ;
+  std::string *result = 0 ;
+  
+  result = (std::string *)(std::string *)V8Simple::TypeNames;
+  jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT int SWIGSTDCALL CSharp_Value_GetValueType(void * jarg1) {
   int jresult ;
   V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
@@ -1052,87 +1047,77 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Value(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsInt(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_String__SWIG_0(char * jarg1) {
   void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Primitive< int > *result = 0 ;
+  char *arg1 = (char *) 0 ;
+  V8Simple::String *result = 0 ;
   
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Primitive< int > *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Int >();
+  arg1 = (char *)jarg1; 
+  result = (V8Simple::String *)new V8Simple::String((char const *)arg1);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsDouble(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_String__SWIG_1(char * jarg1, int jarg2) {
   void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Primitive< double > *result = 0 ;
+  char *arg1 = (char *) 0 ;
+  int arg2 ;
+  V8Simple::String *result = 0 ;
   
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Primitive< double > *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Double >();
+  arg1 = (char *)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (V8Simple::String *)new V8Simple::String((char const *)arg1,arg2);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsString(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_String__SWIG_2(void * jarg1) {
   void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Primitive< char const * > *result = 0 ;
+  V8Simple::String *arg1 = 0 ;
+  V8Simple::String *result = 0 ;
   
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Primitive< char const * > *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::String >();
+  arg1 = (V8Simple::String *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::String const & type is null", 0);
+    return 0;
+  } 
+  result = (V8Simple::String *)new V8Simple::String((V8Simple::String const &)*arg1);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsBool(void * jarg1) {
-  void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Primitive< bool > *result = 0 ;
+SWIGEXPORT int SWIGSTDCALL CSharp_String_GetValueType(void * jarg1) {
+  int jresult ;
+  V8Simple::String *arg1 = (V8Simple::String *) 0 ;
+  V8Simple::Type result;
   
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Primitive< bool > *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Bool >();
-  jresult = (void *)result; 
+  arg1 = (V8Simple::String *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::String const *)arg1)->GetValueType();
+  jresult = (int)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsObject(void * jarg1) {
-  void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Object *result = 0 ;
+SWIGEXPORT char * SWIGSTDCALL CSharp_String_GetValue(void * jarg1) {
+  char * jresult ;
+  V8Simple::String *arg1 = (V8Simple::String *) 0 ;
+  char *result = 0 ;
   
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Object *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Object >();
-  jresult = (void *)result; 
+  arg1 = (V8Simple::String *)jarg1; 
+  result = (char *)((V8Simple::String const *)arg1)->GetValue();
+  jresult = SWIG_csharp_string_callback((const char *)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsFunction(void * jarg1) {
-  void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Function *result = 0 ;
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_String(void * jarg1) {
+  V8Simple::String *arg1 = (V8Simple::String *) 0 ;
   
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Function *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Function >();
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Value_AsArray(void * jarg1) {
-  void * jresult ;
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  V8Simple::Array *result = 0 ;
-  
-  arg1 = (V8Simple::Value *)jarg1; 
-  result = (V8Simple::Array *)(arg1)->SWIGTEMPLATEDISAMBIGUATOR As< V8Simple::Array >();
-  jresult = (void *)result; 
-  return jresult;
+  arg1 = (V8Simple::String *)jarg1; 
+  delete arg1;
 }
 
 
@@ -1180,10 +1165,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Object_Set(void * jarg1, char * jarg2, void *
   arg2 = (char *)jarg2; 
   arg3 = (V8Simple::Value *)jarg3;
   if (!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::Value const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::Value & type is null", 0);
     return ;
   } 
-  (arg1)->Set((char const *)arg2,(V8Simple::Value const &)*arg3);
+  (arg1)->Set((char const *)arg2,*arg3);
 }
 
 
@@ -1422,10 +1407,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Array_Set(void * jarg1, int jarg2, void * jar
   arg2 = (int)jarg2; 
   arg3 = (V8Simple::Value *)jarg3;
   if (!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::Value const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::Value & type is null", 0);
     return ;
   } 
-  (arg1)->Set(arg2,(V8Simple::Value const &)*arg3);
+  (arg1)->Set(arg2,*arg3);
 }
 
 
@@ -1555,48 +1540,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CallSwigExplicitCallback(void * ja
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Clone(void * jarg1) {
-  void * jresult ;
-  V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  V8Simple::Callback *result = 0 ;
-  
-  arg1 = (V8Simple::Callback *)jarg1; 
-  try {
-    result = (V8Simple::Callback *)((V8Simple::Callback const *)arg1)->Clone();
-  }
-  catch(std::runtime_error &_e) {
-    {
-      SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, (&_e)->what());
-      return 0;
-    }
-  }
-  
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CloneSwigExplicitCallback(void * jarg1) {
-  void * jresult ;
-  V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  V8Simple::Callback *result = 0 ;
-  
-  arg1 = (V8Simple::Callback *)jarg1; 
-  try {
-    result = (V8Simple::Callback *)((V8Simple::Callback const *)arg1)->V8Simple::Callback::Clone();
-  }
-  catch(std::runtime_error &_e) {
-    {
-      SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, (&_e)->what());
-      return 0;
-    }
-  }
-  
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void SWIGSTDCALL CSharp_Callback_Retain(void * jarg1) {
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
   
@@ -1637,11 +1580,11 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Callback(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_Callback_director_connect(void *objarg, SwigDirector_Callback::SWIG_Callback0_t callback0, SwigDirector_Callback::SWIG_Callback1_t callback1, SwigDirector_Callback::SWIG_Callback2_t callback2, SwigDirector_Callback::SWIG_Callback3_t callback3, SwigDirector_Callback::SWIG_Callback4_t callback4) {
+SWIGEXPORT void SWIGSTDCALL CSharp_Callback_director_connect(void *objarg, SwigDirector_Callback::SWIG_Callback0_t callback0, SwigDirector_Callback::SWIG_Callback1_t callback1, SwigDirector_Callback::SWIG_Callback2_t callback2, SwigDirector_Callback::SWIG_Callback3_t callback3) {
   V8Simple::Callback *obj = (V8Simple::Callback *)objarg;
   SwigDirector_Callback *director = dynamic_cast<SwigDirector_Callback *>(obj);
   if (director) {
-    director->swig_connect_director(callback0, callback1, callback2, callback3, callback4);
+    director->swig_connect_director(callback0, callback1, callback2, callback3);
   }
 }
 
@@ -1734,54 +1677,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Double(void * jarg1) {
   V8Simple::Primitive< double > *arg1 = (V8Simple::Primitive< double > *) 0 ;
   
   arg1 = (V8Simple::Primitive< double > *)jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_String(char * jarg1) {
-  void * jresult ;
-  char **arg1 = 0 ;
-  char *temp1 = 0 ;
-  V8Simple::Primitive< char const * > *result = 0 ;
-  
-  
-  temp1 = (char *)jarg1;
-  arg1 = &temp1;
-  
-  result = (V8Simple::Primitive< char const * > *)new V8Simple::Primitive< char const * >((char const *const &)*arg1);
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_String_GetValueType(void * jarg1) {
-  int jresult ;
-  V8Simple::Primitive< char const * > *arg1 = (V8Simple::Primitive< char const * > *) 0 ;
-  V8Simple::Type result;
-  
-  arg1 = (V8Simple::Primitive< char const * > *)jarg1; 
-  result = (V8Simple::Type)((V8Simple::Primitive< char const * > const *)arg1)->GetValueType();
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT char * SWIGSTDCALL CSharp_String_GetValue(void * jarg1) {
-  char * jresult ;
-  V8Simple::Primitive< char const * > *arg1 = (V8Simple::Primitive< char const * > *) 0 ;
-  char *result = 0 ;
-  
-  arg1 = (V8Simple::Primitive< char const * > *)jarg1; 
-  result = (char *)((V8Simple::Primitive< char const * > const *)arg1)->GetValue();
-  jresult = SWIG_csharp_string_callback((const char *)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_delete_String(void * jarg1) {
-  V8Simple::Primitive< char const * > *arg1 = (V8Simple::Primitive< char const * > *) 0 ;
-  
-  arg1 = (V8Simple::Primitive< char const * > *)jarg1; 
   delete arg1;
 }
 
@@ -2720,6 +2615,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ValueVector(void * jarg1) {
 }
 
 
+SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_String_SWIGUpcast(V8Simple::String *jarg1) {
+    return (V8Simple::Value *)jarg1;
+}
+
 SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Object_SWIGUpcast(V8Simple::Object *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
@@ -2741,10 +2640,6 @@ SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Int_SWIGUpcast(V8Simple::Primiti
 }
 
 SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Double_SWIGUpcast(V8Simple::Primitive< double > *jarg1) {
-    return (V8Simple::Value *)jarg1;
-}
-
-SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_String_SWIGUpcast(V8Simple::Primitive< char const * > *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
 

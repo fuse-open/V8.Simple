@@ -13,12 +13,13 @@ static class Test
 			Value val2 = context.Evaluate("hej.js", "12.3 + 13.5");
 			Value val3 = context.Evaluate("hej.js", "\"hej \" + \"hopp\"");
 			Console.WriteLine(val.GetValueType());
-			Int intVal = val.AsInt();
-			V8Simple.Double doubleVal = val2.AsDouble();
-			V8Simple.String stringVal = val3.AsString();
+			Int intVal = val as V8Simple.Int;
+			V8Simple.Double doubleVal = val2 as V8Simple.Double;
+			V8Simple.String stringVal = val3 as V8Simple.String;
 			Console.WriteLine(intVal == null ? "intVal is null" : intVal.GetValue().ToString());
 			Console.WriteLine(doubleVal == null ? "doubleVal is null" : doubleVal.GetValue().ToString());
 			Console.WriteLine(stringVal == null ? "stringVal is null" : stringVal.GetValue());
+			GC.Collect();
 		}
 	}
 
@@ -26,12 +27,21 @@ static class Test
 	{
 		using (var context = new Context(new ExceptionHandler()))
 		{
-			Function f = context.Evaluate("hej.js", "(function(x, y) { return x + y; })").AsFunction();
-			Console.WriteLine(f == null ? "f is null" : f.ToString());
+			Function f = context.Evaluate("hej.js", "(function(x, y) { return x + y; })") as Function;
+			V8Simple.Array a = context.Evaluate("arr.js", "([2,3,1,4])") as V8Simple.Array;
+			V8Simple.Object o = context.Evaluate("obj.js", "({test: \"blah\", test2: \"xyz\"})") as V8Simple.Object;
+			Console.WriteLine(f == null ? "f is null" : "f is not null");
 			ValueVector args = new ValueVector { new Int(3), new Int(4) };
-			int result = f.Call(args).AsInt().GetValue();
+			int result = (f.Call(args) as Int).GetValue();
 			Console.WriteLine(result);
+			// GC.Collect();
+			// GC.WaitForPendingFinalizers();
+			// Console.WriteLine("after collect");
+			// f.Dispose();
 		}
+		GC.Collect();
+		GC.WaitForPendingFinalizers();
+		Console.WriteLine("after collect 2");
 	}
 
 	class ExceptionHandler : ScriptExceptionHandler
@@ -77,12 +87,6 @@ static class Test
 			return new V8Simple.String("callback return value");
 		}
 
-		public override Callback Clone()
-		{
-			Console.WriteLine("Callback.Clone()");
-			return new CB();
-		}
-
 		public override void Retain()
 		{
 			Console.WriteLine("Callback.Retain()");
@@ -104,7 +108,7 @@ static class Test
 			{
 				Value vf = context.Evaluate("hej.js", "(function(f) { return f(); })");
 				Console.WriteLine("vf");
-				Function f = vf.AsFunction();
+				Function f = vf as Function;
 				Console.WriteLine(f == null ? "f is null" : f.ToString());
 				ValueVector args = new ValueVector { new CB() };
 				Console.WriteLine("Before call");
@@ -112,10 +116,12 @@ static class Test
 			}
 			Console.WriteLine("After call");
 			Console.WriteLine(fresult.GetValueType());
-			result = fresult.AsString().GetValue();
+			result = (fresult as V8Simple.String).GetValue();
 		}
+		Console.WriteLine("Collect");
 		GC.Collect();
 		GC.WaitForPendingFinalizers();
+		Console.WriteLine("Collect done");
 		// Console.WriteLine(result.AsString().GetValue());
 	}
 
@@ -136,20 +142,24 @@ static class Test
 
 	static void Main(string[] args)
 	{
-		DoStuff();
+		// DoStuff();
 		DoStuff2();
+		Console.WriteLine("before collect 3");
+		GC.Collect();
+		GC.WaitForPendingFinalizers();
+		Console.WriteLine("after collect 3");
 		DoStuff4();
 		using (var context = new Context(new ExceptionHandler()))
 		{
 			DoStuff3(context);
-			while (true)
+			for (int i = 0; i < 100; ++i)
 			{
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
 				context.IdleNotificationDeadline(1);
 			}
 		}
-		GC.Collect();
-		GC.WaitForPendingFinalizers();
+		// GC.Collect();
+		// GC.WaitForPendingFinalizers();
 	}
 }

@@ -2,6 +2,36 @@
 %{
 #include "V8Simple.h"
 %}
+// Make sure we return the correct objects in C#:
+// See: http://johnnado.com/swig-csharp-java-downcast/
+%pragma(csharp) imclasscode=%{
+public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool owner)
+{
+	if (cPtr == global::System.IntPtr.Zero)
+	{
+		return null;
+	}
+	Type type = (Type)$modulePINVOKE.Value_GetValueType(new global::System.Runtime.InteropServices.HandleRef(null, cPtr));
+	switch (type)
+	{
+		case Type.Int: return new Int(cPtr, owner);
+		case Type.Double: return new Double(cPtr, owner);
+		case Type.String: return new String(cPtr, owner);
+		case Type.Bool: return new Bool(cPtr, owner);
+		case Type.Object: return new Object(cPtr, owner);
+		case Type.Function: return new Function(cPtr, owner);
+		case Type.Array: return new Array(cPtr, owner);
+	}
+	throw new global::System.Exception("V8Simple: Unhandled value type");
+}
+%}
+%typemap(csout, excode=SWIGEXCODE)
+V8Simple::Value*
+{
+	global::System.IntPtr cPtr = $imcall;
+	$csclassname ret = ($csclassname) $modulePINVOKE.InstantiateConcreteValue(cPtr, $owner);$excode
+	return ret;
+}
 %include <std_vector.i>
 %newobject V8Simple::Context::Evaluate(const char*, const char*);
 %newobject V8Simple::Context::GlobalObject();
@@ -12,14 +42,6 @@
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::Callback::Call(const std::vector<Value*>&);
 %newobject V8Simple::Callback::Clone() const;
-%newobject V8Simple::Value::As<V8Simple::Int>();
-%newobject V8Simple::Value::As<V8Simple::Double>();
-%newobject V8Simple::Value::As<V8Simple::String>();
-%newobject V8Simple::Value::As<V8Simple::Bool>();
-%newobject V8Simple::Value::As<V8Simple::Object>();
-%newobject V8Simple::Value::As<V8Simple::Function>();
-%newobject V8Simple::Value::As<V8Simple::Array>();
-%ignore V8Simple::Value::Deallocate(Value*);
 %feature("director") V8Simple::MessageHandler;
 %feature("director") V8Simple::ScriptExceptionHandler;
 %feature("director") V8Simple::Callback;
@@ -30,14 +52,6 @@
 %include "V8Simple.h"
 %template(Int) V8Simple::Primitive<int>;
 %template(Double) V8Simple::Primitive<double>;
-%template(String) V8Simple::Primitive<const char*>;
 %template(Bool) V8Simple::Primitive<bool>;
 %template(StringVector) std::vector<const char*>;
 %template(ValueVector) std::vector<V8Simple::Value*>;
-%template(AsInt) V8Simple::Value::As<V8Simple::Int>;
-%template(AsDouble) V8Simple::Value::As<V8Simple::Double>;
-%template(AsString) V8Simple::Value::As<V8Simple::String>;
-%template(AsBool) V8Simple::Value::As<V8Simple::Bool>;
-%template(AsObject) V8Simple::Value::As<V8Simple::Object>;
-%template(AsFunction) V8Simple::Value::As<V8Simple::Function>;
-%template(AsArray) V8Simple::Value::As<V8Simple::Array>;

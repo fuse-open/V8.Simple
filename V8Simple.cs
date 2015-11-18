@@ -110,11 +110,11 @@ public class Context : global::System.IDisposable {
   }
 
   public Value Evaluate(string fileName, string code) {
-    global::System.IntPtr cPtr = v8PINVOKE.Context_Evaluate(swigCPtr, fileName, code);
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
+	global::System.IntPtr cPtr = v8PINVOKE.Context_Evaluate(swigCPtr, fileName, code);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   public Object GlobalObject() {
     global::System.IntPtr cPtr = v8PINVOKE.Context_GlobalObject(swigCPtr);
@@ -331,45 +331,57 @@ public class Value : global::System.IDisposable {
     return ret;
   }
 
-  public Int AsInt() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsInt(swigCPtr);
-    Int ret = (cPtr == global::System.IntPtr.Zero) ? null : new Int(cPtr, true);
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class String : Value {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+
+  internal String(global::System.IntPtr cPtr, bool cMemoryOwn) : base(v8PINVOKE.String_SWIGUpcast(cPtr), cMemoryOwn) {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(String obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~String() {
+    Dispose();
+  }
+
+  public override void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_String(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+      base.Dispose();
+    }
+  }
+
+  public String(string value) : this(v8PINVOKE.new_String__SWIG_0(value), true) {
+  }
+
+  public String(string value, int length) : this(v8PINVOKE.new_String__SWIG_1(value, length), true) {
+  }
+
+  public String(String str) : this(v8PINVOKE.new_String__SWIG_2(String.getCPtr(str)), true) {
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.String_GetValueType(swigCPtr);
     return ret;
   }
 
-  public Double AsDouble() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsDouble(swigCPtr);
-    Double ret = (cPtr == global::System.IntPtr.Zero) ? null : new Double(cPtr, true);
-    return ret;
-  }
-
-  public String AsString() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsString(swigCPtr);
-    String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, true);
-    return ret;
-  }
-
-  public Bool AsBool() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsBool(swigCPtr);
-    Bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new Bool(cPtr, true);
-    return ret;
-  }
-
-  public Object AsObject() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsObject(swigCPtr);
-    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, true);
-    return ret;
-  }
-
-  public Function AsFunction() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsFunction(swigCPtr);
-    Function ret = (cPtr == global::System.IntPtr.Zero) ? null : new Function(cPtr, true);
-    return ret;
-  }
-
-  public Array AsArray() {
-    global::System.IntPtr cPtr = v8PINVOKE.Value_AsArray(swigCPtr);
-    Array ret = (cPtr == global::System.IntPtr.Zero) ? null : new Array(cPtr, true);
+  public string GetValue() {
+    string ret = v8PINVOKE.String_GetValue(swigCPtr);
     return ret;
   }
 
@@ -413,11 +425,11 @@ public class Object : Value {
   }
 
   public Value Get(string key) {
-    global::System.IntPtr cPtr = v8PINVOKE.Object_Get(swigCPtr, key);
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
+	global::System.IntPtr cPtr = v8PINVOKE.Object_Get(swigCPtr, key);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   public void Set(string key, Value value) {
     v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
@@ -436,11 +448,11 @@ public class Object : Value {
   }
 
   public Value CallMethod(string name, ValueVector args) {
-    global::System.IntPtr cPtr = v8PINVOKE.Object_CallMethod(swigCPtr, name, ValueVector.getCPtr(args));
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
+	global::System.IntPtr cPtr = v8PINVOKE.Object_CallMethod(swigCPtr, name, ValueVector.getCPtr(args));
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   public bool ContainsKey(string key) {
     bool ret = v8PINVOKE.Object_ContainsKey(swigCPtr, key);
@@ -493,11 +505,11 @@ public class Function : Value {
   }
 
   public Value Call(ValueVector args) {
-    global::System.IntPtr cPtr = v8PINVOKE.Function_Call(swigCPtr, ValueVector.getCPtr(args));
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
+	global::System.IntPtr cPtr = v8PINVOKE.Function_Call(swigCPtr, ValueVector.getCPtr(args));
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   public Object Construct(ValueVector args) {
     global::System.IntPtr cPtr = v8PINVOKE.Function_Construct(swigCPtr, ValueVector.getCPtr(args));
@@ -552,11 +564,11 @@ public class Array : Value {
   }
 
   public Value Get(int index) {
-    global::System.IntPtr cPtr = v8PINVOKE.Array_Get(swigCPtr, index);
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
+	global::System.IntPtr cPtr = v8PINVOKE.Array_Get(swigCPtr, index);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   public void Set(int index, Value value) {
     v8PINVOKE.Array_Set(swigCPtr, index, Value.getCPtr(value));
@@ -618,25 +630,18 @@ public class Callback : Value {
   }
 
   public virtual Value Call(ValueVector args) {
-    global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Call", swigMethodTypes1) ? v8PINVOKE.Callback_CallSwigExplicitCallback(swigCPtr, ValueVector.getCPtr(args)) : v8PINVOKE.Callback_Call(swigCPtr, ValueVector.getCPtr(args)));
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, true);
+	global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Call", swigMethodTypes1) ? v8PINVOKE.Callback_CallSwigExplicitCallback(swigCPtr, ValueVector.getCPtr(args)) : v8PINVOKE.Callback_Call(swigCPtr, ValueVector.getCPtr(args)));
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public virtual Callback Clone() {
-    global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Clone", swigMethodTypes2) ? v8PINVOKE.Callback_CloneSwigExplicitCallback(swigCPtr) : v8PINVOKE.Callback_Clone(swigCPtr));
-    Callback ret = (cPtr == global::System.IntPtr.Zero) ? null : new Callback(cPtr, true);
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   public virtual void Retain() {
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes3)) v8PINVOKE.Callback_RetainSwigExplicitCallback(swigCPtr); else v8PINVOKE.Callback_Retain(swigCPtr);
+    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes2)) v8PINVOKE.Callback_RetainSwigExplicitCallback(swigCPtr); else v8PINVOKE.Callback_Retain(swigCPtr);
   }
 
   public virtual void Release() {
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes4)) v8PINVOKE.Callback_ReleaseSwigExplicitCallback(swigCPtr); else v8PINVOKE.Callback_Release(swigCPtr);
+    if (SwigDerivedClassHasMethod("Release", swigMethodTypes3)) v8PINVOKE.Callback_ReleaseSwigExplicitCallback(swigCPtr); else v8PINVOKE.Callback_Release(swigCPtr);
   }
 
   private void SwigDirectorConnect() {
@@ -644,13 +649,11 @@ public class Callback : Value {
       swigDelegate0 = new SwigDelegateCallback_0(SwigDirectorGetValueType);
     if (SwigDerivedClassHasMethod("Call", swigMethodTypes1))
       swigDelegate1 = new SwigDelegateCallback_1(SwigDirectorCall);
-    if (SwigDerivedClassHasMethod("Clone", swigMethodTypes2))
-      swigDelegate2 = new SwigDelegateCallback_2(SwigDirectorClone);
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes3))
-      swigDelegate3 = new SwigDelegateCallback_3(SwigDirectorRetain);
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes4))
-      swigDelegate4 = new SwigDelegateCallback_4(SwigDirectorRelease);
-    v8PINVOKE.Callback_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2, swigDelegate3, swigDelegate4);
+    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes2))
+      swigDelegate2 = new SwigDelegateCallback_2(SwigDirectorRetain);
+    if (SwigDerivedClassHasMethod("Release", swigMethodTypes3))
+      swigDelegate3 = new SwigDelegateCallback_3(SwigDirectorRelease);
+    v8PINVOKE.Callback_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2, swigDelegate3);
   }
 
   private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
@@ -667,10 +670,6 @@ public class Callback : Value {
     return Value.getCPtr(Call(new ValueVector(args, false))).Handle;
   }
 
-  private global::System.IntPtr SwigDirectorClone() {
-    return Callback.getCPtr(Clone()).Handle;
-  }
-
   private void SwigDirectorRetain() {
     Retain();
   }
@@ -681,21 +680,18 @@ public class Callback : Value {
 
   public delegate int SwigDelegateCallback_0();
   public delegate global::System.IntPtr SwigDelegateCallback_1(global::System.IntPtr args);
-  public delegate global::System.IntPtr SwigDelegateCallback_2();
+  public delegate void SwigDelegateCallback_2();
   public delegate void SwigDelegateCallback_3();
-  public delegate void SwigDelegateCallback_4();
 
   private SwigDelegateCallback_0 swigDelegate0;
   private SwigDelegateCallback_1 swigDelegate1;
   private SwigDelegateCallback_2 swigDelegate2;
   private SwigDelegateCallback_3 swigDelegate3;
-  private SwigDelegateCallback_4 swigDelegate4;
 
   private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] { typeof(ValueVector) };
   private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes3 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes4 = new global::System.Type[] {  };
 }
 
 }
@@ -787,53 +783,6 @@ public class Double : Value {
 
   public double GetValue() {
     double ret = v8PINVOKE.Double_GetValue(swigCPtr);
-    return ret;
-  }
-
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
-public class String : Value {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-
-  internal String(global::System.IntPtr cPtr, bool cMemoryOwn) : base(v8PINVOKE.String_SWIGUpcast(cPtr), cMemoryOwn) {
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(String obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~String() {
-    Dispose();
-  }
-
-  public override void Dispose() {
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_String(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-      base.Dispose();
-    }
-  }
-
-  public String(string value) : this(v8PINVOKE.new_String(value), true) {
-  }
-
-  public override Type GetValueType() {
-    Type ret = (Type)v8PINVOKE.String_GetValueType(swigCPtr);
-    return ret;
-  }
-
-  public string GetValue() {
-    string ret = v8PINVOKE.String_GetValue(swigCPtr);
     return ret;
   }
 
@@ -1431,11 +1380,11 @@ public class ValueVector : global::System.IDisposable, global::System.Collection
   }
 
   private Value getitemcopy(int index) {
-    global::System.IntPtr cPtr = v8PINVOKE.ValueVector_getitemcopy(swigCPtr, index);
-    Value ret = (cPtr == global::System.IntPtr.Zero) ? null : new Value(cPtr, false);
+	global::System.IntPtr cPtr = v8PINVOKE.ValueVector_getitemcopy(swigCPtr, index);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, false);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
+	return ret;
+}
 
   private Value getitem(int index) {
     global::System.IntPtr cPtr = v8PINVOKE.ValueVector_getitem(swigCPtr, index);
@@ -1705,6 +1654,27 @@ class v8PINVOKE {
   }
 
 
+public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool owner)
+{
+	if (cPtr == global::System.IntPtr.Zero)
+	{
+		return null;
+	}
+	Type type = (Type)v8PINVOKE.Value_GetValueType(new global::System.Runtime.InteropServices.HandleRef(null, cPtr));
+	switch (type)
+	{
+		case Type.Int: return new Int(cPtr, owner);
+		case Type.Double: return new Double(cPtr, owner);
+		case Type.String: return new String(cPtr, owner);
+		case Type.Bool: return new Bool(cPtr, owner);
+		case Type.Object: return new Object(cPtr, owner);
+		case Type.Function: return new Function(cPtr, owner);
+		case Type.Array: return new Array(cPtr, owner);
+	}
+	throw new global::System.Exception("V8Simple: Unhandled value type");
+}
+
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetName")]
   public static extern string ScriptException_GetName(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -1786,32 +1756,32 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
   public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_1 delegate1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_2 delegate2);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_TypeNames_get")]
+  public static extern global::System.IntPtr TypeNames_get();
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_GetValueType")]
   public static extern int Value_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Value")]
   public static extern void delete_Value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsInt")]
-  public static extern global::System.IntPtr Value_AsInt(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_String__SWIG_0")]
+  public static extern global::System.IntPtr new_String__SWIG_0(string jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsDouble")]
-  public static extern global::System.IntPtr Value_AsDouble(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_String__SWIG_1")]
+  public static extern global::System.IntPtr new_String__SWIG_1(string jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsString")]
-  public static extern global::System.IntPtr Value_AsString(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_String__SWIG_2")]
+  public static extern global::System.IntPtr new_String__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsBool")]
-  public static extern global::System.IntPtr Value_AsBool(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetValueType")]
+  public static extern int String_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsObject")]
-  public static extern global::System.IntPtr Value_AsObject(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetValue")]
+  public static extern string String_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsFunction")]
-  public static extern global::System.IntPtr Value_AsFunction(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Value_AsArray")]
-  public static extern global::System.IntPtr Value_AsArray(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_String")]
+  public static extern void delete_String(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_GetValueType")]
   public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1888,12 +1858,6 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_CallSwigExplicitCallback")]
   public static extern global::System.IntPtr Callback_CallSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_Clone")]
-  public static extern global::System.IntPtr Callback_Clone(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_CloneSwigExplicitCallback")]
-  public static extern global::System.IntPtr Callback_CloneSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_Retain")]
   public static extern void Callback_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -1910,7 +1874,7 @@ class v8PINVOKE {
   public static extern void delete_Callback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_director_connect")]
-  public static extern void Callback_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, Callback.SwigDelegateCallback_0 delegate0, Callback.SwigDelegateCallback_1 delegate1, Callback.SwigDelegateCallback_2 delegate2, Callback.SwigDelegateCallback_3 delegate3, Callback.SwigDelegateCallback_4 delegate4);
+  public static extern void Callback_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, Callback.SwigDelegateCallback_0 delegate0, Callback.SwigDelegateCallback_1 delegate1, Callback.SwigDelegateCallback_2 delegate2, Callback.SwigDelegateCallback_3 delegate3);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Int")]
   public static extern global::System.IntPtr new_Int(int jarg1);
@@ -1935,18 +1899,6 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Double")]
   public static extern void delete_Double(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_String")]
-  public static extern global::System.IntPtr new_String(string jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetValueType")]
-  public static extern int String_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_GetValue")]
-  public static extern string String_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_String")]
-  public static extern void delete_String(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Bool")]
   public static extern global::System.IntPtr new_Bool(bool jarg1);
@@ -2116,6 +2068,9 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ValueVector")]
   public static extern void delete_ValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_SWIGUpcast")]
+  public static extern global::System.IntPtr String_SWIGUpcast(global::System.IntPtr jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_SWIGUpcast")]
   public static extern global::System.IntPtr Object_SWIGUpcast(global::System.IntPtr jarg1);
 
@@ -2134,9 +2089,6 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Double_SWIGUpcast")]
   public static extern global::System.IntPtr Double_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_SWIGUpcast")]
-  public static extern global::System.IntPtr String_SWIGUpcast(global::System.IntPtr jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Bool_SWIGUpcast")]
   public static extern global::System.IntPtr Bool_SWIGUpcast(global::System.IntPtr jarg1);
 }
@@ -2145,6 +2097,33 @@ class v8PINVOKE {
 namespace Fuse.Scripting.V8.Simple {
 
 public class v8 {
+  public static SWIGTYPE_p_std__string TypeNames {
+    get {
+      global::System.IntPtr cPtr = v8PINVOKE.TypeNames_get();
+      SWIGTYPE_p_std__string ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_std__string(cPtr, false);
+      return ret;
+    } 
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class SWIGTYPE_p_std__string {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+
+  internal SWIGTYPE_p_std__string(global::System.IntPtr cPtr, bool futureUse) {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  protected SWIGTYPE_p_std__string() {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_std__string obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
 }
 
 }
