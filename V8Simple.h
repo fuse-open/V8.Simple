@@ -4,10 +4,9 @@
 #include <stdexcept>
 #include <vector>
 
-// Note: All public functions that return a Value* (or derived class), save for
-// Value::As<T>(), require that the caller takes ownership of and deletes the
-// pointer when appropriate. The Values are allocated with `new`, so should be
-// deallocated with `delete`.
+// Note: All public functions that return a Value* (or derived class), require
+// that the caller takes ownership of and deletes the pointer when appropriate.
+// The Values should be deallocated with Value::Deallocate.
 
 namespace V8Simple
 {
@@ -144,13 +143,17 @@ public:
 	{
 		if (GetValueType() == TypeTag<T>::Tag)
 		{
-			return static_cast<T*>(this);
+			return new T(*static_cast<T*>(this));
 		}
 		return nullptr;
 	}
 	virtual ~Value()
 	{
 		// std::cout << "- " << this << std::endl;
+	}
+	static void Deallocate(Value* v)
+	{
+		delete v;
 	}
 protected:
 	Value(Type t)
@@ -198,9 +201,10 @@ public:
 		throw(std::runtime_error);
 	bool ContainsKey(const char* key);
 	bool Equals(const Object& object);
-private:
+protected:
 	Object(v8::Local<v8::Object> object);
-	v8::Persistent<v8::Object> _object;
+private:
+	v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>> _object;
 	friend class Context;
 	friend class Function;
 };
@@ -213,10 +217,11 @@ public:
 		throw(std::runtime_error);
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function& f);
+protected:
+	Function(v8::Local<v8::Function> function);
 private:
 	friend class Context;
-	Function(v8::Local<v8::Function> function);
-	v8::Persistent<v8::Function> _function;
+	v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>> _function;
 };
 
 class Array: public Value
@@ -228,10 +233,11 @@ public:
 	void Set(int index, const Value& value);
 	int Length();
 	bool Equals(const Array& array);
+protected:
+	Array(v8::Local<v8::Array> array);
 private:
 	friend class Context;
-	Array(v8::Local<v8::Array> array);
-	v8::Persistent<v8::Array> _array;
+	v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array>> _array;
 };
 
 class Callback: public Value

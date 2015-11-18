@@ -12,6 +12,14 @@
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::Callback::Call(const std::vector<Value*>&);
 %newobject V8Simple::Callback::Clone() const;
+%newobject V8Simple::Value::As<V8Simple::Int>();
+%newobject V8Simple::Value::As<V8Simple::Double>();
+%newobject V8Simple::Value::As<V8Simple::String>();
+%newobject V8Simple::Value::As<V8Simple::Bool>();
+%newobject V8Simple::Value::As<V8Simple::Object>();
+%newobject V8Simple::Value::As<V8Simple::Function>();
+%newobject V8Simple::Value::As<V8Simple::Array>();
+%ignore V8Simple::Value::Deallocate(Value*);
 %feature("director") V8Simple::MessageHandler;
 %feature("director") V8Simple::ScriptExceptionHandler;
 %feature("director") V8Simple::Callback;

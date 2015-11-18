@@ -333,43 +333,43 @@ public class Value : global::System.IDisposable {
 
   public Int AsInt() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsInt(swigCPtr);
-    Int ret = (cPtr == global::System.IntPtr.Zero) ? null : new Int(cPtr, false);
+    Int ret = (cPtr == global::System.IntPtr.Zero) ? null : new Int(cPtr, true);
     return ret;
   }
 
   public Double AsDouble() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsDouble(swigCPtr);
-    Double ret = (cPtr == global::System.IntPtr.Zero) ? null : new Double(cPtr, false);
+    Double ret = (cPtr == global::System.IntPtr.Zero) ? null : new Double(cPtr, true);
     return ret;
   }
 
   public String AsString() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsString(swigCPtr);
-    String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, false);
+    String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, true);
     return ret;
   }
 
   public Bool AsBool() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsBool(swigCPtr);
-    Bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new Bool(cPtr, false);
+    Bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new Bool(cPtr, true);
     return ret;
   }
 
   public Object AsObject() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsObject(swigCPtr);
-    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, false);
+    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, true);
     return ret;
   }
 
   public Function AsFunction() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsFunction(swigCPtr);
-    Function ret = (cPtr == global::System.IntPtr.Zero) ? null : new Function(cPtr, false);
+    Function ret = (cPtr == global::System.IntPtr.Zero) ? null : new Function(cPtr, true);
     return ret;
   }
 
   public Array AsArray() {
     global::System.IntPtr cPtr = v8PINVOKE.Value_AsArray(swigCPtr);
-    Array ret = (cPtr == global::System.IntPtr.Zero) ? null : new Array(cPtr, false);
+    Array ret = (cPtr == global::System.IntPtr.Zero) ? null : new Array(cPtr, true);
     return ret;
   }
 
