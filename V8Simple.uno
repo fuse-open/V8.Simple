@@ -31,8 +31,8 @@ namespace Fuse.Scripting.V8.Simple
 				extern "const char* cfileName = ::uAllocCStr($0)";
 				extern "const char* ccode = ::uAllocCStr($1)";
 				Value result = Value.New(extern <ValueImpl> (_contextImpl) "$0->Evaluate(cfileName, ccode)");
-				extern "::uFreeCStr($0)";
-				extern "::uFreeCStr($1)";
+				extern "::uFreeCStr(ccode)";
+				extern "::uFreeCStr(cfileName)";
 				return result;
 			}
 		}
@@ -53,10 +53,20 @@ namespace Fuse.Scripting.V8.Simple
 			}
 		}
 
-		// TODO
-		public static void SetDebugMessageHandler(DebugMessageHandler debugMessageHandler);
-		public static void SendDebugCommand(string command);
-		public static void ProcessDebugMessages();
+		public static void SetDebugMessageHandler(DebugMessageHandler debugMessageHandler)
+		{
+			extern (debugMessageHandler._impl) "::V8Simple::Context::SetDebugMessageHandler($0)";
+		}
+		public static void SendDebugCommand(string command)
+		{
+			extern "const char* ccommand = ::uAllocCStr($0)";
+			extern "::V8Simple::Context::SendDebugCommand(ccommand)";
+			extern "::uFreeCStr(ccommand)";
+		}
+		public static void ProcessDebugMessages()
+		{
+			extern "::V8Simple::Context::ProcessDebugMessages()";
+		}
 	}
 
 	[TargetSpecificType]
@@ -125,10 +135,20 @@ namespace Fuse.Scripting.V8.Simple
 	[TargetSpecificImplementation]
 	public class DebugMessageHandler
 	{
-		// TODO
-		public virtual void Handle(string jsonMessage);
-		public virtual void Retain();
-		public virtual void Release();
+		if defined(CPlusPlus)
+			internal DebugMessageHandlerImpl _impl;
+		public extern(CPlusPlus) DebugMessageHandler()
+		{
+			_impl = extern<DebugMessageHandlerImpl> (this) "new @{DebugMessageHandlerImpl}($0)";
+		}
+		extern(CPlusPlus) ~DebugMessageHandler()
+		{
+			extern (_impl) "delete $0";
+		}
+
+		public virtual void Handle(string jsonMessage) { }
+		public virtual void Retain() { }
+		public virtual void Release() { }
 	}
 
 	[TargetSpecificType]
@@ -138,10 +158,20 @@ namespace Fuse.Scripting.V8.Simple
 	[TargetSpecificImplementation]
 	public class ScriptExceptionHandler
 	{
-		// TODO
-		public virtual void Handle(ScriptException e);
-		public virtual void Retain();
-		public virtual void Release();
+		if defined(CPlusPlus)
+			internal ScriptExceptionHandlerImpl _impl;
+		public extern(CPlusPlus) ScriptExceptionHandler()
+		{
+			_impl = extern<ScriptExceptionHandlerImpl> (this) "new @{ScriptExceptionHandlerImpl}($0)";
+		}
+		extern(CPlusPlus) ~DebugMessageHandler()
+		{
+			extern (_impl) "delete $0";
+		}
+
+		public virtual void Handle(ScriptException e) { }
+		public virtual void Retain() { }
+		public virtual void Release() { }
 	}
 
 	[TargetSpecificType]
@@ -149,14 +179,14 @@ namespace Fuse.Scripting.V8.Simple
 
 	[DotNetType("Fuse.Scripting.V8.Simple.Type")]
 	public enum Type {
-	  Int,
-	  Double,
-	  String,
-	  Bool,
-	  Object,
-	  Array,
-	  Function,
-	  Callback
+		Int,
+		Double,
+		String,
+		Bool,
+		Object,
+		Array,
+		Function,
+		Callback
 	}
 
 	[DotNetType("Fuse.Scripting.V8.Simple.Value")]
@@ -370,15 +400,29 @@ namespace Fuse.Scripting.V8.Simple
 	[TargetSpecificType]
 	internal extern(CPlusPlus) struct ArrayImpl { }
 
-	// TODO
 	[DotNetType("Fuse.Scripting.V8.Simple.Callback")]
 	[TargetSpecificImplementation]
 	public class Callback: Value
 	{
-		public override Type GetValueType();
-		public virtual Value Call(ValueVector args);
-		public virtual void Retain();
-		public virtual void Release();
+		if defined(CPlusPlus)
+			protected CallbackImpl _callbackImpl
+			{
+				get
+				{
+					return extern<CallbackImpl> (_valueImpl) "static_cast< @{CallbackImpl}>($0)";
+				}
+			}
+		internal extern(CPlusPlus) Callback()
+			: base(extern<ValueImpl> (this) "new @{CallbackImpl}($0)")
+		{
+		}
+		public override Type GetValueType()
+		{
+			return extern<Type> (_callbackImpl) "$0->GetValueType()";
+		}
+		public virtual Value Call(ValueVector args) { }
+		public virtual void Retain() { }
+		public virtual void Release() { }
 	}
 
 	[TargetSpecificType]

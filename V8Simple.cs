@@ -359,7 +359,7 @@ public class Callback : Value {
 
   public virtual Value Call(ValueVector args) {
 	global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Call", swigMethodTypes1) ? v8PINVOKE.Callback_CallSwigExplicitCallback(swigCPtr, ValueVector.getCPtr(args)) : v8PINVOKE.Callback_Call(swigCPtr, ValueVector.getCPtr(args)));
-	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, false);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
 	return ret;
 }

@@ -40,8 +40,6 @@ V8Simple::Value*
 %newobject V8Simple::Function::Call(const std::vector<Value*>&);
 %newobject V8Simple::Function::Construct(const std::vector<Value*>&);
 %newobject V8Simple::Array::Get(int);
-%newobject V8Simple::Callback::Call(const std::vector<Value*>&);
-%newobject V8Simple::Callback::Clone() const;
 %feature("director") V8Simple::MessageHandler;
 %feature("director") V8Simple::ScriptExceptionHandler;
 %feature("director") V8Simple::Callback;

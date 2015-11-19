@@ -57,4 +57,25 @@
 		<Require Header.Declaration="class ::V8Simple::Bool;" />
 		<Require Source.Include="V8Simple.h" />
 	</Type>
+	<Type Name="Fuse.Scripting.V8.Simple.CallbackImpl"
+		TypeName="::V8Simple::CallbackProxy*"
+		Default="NULL">
+		<Require Header.Declaration="class ::V8Simple::CallbackProxy;" />
+		<Require Source.Include="V8Simple.h" />
+		<Require Source.Include="Proxy.h" />
+	</Type>
+	<Type Name="Fuse.Scripting.V8.Simple.DebugMessageHandlerImpl"
+		TypeName="::V8Simple::DebugMessageHandlerProxy*"
+		Default="NULL">
+		<Require Header.Declaration="class ::V8Simple::DebugMessageHandlerProxy;" />
+		<Require Source.Include="V8Simple.h" />
+		<Require Source.Include="Proxy.h" />
+	</Type>
+	<Type Name="Fuse.Scripting.V8.Simple.ScriptExceptionHandlerImpl"
+		TypeName="::V8Simple::ScriptExceptionHandlerProxy*"
+		Default="NULL">
+		<Require Header.Declaration="class ::V8Simple::ScriptExceptionHandlerProxy;" />
+		<Require Source.Include="V8Simple.h" />
+		<Require Source.Include="Proxy.h" />
+	</Type>
 </Extensions>
