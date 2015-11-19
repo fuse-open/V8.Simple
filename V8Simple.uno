@@ -237,14 +237,31 @@ namespace Fuse.Scripting.V8.Simple
 			extern "::uFreeCStr(ckey)";
 			return result;
 		}
-		// TODO
-		public StringVector Keys();
+		public StringVector Keys()
+		{
+			extern (_objectImpl) "::std::vector< ::V8Simple::String> vresult = $0->Keys()";
+			StringVector result = new StringVector();
+			int length = extern<int> "vresult.size()";
+			for (int i = 0; i < length; ++i)
+			{
+				result.Add(new String(extern<ValueImpl> (i) "new @{StringImpl}(vresult[$0])"));
+			}
+			return result;
+		}
 		public bool InstanceOf(Function type)
 		{
 			return extern<bool> (_objectImpl, type._functionImpl) "$0->InstanceOf($1)";
 		}
-		// TODO
-		public Value CallMethod(string name, ValueVector args);
+		public Value CallMethod(string name, ValueVector args)
+		{
+			extern "::std::vector<Value*> vargs";
+			extern (args.Count) "vargs.reserve($0)";
+			foreach (var arg in args)
+			{
+				extern (arg._valueImpl) "vargs.push_back($0)";
+			}
+			return Value.New(extern<ValueImpl> (_functionImpl) "$0->Call(vargs)");
+		}
 		public bool ContainsKey(string key)
 		{
 			extern "const char* ckey = ::uAllocCStr($0)";
@@ -282,10 +299,26 @@ namespace Fuse.Scripting.V8.Simple
 		{
 			return extern<Type> (_functionImpl) "$0->GetValueType()";
 		}
-		// TODO
-		public Value Call(ValueVector args);
-		// TODO
-		public Object Construct(ValueVector args);
+		public Value Call(ValueVector args)
+		{
+			extern "::std::vector<Value*> vargs";
+			extern (args.Count) "vargs.reserve($0)";
+			foreach (var arg in args)
+			{
+				extern (arg._valueImpl) "vargs.push_back($0)";
+			}
+			return Value.New(extern<ValueImpl> (_functionImpl) "$0->Call(vargs)");
+		}
+		public Object Construct(ValueVector args)
+		{
+			extern "::std::vector<Value*> vargs";
+			extern (args.Count) "vargs.reserve($0)";
+			foreach (var arg in args)
+			{
+				extern (arg._valueImpl) "vargs.push_back($0)";
+			}
+			return new Object(extern<ValueImpl> (_functionImpl) "$0->Construct(vargs)");
+		}
 		public bool Equals(Function f)
 		{
 			return extern<bool> (_functionImpl, f._functionImpl) "$0->Equals(*$1)";
@@ -443,7 +476,7 @@ namespace Fuse.Scripting.V8.Simple
 		public String(string value)
 		{
 			extern "const char* cvalue = ::uAllocCStr($0)";
-			_valueImpl = extern<ValueImpl> "new ::V8Simple::String(cvalue)")
+			_valueImpl = extern<ValueImpl>(value.Length) "new ::V8Simple::String(cvalue, $0)")
 			extern "::uFreeCStr(cvalue)";
 		}
 		public string GetValue()
@@ -489,25 +522,31 @@ namespace Fuse.Scripting.V8.Simple
 	[TargetSpecificType]
 	internal extern(CPlusPlus) struct BoolImpl { }
 
-	// TODO
 	[DotNetType("Fuse.Scripting.V8.Simple.StringVector")]
-	[TargetSpecificImplementation]
-	public class StringVector: IList<string>
+	public class StringVector: ICollection<String>
 	{
-		public StringVector();
+		if defined(CPlusPlus)
+			List<String> _list;
+		public StringVector() { _list = new List<String>(); }
+		void ICollection<String>.Clear() { _list.Clear(); }
+		void ICollection<String>.Add(String item) { _list.Add(String); }
+		bool ICollection<String>.Remove(String item) { return _list.Remove(String); }
+		bool ICollection<String>.Contains(String item) { return _list.Contains(String); }
+		int ICollection<String>.Count { get { return _list.Count; } }
+		IEnumerator<String> GetEnumerator() { return _list.GetEnumerator(); }
 	}
 
-	[TargetSpecificType]
-	internal extern(CPlusPlus) struct StringVectorImpl { }
-
-	// TODO
 	[DotNetType("Fuse.Scripting.V8.Simple.ValueVector")]
-	[TargetSpecificImplementation]
-	public class ValueVector: IList<Value>
+	public class ValueVector: ICollection<Value>
 	{
-		public ValueVector();
+		if defined(CPlusPlus)
+			List<Value> _list;
+		public ValueVector() { _list = new List<Value>(); }
+		void ICollection<Value>.Clear() { _list.Clear(); }
+		void ICollection<Value>.Add(Value item) { _list.Add(item); }
+		bool ICollection<Value>.Remove(Value item) { return _list.Remove(item); }
+		bool ICollection<Value>.Contains(Value item) { return _list.Contains(item); }
+		int ICollection<Value>.Count { get { return _list.Count; } }
+		IEnumerator<Value> GetEnumerator() { return _list.GetEnumerator(); }
 	}
-
-	[TargetSpecificType]
-	internal extern(CPlusPlus) struct ValueVectorImpl { }
 }

@@ -53,11 +53,11 @@ static class Test
 		public override void Handle(ScriptException e)
 		{
 			throw new Exception(e.GetName() + "\n" +
-				e.GetErrorMessage() + "\n" +
-				e.GetFileName() + "\n" +
+				e.GetErrorMessage().GetValue() + "\n" +
+				e.GetFileName().GetValue() + "\n" +
 				e.GetLineNumber() + "\n" +
-				e.GetStackTrace() + "\n" +
-				e.GetSourceLine());
+				e.GetStackTrace().GetValue() + "\n" +
+				e.GetSourceLine().GetValue());
 		}
 
 		public override void Retain()

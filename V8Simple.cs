@@ -10,278 +10,6 @@
 
 namespace Fuse.Scripting.V8.Simple {
 
-public class ScriptException : global::System.IDisposable {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-  protected bool swigCMemOwn;
-
-  internal ScriptException(global::System.IntPtr cPtr, bool cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ScriptException obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~ScriptException() {
-    Dispose();
-  }
-
-  public virtual void Dispose() {
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_ScriptException(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-
-  public string GetName() {
-    string ret = v8PINVOKE.ScriptException_GetName(swigCPtr);
-    return ret;
-  }
-
-  public string GetErrorMessage() {
-    string ret = v8PINVOKE.ScriptException_GetErrorMessage(swigCPtr);
-    return ret;
-  }
-
-  public string GetFileName() {
-    string ret = v8PINVOKE.ScriptException_GetFileName(swigCPtr);
-    return ret;
-  }
-
-  public int GetLineNumber() {
-    int ret = v8PINVOKE.ScriptException_GetLineNumber(swigCPtr);
-    return ret;
-  }
-
-  public string GetStackTrace() {
-    string ret = v8PINVOKE.ScriptException_GetStackTrace(swigCPtr);
-    return ret;
-  }
-
-  public string GetSourceLine() {
-    string ret = v8PINVOKE.ScriptException_GetSourceLine(swigCPtr);
-    return ret;
-  }
-
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
-public class Context : global::System.IDisposable {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-  protected bool swigCMemOwn;
-
-  internal Context(global::System.IntPtr cPtr, bool cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Context obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~Context() {
-    Dispose();
-  }
-
-  public virtual void Dispose() {
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_Context(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-
-  public Context(ScriptExceptionHandler scriptExceptionHandler) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler)), true) {
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public Value Evaluate(string fileName, string code) {
-	global::System.IntPtr cPtr = v8PINVOKE.Context_Evaluate(swigCPtr, fileName, code);
-	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-	return ret;
-}
-
-  public Object GlobalObject() {
-    global::System.IntPtr cPtr = v8PINVOKE.Context_GlobalObject(swigCPtr);
-    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, true);
-    return ret;
-  }
-
-  public bool IdleNotificationDeadline(double deadline_in_seconds) {
-    bool ret = v8PINVOKE.Context_IdleNotificationDeadline(swigCPtr, deadline_in_seconds);
-    return ret;
-  }
-
-  public static void SetDebugMessageHandler(DebugMessageHandler debugMessageHandler) {
-    v8PINVOKE.Context_SetDebugMessageHandler(DebugMessageHandler.getCPtr(debugMessageHandler));
-  }
-
-  public static void SendDebugCommand(string command) {
-    v8PINVOKE.Context_SendDebugCommand(command);
-  }
-
-  public static void ProcessDebugMessages() {
-    v8PINVOKE.Context_ProcessDebugMessages();
-  }
-
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
-public class DebugMessageHandler : global::System.IDisposable {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-  protected bool swigCMemOwn;
-
-  internal DebugMessageHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(DebugMessageHandler obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~DebugMessageHandler() {
-    Dispose();
-  }
-
-  public virtual void Dispose() {
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_DebugMessageHandler(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-
-  public virtual void Handle(string jsonMessage) {
-    v8PINVOKE.DebugMessageHandler_Handle(swigCPtr, jsonMessage);
-  }
-
-  public virtual void Retain() {
-    v8PINVOKE.DebugMessageHandler_Retain(swigCPtr);
-  }
-
-  public virtual void Release() {
-    v8PINVOKE.DebugMessageHandler_Release(swigCPtr);
-  }
-
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
-public class ScriptExceptionHandler : global::System.IDisposable {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-  protected bool swigCMemOwn;
-
-  internal ScriptExceptionHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ScriptExceptionHandler obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~ScriptExceptionHandler() {
-    Dispose();
-  }
-
-  public virtual void Dispose() {
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_ScriptExceptionHandler(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-
-  public virtual void Handle(ScriptException e) {
-    v8PINVOKE.ScriptExceptionHandler_Handle(swigCPtr, ScriptException.getCPtr(e));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public virtual void Retain() {
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1)) v8PINVOKE.ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(swigCPtr); else v8PINVOKE.ScriptExceptionHandler_Retain(swigCPtr);
-  }
-
-  public virtual void Release() {
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2)) v8PINVOKE.ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(swigCPtr); else v8PINVOKE.ScriptExceptionHandler_Release(swigCPtr);
-  }
-
-  public ScriptExceptionHandler() : this(v8PINVOKE.new_ScriptExceptionHandler(), true) {
-    SwigDirectorConnect();
-  }
-
-  private void SwigDirectorConnect() {
-    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0))
-      swigDelegate0 = new SwigDelegateScriptExceptionHandler_0(SwigDirectorHandle);
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1))
-      swigDelegate1 = new SwigDelegateScriptExceptionHandler_1(SwigDirectorRetain);
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2))
-      swigDelegate2 = new SwigDelegateScriptExceptionHandler_2(SwigDirectorRelease);
-    v8PINVOKE.ScriptExceptionHandler_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2);
-  }
-
-  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
-    global::System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(methodName, global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, methodTypes, null);
-    bool hasDerivedMethod = methodInfo.DeclaringType.IsSubclassOf(typeof(ScriptExceptionHandler));
-    return hasDerivedMethod;
-  }
-
-  private void SwigDirectorHandle(global::System.IntPtr e) {
-    Handle(new ScriptException(e, false));
-  }
-
-  private void SwigDirectorRetain() {
-    Retain();
-  }
-
-  private void SwigDirectorRelease() {
-    Release();
-  }
-
-  public delegate void SwigDelegateScriptExceptionHandler_0(global::System.IntPtr e);
-  public delegate void SwigDelegateScriptExceptionHandler_1();
-  public delegate void SwigDelegateScriptExceptionHandler_2();
-
-  private SwigDelegateScriptExceptionHandler_0 swigDelegate0;
-  private SwigDelegateScriptExceptionHandler_1 swigDelegate1;
-  private SwigDelegateScriptExceptionHandler_2 swigDelegate2;
-
-  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(ScriptException) };
-  private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
 public enum Type {
   Int,
   Double,
@@ -390,86 +118,6 @@ public class String : Value {
 }
 namespace Fuse.Scripting.V8.Simple {
 
-public class Object : Value {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-
-  internal Object(global::System.IntPtr cPtr, bool cMemoryOwn) : base(v8PINVOKE.Object_SWIGUpcast(cPtr), cMemoryOwn) {
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Object obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~Object() {
-    Dispose();
-  }
-
-  public override void Dispose() {
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_Object(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-      base.Dispose();
-    }
-  }
-
-  public override Type GetValueType() {
-    Type ret = (Type)v8PINVOKE.Object_GetValueType(swigCPtr);
-    return ret;
-  }
-
-  public Value Get(string key) {
-	global::System.IntPtr cPtr = v8PINVOKE.Object_Get(swigCPtr, key);
-	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-	return ret;
-}
-
-  public void Set(string key, Value value) {
-    v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public StringVector Keys() {
-    StringVector ret = new StringVector(v8PINVOKE.Object_Keys(swigCPtr), true);
-    return ret;
-  }
-
-  public bool InstanceOf(Function type) {
-    bool ret = v8PINVOKE.Object_InstanceOf(swigCPtr, Function.getCPtr(type));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public Value CallMethod(string name, ValueVector args) {
-	global::System.IntPtr cPtr = v8PINVOKE.Object_CallMethod(swigCPtr, name, ValueVector.getCPtr(args));
-	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-	return ret;
-}
-
-  public bool ContainsKey(string key) {
-    bool ret = v8PINVOKE.Object_ContainsKey(swigCPtr, key);
-    return ret;
-  }
-
-  public bool Equals(Object arg0) {
-    bool ret = v8PINVOKE.Object_Equals(swigCPtr, Object.getCPtr(arg0));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
 public class Function : Value {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
@@ -520,6 +168,86 @@ public class Function : Value {
 
   public bool Equals(Function f) {
     bool ret = v8PINVOKE.Function_Equals(swigCPtr, Function.getCPtr(f));
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class Object : Value {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+
+  internal Object(global::System.IntPtr cPtr, bool cMemoryOwn) : base(v8PINVOKE.Object_SWIGUpcast(cPtr), cMemoryOwn) {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Object obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~Object() {
+    Dispose();
+  }
+
+  public override void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_Object(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+      base.Dispose();
+    }
+  }
+
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.Object_GetValueType(swigCPtr);
+    return ret;
+  }
+
+  public Value Get(string key) {
+	global::System.IntPtr cPtr = v8PINVOKE.Object_Get(swigCPtr, key);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+	return ret;
+}
+
+  public void Set(string key, Value value) {
+    v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public SWIGTYPE_p_std__vectorT_V8Simple__String_t Keys() {
+    SWIGTYPE_p_std__vectorT_V8Simple__String_t ret = new SWIGTYPE_p_std__vectorT_V8Simple__String_t(v8PINVOKE.Object_Keys(swigCPtr), true);
+    return ret;
+  }
+
+  public bool InstanceOf(Function type) {
+    bool ret = v8PINVOKE.Object_InstanceOf(swigCPtr, Function.getCPtr(type));
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public Value CallMethod(string name, ValueVector args) {
+	global::System.IntPtr cPtr = v8PINVOKE.Object_CallMethod(swigCPtr, name, ValueVector.getCPtr(args));
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+	return ret;
+}
+
+  public bool ContainsKey(string key) {
+    bool ret = v8PINVOKE.Object_ContainsKey(swigCPtr, key);
+    return ret;
+  }
+
+  public bool Equals(Object arg0) {
+    bool ret = v8PINVOKE.Object_Equals(swigCPtr, Object.getCPtr(arg0));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -692,6 +420,278 @@ public class Callback : Value {
   private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] { typeof(ValueVector) };
   private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes3 = new global::System.Type[] {  };
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class ScriptException : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal ScriptException(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ScriptException obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~ScriptException() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_ScriptException(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+
+  public String GetName() {
+    String ret = new String(v8PINVOKE.ScriptException_GetName(swigCPtr), false);
+    return ret;
+  }
+
+  public String GetErrorMessage() {
+    String ret = new String(v8PINVOKE.ScriptException_GetErrorMessage(swigCPtr), false);
+    return ret;
+  }
+
+  public String GetFileName() {
+    String ret = new String(v8PINVOKE.ScriptException_GetFileName(swigCPtr), false);
+    return ret;
+  }
+
+  public int GetLineNumber() {
+    int ret = v8PINVOKE.ScriptException_GetLineNumber(swigCPtr);
+    return ret;
+  }
+
+  public String GetStackTrace() {
+    String ret = new String(v8PINVOKE.ScriptException_GetStackTrace(swigCPtr), false);
+    return ret;
+  }
+
+  public String GetSourceLine() {
+    String ret = new String(v8PINVOKE.ScriptException_GetSourceLine(swigCPtr), false);
+    return ret;
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class DebugMessageHandler : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal DebugMessageHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(DebugMessageHandler obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~DebugMessageHandler() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_DebugMessageHandler(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+
+  public virtual void Handle(string jsonMessage) {
+    v8PINVOKE.DebugMessageHandler_Handle(swigCPtr, jsonMessage);
+  }
+
+  public virtual void Retain() {
+    v8PINVOKE.DebugMessageHandler_Retain(swigCPtr);
+  }
+
+  public virtual void Release() {
+    v8PINVOKE.DebugMessageHandler_Release(swigCPtr);
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class ScriptExceptionHandler : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal ScriptExceptionHandler(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ScriptExceptionHandler obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~ScriptExceptionHandler() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_ScriptExceptionHandler(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+
+  public virtual void Handle(ScriptException e) {
+    v8PINVOKE.ScriptExceptionHandler_Handle(swigCPtr, ScriptException.getCPtr(e));
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public virtual void Retain() {
+    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1)) v8PINVOKE.ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(swigCPtr); else v8PINVOKE.ScriptExceptionHandler_Retain(swigCPtr);
+  }
+
+  public virtual void Release() {
+    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2)) v8PINVOKE.ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(swigCPtr); else v8PINVOKE.ScriptExceptionHandler_Release(swigCPtr);
+  }
+
+  public ScriptExceptionHandler() : this(v8PINVOKE.new_ScriptExceptionHandler(), true) {
+    SwigDirectorConnect();
+  }
+
+  private void SwigDirectorConnect() {
+    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0))
+      swigDelegate0 = new SwigDelegateScriptExceptionHandler_0(SwigDirectorHandle);
+    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1))
+      swigDelegate1 = new SwigDelegateScriptExceptionHandler_1(SwigDirectorRetain);
+    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2))
+      swigDelegate2 = new SwigDelegateScriptExceptionHandler_2(SwigDirectorRelease);
+    v8PINVOKE.ScriptExceptionHandler_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2);
+  }
+
+  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
+    global::System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(methodName, global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, methodTypes, null);
+    bool hasDerivedMethod = methodInfo.DeclaringType.IsSubclassOf(typeof(ScriptExceptionHandler));
+    return hasDerivedMethod;
+  }
+
+  private void SwigDirectorHandle(global::System.IntPtr e) {
+    Handle(new ScriptException(e, false));
+  }
+
+  private void SwigDirectorRetain() {
+    Retain();
+  }
+
+  private void SwigDirectorRelease() {
+    Release();
+  }
+
+  public delegate void SwigDelegateScriptExceptionHandler_0(global::System.IntPtr e);
+  public delegate void SwigDelegateScriptExceptionHandler_1();
+  public delegate void SwigDelegateScriptExceptionHandler_2();
+
+  private SwigDelegateScriptExceptionHandler_0 swigDelegate0;
+  private SwigDelegateScriptExceptionHandler_1 swigDelegate1;
+  private SwigDelegateScriptExceptionHandler_2 swigDelegate2;
+
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(ScriptException) };
+  private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
+  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class Context : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal Context(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Context obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~Context() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_Context(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+
+  public Context(ScriptExceptionHandler scriptExceptionHandler) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler)), true) {
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public Value Evaluate(string fileName, string code) {
+	global::System.IntPtr cPtr = v8PINVOKE.Context_Evaluate(swigCPtr, fileName, code);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+	return ret;
+}
+
+  public Object GlobalObject() {
+    global::System.IntPtr cPtr = v8PINVOKE.Context_GlobalObject(swigCPtr);
+    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, true);
+    return ret;
+  }
+
+  public bool IdleNotificationDeadline(double deadline_in_seconds) {
+    bool ret = v8PINVOKE.Context_IdleNotificationDeadline(swigCPtr, deadline_in_seconds);
+    return ret;
+  }
+
+  public static void SetDebugMessageHandler(DebugMessageHandler debugMessageHandler) {
+    v8PINVOKE.Context_SetDebugMessageHandler(DebugMessageHandler.getCPtr(debugMessageHandler));
+  }
+
+  public static void SendDebugCommand(string command) {
+    v8PINVOKE.Context_SendDebugCommand(command);
+  }
+
+  public static void ProcessDebugMessages() {
+    v8PINVOKE.Context_ProcessDebugMessages();
+  }
+
 }
 
 }
@@ -1675,87 +1675,6 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
 }
 
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetName")]
-  public static extern string ScriptException_GetName(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetErrorMessage")]
-  public static extern string ScriptException_GetErrorMessage(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetFileName")]
-  public static extern string ScriptException_GetFileName(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetLineNumber")]
-  public static extern int ScriptException_GetLineNumber(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetStackTrace")]
-  public static extern string ScriptException_GetStackTrace(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetSourceLine")]
-  public static extern string ScriptException_GetSourceLine(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptException")]
-  public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Context")]
-  public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Evaluate")]
-  public static extern global::System.IntPtr Context_Evaluate(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, string jarg3);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_GlobalObject")]
-  public static extern global::System.IntPtr Context_GlobalObject(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_IdleNotificationDeadline")]
-  public static extern bool Context_IdleNotificationDeadline(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context")]
-  public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
-  public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_SendDebugCommand")]
-  public static extern void Context_SendDebugCommand(string jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_ProcessDebugMessages")]
-  public static extern void Context_ProcessDebugMessages();
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Handle")]
-  public static extern void DebugMessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_DebugMessageHandler")]
-  public static extern void delete_DebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Retain")]
-  public static extern void DebugMessageHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Release")]
-  public static extern void DebugMessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
-  public static extern void ScriptExceptionHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
-  public static extern void delete_ScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Retain")]
-  public static extern void ScriptExceptionHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler")]
-  public static extern void ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Release")]
-  public static extern void ScriptExceptionHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler")]
-  public static extern void ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_ScriptExceptionHandler")]
-  public static extern global::System.IntPtr new_ScriptExceptionHandler();
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
-  public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_1 delegate1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_2 delegate2);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_TypeNames_get")]
   public static extern global::System.IntPtr TypeNames_get();
 
@@ -1783,6 +1702,21 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_String")]
   public static extern void delete_String(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_GetValueType")]
+  public static extern int Function_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Call")]
+  public static extern global::System.IntPtr Function_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Construct")]
+  public static extern global::System.IntPtr Function_Construct(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Equals")]
+  public static extern bool Function_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Function")]
+  public static extern void delete_Function(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_GetValueType")]
   public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -1809,21 +1743,6 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Object")]
   public static extern void delete_Object(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_GetValueType")]
-  public static extern int Function_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Call")]
-  public static extern global::System.IntPtr Function_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Construct")]
-  public static extern global::System.IntPtr Function_Construct(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_Equals")]
-  public static extern bool Function_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Function")]
-  public static extern void delete_Function(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Array_GetValueType")]
   public static extern int Array_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1875,6 +1794,87 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Callback_director_connect")]
   public static extern void Callback_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, Callback.SwigDelegateCallback_0 delegate0, Callback.SwigDelegateCallback_1 delegate1, Callback.SwigDelegateCallback_2 delegate2, Callback.SwigDelegateCallback_3 delegate3);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetName")]
+  public static extern global::System.IntPtr ScriptException_GetName(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetErrorMessage")]
+  public static extern global::System.IntPtr ScriptException_GetErrorMessage(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetFileName")]
+  public static extern global::System.IntPtr ScriptException_GetFileName(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetLineNumber")]
+  public static extern int ScriptException_GetLineNumber(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetStackTrace")]
+  public static extern global::System.IntPtr ScriptException_GetStackTrace(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptException_GetSourceLine")]
+  public static extern global::System.IntPtr ScriptException_GetSourceLine(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptException")]
+  public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Handle")]
+  public static extern void DebugMessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_DebugMessageHandler")]
+  public static extern void delete_DebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Retain")]
+  public static extern void DebugMessageHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Release")]
+  public static extern void DebugMessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
+  public static extern void ScriptExceptionHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
+  public static extern void delete_ScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Retain")]
+  public static extern void ScriptExceptionHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler")]
+  public static extern void ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Release")]
+  public static extern void ScriptExceptionHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler")]
+  public static extern void ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_ScriptExceptionHandler")]
+  public static extern global::System.IntPtr new_ScriptExceptionHandler();
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
+  public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_1 delegate1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_2 delegate2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Context")]
+  public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_Evaluate")]
+  public static extern global::System.IntPtr Context_Evaluate(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, string jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_GlobalObject")]
+  public static extern global::System.IntPtr Context_GlobalObject(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_IdleNotificationDeadline")]
+  public static extern bool Context_IdleNotificationDeadline(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_Context")]
+  public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
+  public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_SendDebugCommand")]
+  public static extern void Context_SendDebugCommand(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Context_ProcessDebugMessages")]
+  public static extern void Context_ProcessDebugMessages();
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_Int")]
   public static extern global::System.IntPtr new_Int(int jarg1);
@@ -2071,11 +2071,11 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_String_SWIGUpcast")]
   public static extern global::System.IntPtr String_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_SWIGUpcast")]
-  public static extern global::System.IntPtr Object_SWIGUpcast(global::System.IntPtr jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Function_SWIGUpcast")]
   public static extern global::System.IntPtr Function_SWIGUpcast(global::System.IntPtr jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Object_SWIGUpcast")]
+  public static extern global::System.IntPtr Object_SWIGUpcast(global::System.IntPtr jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_Array_SWIGUpcast")]
   public static extern global::System.IntPtr Array_SWIGUpcast(global::System.IntPtr jarg1);
@@ -2105,6 +2105,25 @@ public class v8 {
     } 
   }
 
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
+public class SWIGTYPE_p_std__vectorT_V8Simple__String_t {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+
+  internal SWIGTYPE_p_std__vectorT_V8Simple__String_t(global::System.IntPtr cPtr, bool futureUse) {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  protected SWIGTYPE_p_std__vectorT_V8Simple__String_t() {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_std__vectorT_V8Simple__String_t obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
 }
 
 }
