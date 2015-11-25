@@ -1,5 +1,5 @@
-LDFLAGS= -fPIC -fno-rtti -L$(HOME)/v8-lib/lib-osx-32 -stdlib=libstdc++ -lv8_base -lv8_libbase -lv8_libplatform -lv8_nosnapshot -dead_strip
-CPPFLAGS= -Wall -m32 -stdlib=libstdc++ -std=c++11 -I$(HOME)/v8 -Os
+LDFLAGS+= -fPIC -fno-rtti -L$(HOME)/v8-lib/lib-osx-32 -stdlib=libstdc++ -lv8_base -lv8_libbase -lv8_libplatform -lv8_nosnapshot -dead_strip
+CXXFLAGS+= -Wall -m32 -stdlib=libstdc++ -std=c++11 -I$(HOME)/v8 -Os
 
 FILE=V8Simple
 OBJ_DIR=obj
@@ -10,15 +10,15 @@ all: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).dll
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
-	clang++ -c $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o: %.cxx
 	@mkdir -p $(OBJ_DIR)
-	clang++ -c $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(LIB_DIR)/$(LIB_FILE): $(OBJ_DIR)/$(FILE).o $(OBJ_DIR)/$(FILE)_wrap.o
 	@mkdir -p $(LIB_DIR)
-	clang++ -shared $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 $(FILE).cs $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
 	swig -csharp -dllimport $(FILE) -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
@@ -29,6 +29,6 @@ $(LIB_DIR)/$(FILE).dll: $(FILE).cs
 .PHONY: clean
 
 clean:
-	$(RM) $(FILE)_wrap.cxx
-	$(RM) -r $(LIB_DIR)
-	$(RM) -r $(OBJ_DIR)
+	rm $(FILE)_wrap.cxx
+	rm -r $(LIB_DIR)
+	rm -r $(OBJ_DIR)
