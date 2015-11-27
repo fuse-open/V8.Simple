@@ -682,7 +682,8 @@ void SwigDirector_ScriptExceptionHandler::Handle(V8Simple::ScriptException const
   void * je = 0 ;
   
   if (!swig_callbackHandle) {
-    throw Swig::DirectorPureVirtualException("V8Simple::ScriptExceptionHandler::Handle");
+    V8Simple::ScriptExceptionHandler::Handle(e);
+    return;
   } else {
     je = (V8Simple::ScriptException *) &e; 
     swig_callbackHandle(je);
@@ -1415,6 +1416,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_DebugMessageHandler_Release(void * jarg1) {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_DebugMessageHandler() {
+  void * jresult ;
+  V8Simple::DebugMessageHandler *result = 0 ;
+  
+  result = (V8Simple::DebugMessageHandler *)new V8Simple::DebugMessageHandler();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_Handle(void * jarg1, void * jarg2) {
   V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
   V8Simple::ScriptException *arg2 = 0 ;
@@ -1426,6 +1437,20 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_Handle(void * jarg1, v
     return ;
   } 
   (arg1)->Handle((V8Simple::ScriptException const &)*arg2);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler(void * jarg1, void * jarg2) {
+  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
+  V8Simple::ScriptException *arg2 = 0 ;
+  
+  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
+  arg2 = (V8Simple::ScriptException *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::ScriptException const & type is null", 0);
+    return ;
+  } 
+  (arg1)->V8Simple::ScriptExceptionHandler::Handle((V8Simple::ScriptException const &)*arg2);
 }
 
 

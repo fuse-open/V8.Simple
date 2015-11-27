@@ -185,7 +185,7 @@ private:
 
 struct DebugMessageHandler
 {
-	virtual void Handle(const char* jsonMessage) = 0;
+	virtual void Handle(const char* jsonMessage) { }
 	virtual ~DebugMessageHandler() { }
 	virtual void Retain() const { }
 	virtual void Release() const { }
@@ -193,7 +193,7 @@ struct DebugMessageHandler
 
 struct ScriptExceptionHandler
 {
-	virtual void Handle(const ScriptException& e) = 0;
+	virtual void Handle(const ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
 	virtual void Retain() const { }
 	virtual void Release() const { }

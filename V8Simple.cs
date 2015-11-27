@@ -532,6 +532,9 @@ public class DebugMessageHandler : global::System.IDisposable {
     v8PINVOKE.DebugMessageHandler_Release(swigCPtr);
   }
 
+  public DebugMessageHandler() : this(v8PINVOKE.new_DebugMessageHandler(), true) {
+  }
+
 }
 
 }
@@ -568,7 +571,7 @@ public class ScriptExceptionHandler : global::System.IDisposable {
   }
 
   public virtual void Handle(ScriptException e) {
-    v8PINVOKE.ScriptExceptionHandler_Handle(swigCPtr, ScriptException.getCPtr(e));
+    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler(swigCPtr, ScriptException.getCPtr(e)); else v8PINVOKE.ScriptExceptionHandler_Handle(swigCPtr, ScriptException.getCPtr(e));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -1828,8 +1831,14 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_DebugMessageHandler_Release")]
   public static extern void DebugMessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_new_DebugMessageHandler")]
+  public static extern global::System.IntPtr new_DebugMessageHandler();
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
   public static extern void ScriptExceptionHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler")]
+  public static extern void ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
   public static extern void delete_ScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
