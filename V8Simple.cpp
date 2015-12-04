@@ -2,6 +2,7 @@
 #include <include/v8-debug.h>
 #include <include/libplatform/libplatform.h>
 #include <stdlib.h>
+#include <string>
 
 namespace V8Simple
 {
@@ -16,7 +17,7 @@ String::String(const char* value, int length)
 	, _value(new char[length + 1])
 	, _length(length)
 {
-	std::cout << "String constructor" << std::endl;
+	// std::cout << "String constructor" << std::endl;
 	std::memcpy(_value, value, _length + 1);
 }
 
@@ -44,7 +45,7 @@ const char* String::GetValue() const { return _value; }
 
 String::~String()
 {
-	std::cout << "String destructor " << this << std::endl;
+	// std::cout << "String destructor " << this << std::endl;
 	delete[] _value;
 }
 
@@ -68,7 +69,7 @@ Object::Object(v8::Local<v8::Object> object)
 
 Type Object::GetValueType() const { return Type::Object; }
 
-Value* Object::Get(const char* key) throw(std::runtime_error)
+Value* Object::Get(const char* key)
 {
 	try
 	{
@@ -85,6 +86,11 @@ Value* Object::Get(const char* key) throw(std::runtime_error)
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
+		return nullptr;
+	}
+	catch (std::runtime_error& e)
+	{
+		Context::HandleRuntimeException(e.what());
 		return nullptr;
 	}
 }
@@ -144,7 +150,6 @@ std::vector<String> Object::Keys()
 }
 
 bool Object::InstanceOf(Function& type)
-	throw(std::runtime_error)
 {
 	Value* thisValue = static_cast<Value*>(this);
 	std::vector<Value*> args;
@@ -154,14 +159,27 @@ bool Object::InstanceOf(Function& type)
 	Bool* callResult =
 		static_cast<Bool*>(Context::_instanceOf->Call(args));
 	bool result = callResult->GetValue();
-	delete callResult;
+	if (callResult != nullptr)
+	{
+		delete callResult;
+	}
 	return result;
+}
+
+// Workaround for pre-C++11
+template<class T>
+static T* DataPointer(std::vector<T>& v)
+{
+	if (v.size() == 0)
+	{
+		return nullptr;
+	}
+	return &v[0];
 }
 
 Value* Object::CallMethod(
 	const char* name,
 	const std::vector<Value*>& args)
-	throw(std::runtime_error)
 {
 	try
 	{
@@ -184,13 +202,17 @@ Value* Object::CallMethod(
 			fun->Call(
 				localObject,
 				static_cast<int>(unwrappedArgs.size()),
-				unwrappedArgs.data()));
+				DataPointer(unwrappedArgs)));
 	}
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
-		return nullptr;
 	}
+	catch (std::runtime_error& e)
+	{
+		Context::HandleRuntimeException(e.what());
+	}
+	return nullptr;
 }
 
 bool Object::ContainsKey(const char* key)
@@ -249,7 +271,6 @@ Function::Function(v8::Local<v8::Function> function)
 Type Function::GetValueType() const { return Type::Function; }
 
 Value* Function::Call(const std::vector<Value*>& args)
-	throw(std::runtime_error)
 {
 	try
 	{
@@ -265,13 +286,17 @@ Value* Function::Call(const std::vector<Value*>& args)
 				context,
 				context->Global(),
 				static_cast<int>(unwrappedArgs.size()),
-				unwrappedArgs.data()));
+				DataPointer(unwrappedArgs)));
 	}
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
-		return nullptr;
 	}
+	catch (std::runtime_error& e)
+	{
+		Context::HandleRuntimeException(e.what());
+	}
+	return nullptr;
 }
 
 Object* Function::Construct(const std::vector<Value*>& args)
@@ -292,13 +317,13 @@ Object* Function::Construct(const std::vector<Value*>& args)
 				_function.Get(Context::_isolate)->NewInstance(
 					context,
 					unwrappedArgs.size(),
-					unwrappedArgs.data())));
+					DataPointer(unwrappedArgs))));
 	}
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
-		return nullptr;
 	}
+	return nullptr;
 }
 
 bool Function::Equals(const Function& function)
@@ -321,8 +346,8 @@ bool Function::Equals(const Function& function)
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
-		return false;
 	}
+	return false;
 }
 
 Array::Array(v8::Local<v8::Array> array)
@@ -333,7 +358,6 @@ Array::Array(v8::Local<v8::Array> array)
 Type Array::GetValueType() const { return Type::Array; }
 
 Value* Array::Get(int index)
-	throw(std::runtime_error)
 {
 	try
 	{
@@ -351,6 +375,11 @@ Value* Array::Get(int index)
 	catch (ScriptException& e)
 	{
 		Context::HandleScriptException(e);
+		return nullptr;
+	}
+	catch (std::runtime_error& e)
+	{
+		Context::HandleRuntimeException(e.what());
 		return nullptr;
 	}
 }
@@ -416,9 +445,8 @@ Callback::Callback()
 }
 
 Value* Callback::Call(const std::vector<Value*>& args)
-	throw(std::runtime_error)
 {
-	throw std::runtime_error("Callback.Call not implemented");
+	return nullptr;
 }
 
 Type Callback::GetValueType() const { return Type::Callback; }
@@ -426,8 +454,9 @@ Type Callback::GetValueType() const { return Type::Callback; }
 Function* Context::_instanceOf = nullptr;
 v8::Isolate* Context::_isolate = nullptr;
 v8::Platform* Context::_platform = nullptr;
-DebugMessageHandler* Context::_debugMessageHandler = nullptr;
+MessageHandler* Context::_debugMessageHandler = nullptr;
 ScriptExceptionHandler* Context::_scriptExceptionHandler = nullptr;
+MessageHandler* Context::_runtimeExceptionHandler = nullptr;
 
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 {
@@ -490,10 +519,19 @@ void Context::Throw(
 
 void Context::HandleScriptException(const ScriptException& e)
 {
-	std::cout << "handle script exception" << std::endl;
+	// std::cout << "handle script exception" << std::endl;
 	if (_scriptExceptionHandler != nullptr)
 	{
 		_scriptExceptionHandler->Handle(e);
+	}
+}
+
+void Context::HandleRuntimeException(const char* e)
+{
+	// std::cout << "handle script exception" << std::endl;
+	if (_runtimeExceptionHandler != nullptr)
+	{
+		_runtimeExceptionHandler->Handle(e);
 	}
 }
 
@@ -667,10 +705,13 @@ v8::Local<v8::Value> Context::Unwrap(
 							->Value());
 					Value* result = callback->Call(wrappedArgs);
 
-					for (Value* value: wrappedArgs)
+					// TODO this needs to be done in CIL but not C++ backend...
+					// Do some Swig magic to fix it?
+					/* for (Value* value: wrappedArgs)
 					{
 						delete value;
 					}
+					*/
 					info.GetReturnValue().Set(Unwrap(
 						tryCatch,
 						result));
@@ -693,7 +734,7 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 	return result;
 }
 
-void Context::SetDebugMessageHandler(DebugMessageHandler* debugMessageHandler)
+void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
 	if (_debugMessageHandler != nullptr)
@@ -734,8 +775,14 @@ void Context::ProcessDebugMessages()
 	v8::Debug::ProcessDebugMessages();
 }
 
-Context::Context(ScriptExceptionHandler* scriptExceptionHandler) throw(std::runtime_error)
+Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler)
 {
+	_scriptExceptionHandler = scriptExceptionHandler;
+	_scriptExceptionHandler->Retain();
+
+	_runtimeExceptionHandler = runtimeExceptionHandler;
+	_runtimeExceptionHandler->Retain();
+
 	// TODO remove
 	v8::V8::SetFlagsFromString("--expose-gc", 11);
 	if (_platform == nullptr)
@@ -755,7 +802,7 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler) throw(std::runt
 	}
 	else
 	{
-		throw std::runtime_error("V8Simple Contexts are not re-entrant");
+		Context::HandleRuntimeException("V8Simple Contexts are not re-entrant");
 	}
 
 	v8::Isolate::Scope isolateScope(_isolate);
@@ -763,9 +810,6 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler) throw(std::runt
 
 	auto localContext = v8::Context::New(_isolate);
 	localContext->Enter();
-
-	_scriptExceptionHandler = scriptExceptionHandler;
-	_scriptExceptionHandler->Retain();
 
 	_context = new v8::Persistent<v8::Context>(_isolate, localContext);
 	_instanceOf = static_cast<Function*>(
@@ -778,6 +822,9 @@ Context::~Context()
 {
 	delete _instanceOf;
 	_instanceOf = nullptr;
+
+	_runtimeExceptionHandler->Release();
+	_runtimeExceptionHandler = nullptr;
 
 	_scriptExceptionHandler->Release();
 	_scriptExceptionHandler = nullptr;
@@ -801,7 +848,6 @@ Context::~Context()
 }
 
 Value* Context::Evaluate(const char* fileName, const char* code)
-	throw (std::runtime_error)
 {
 	try
 	{
@@ -824,6 +870,11 @@ Value* Context::Evaluate(const char* fileName, const char* code)
 	catch (ScriptException& e)
 	{
 		HandleScriptException(e);
+		return nullptr;
+	}
+	catch (std::runtime_error& e)
+	{
+		HandleRuntimeException(e.what());
 		return nullptr;
 	}
 }

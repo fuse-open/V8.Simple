@@ -1,13 +1,13 @@
 #pragma once
 #include <include/v8.h>
 // TODO remove
-#include <iostream>
+// #include <iostream>
 #include <stdexcept>
 #include <vector>
 
 // Note: All public functions that return a Value* (or derived class), require
 // that the caller takes ownership of and deletes the pointer when appropriate.
-// The Values should be deallocated with Value::Deallocate.
+// The Values should be deallocated with the delete operator.
 
 namespace V8Simple
 {
@@ -25,7 +25,7 @@ enum class Type
 };
 
 // TODO remove
-const std::string TypeNames[] = { "Int", "Double", "String", "Bool", "Object", "Array", "Function", "Callback" };
+// const std::string TypeNames[] = { "Int", "Double", "String", "Bool", "Object", "Array", "Function", "Callback" };
 
 template<class T> struct TypeTag { };
 
@@ -35,13 +35,13 @@ public:
 	virtual Type GetValueType() const = 0;
 	virtual ~Value()
 	{
-		std::cout << "- " << this << std::endl;
+		// std::cout << "- " << this << std::endl;
 	}
 protected:
 	// TODO remove
 	Value(Type t)
 	{
-		std::cout << "+ " << TypeNames[static_cast<int>(t)] << " " << this << std::endl;
+		// std::cout << "+ " << TypeNames[static_cast<int>(t)] << " " << this << std::endl;
 	}
 };
 
@@ -69,14 +69,13 @@ class Function: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
-	Value* Call(const std::vector<Value*>& args)
-		throw(std::runtime_error);
+	Value* Call(const std::vector<Value*>& args);
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function& f);
 	virtual ~Function()
 	{
 		// TODO remove
-		std::cout << "Function destructor " << this << " " << &_function << std::endl;
+		// std::cout << "Function destructor " << this << " " << &_function << std::endl;
 		// delete _function;
 	}
 protected:
@@ -90,14 +89,11 @@ class Object: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
-	Value* Get(const char* key)
-		throw(std::runtime_error);
+	Value* Get(const char* key);
 	void Set(const char* key, Value& value);
 	std::vector<String> Keys();
-	bool InstanceOf(Function& type)
-		throw(std::runtime_error);
-	Value* CallMethod(const char* name, const std::vector<Value*>& args)
-		throw(std::runtime_error);
+	bool InstanceOf(Function& type);
+	Value* CallMethod(const char* name, const std::vector<Value*>& args);
 	bool ContainsKey(const char* key);
 	bool Equals(const Object& object);
 protected:
@@ -112,8 +108,7 @@ class Array: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
-	Value* Get(int index)
-		throw(std::runtime_error);
+	Value* Get(int index);
 	void Set(int index, Value& value);
 	int Length();
 	bool Equals(const Array& array);
@@ -128,11 +123,10 @@ class Callback: public Value
 {
 public:
 	Callback();
-	virtual Type GetValueType() const override;
-	virtual Value* Call(const std::vector<Value*>& args)
-		throw(std::runtime_error);
-	virtual void Retain() const { }
-	virtual void Release() const { }
+	virtual Type GetValueType() const override /* final */;
+	virtual Value* Call(const std::vector<Value*>& args);
+	virtual void Retain() { }
+	virtual void Release() { }
 private:
 	friend class Context;
 };
@@ -163,12 +157,12 @@ template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 
 struct ScriptException
 {
-	const String& GetName() { return Name; }
-	const String& GetErrorMessage() { return ErrorMessage; }
-	const String& GetFileName() { return FileName; }
+	String* GetName() { return new String(Name); }
+	String* GetErrorMessage() { return new String(ErrorMessage); }
+	String* GetFileName() { return new String(FileName); }
 	int GetLineNumber() { return LineNumber; }
-	const String& GetStackTrace() { return StackTrace; }
-	const String& GetSourceLine() { return SourceLine; }
+	String* GetStackTrace() { return new String(StackTrace); }
+	String* GetSourceLine() { return new String(SourceLine); }
 private:
 	const String Name, ErrorMessage, FileName, StackTrace, SourceLine;
 	int LineNumber;
@@ -183,43 +177,42 @@ private:
 	friend class Context;
 };
 
-struct DebugMessageHandler
+struct MessageHandler
 {
 	virtual void Handle(const char* jsonMessage) { }
-	virtual ~DebugMessageHandler() { }
-	virtual void Retain() const { }
-	virtual void Release() const { }
+	virtual ~MessageHandler() { }
+	virtual void Retain() { }
+	virtual void Release() { }
 };
 
 struct ScriptExceptionHandler
 {
 	virtual void Handle(const ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
-	virtual void Retain() const { }
-	virtual void Release() const { }
+	virtual void Retain() { }
+	virtual void Release() { }
 };
 
 class Context
 {
 public:
-	Context(ScriptExceptionHandler* scriptExceptionHandler)
-		throw(std::runtime_error);
-	Value* Evaluate(const char* fileName, const char* code)
-		throw(std::runtime_error);
+	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
+	Value* Evaluate(const char* fileName, const char* code);
 	Object* GlobalObject();
 	bool IdleNotificationDeadline(double deadline_in_seconds);
 	~Context();
 
-	static void SetDebugMessageHandler(DebugMessageHandler* debugMessageHandler);
+	static void SetDebugMessageHandler(MessageHandler* debugMessageHandler);
 	static void SendDebugCommand(const char* command);
 	static void ProcessDebugMessages();
 private:
-	static DebugMessageHandler* _debugMessageHandler;
+	static MessageHandler* _debugMessageHandler;
 	static v8::Platform* _platform;
 	static v8::Isolate* _isolate;
 	v8::Persistent<v8::Context>* _context;
 	static Function* _instanceOf;
 	static ScriptExceptionHandler* _scriptExceptionHandler;
+	static MessageHandler* _runtimeExceptionHandler;
 	static Value* Wrap(
 		const v8::TryCatch& tryCatch,
 		v8::Local<v8::Value> value)
@@ -249,6 +242,8 @@ private:
 		v8::Maybe<A> a);
 	static void HandleScriptException(
 		const ScriptException& e);
+	static void HandleRuntimeException(
+		const char* e);
 
 	friend class Value;
 	friend class Array;
