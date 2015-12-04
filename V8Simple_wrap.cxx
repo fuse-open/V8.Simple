@@ -978,16 +978,12 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Object_Get(void * jarg1, char * jarg2) {
 SWIGEXPORT void SWIGSTDCALL CSharp_Object_Set(void * jarg1, char * jarg2, void * jarg3) {
   V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
   char *arg2 = (char *) 0 ;
-  V8Simple::Value *arg3 = 0 ;
+  V8Simple::Value *arg3 = (V8Simple::Value *) 0 ;
   
   arg1 = (V8Simple::Object *)jarg1; 
   arg2 = (char *)jarg2; 
-  arg3 = (V8Simple::Value *)jarg3;
-  if (!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::Value & type is null", 0);
-    return ;
-  } 
-  (arg1)->Set((char const *)arg2,*arg3);
+  arg3 = (V8Simple::Value *)jarg3; 
+  (arg1)->Set((char const *)arg2,arg3);
 }
 
 
@@ -1110,16 +1106,12 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Array_Get(void * jarg1, int jarg2) {
 SWIGEXPORT void SWIGSTDCALL CSharp_Array_Set(void * jarg1, int jarg2, void * jarg3) {
   V8Simple::Array *arg1 = (V8Simple::Array *) 0 ;
   int arg2 ;
-  V8Simple::Value *arg3 = 0 ;
+  V8Simple::Value *arg3 = (V8Simple::Value *) 0 ;
   
   arg1 = (V8Simple::Array *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (V8Simple::Value *)jarg3;
-  if (!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::Value & type is null", 0);
-    return ;
-  } 
-  (arg1)->Set(arg2,*arg3);
+  arg3 = (V8Simple::Value *)jarg3; 
+  (arg1)->Set(arg2,arg3);
 }
 
 

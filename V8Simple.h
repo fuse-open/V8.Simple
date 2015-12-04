@@ -90,7 +90,7 @@ class Object: public Value
 public:
 	virtual Type GetValueType() const override final;
 	Value* Get(const char* key);
-	void Set(const char* key, Value& value);
+	void Set(const char* key, Value* value);
 	std::vector<String> Keys();
 	bool InstanceOf(Function& type);
 	Value* CallMethod(const char* name, const std::vector<Value*>& args);
@@ -109,7 +109,7 @@ class Array: public Value
 public:
 	virtual Type GetValueType() const override final;
 	Value* Get(int index);
-	void Set(int index, Value& value);
+	void Set(int index, Value* value);
 	int Length();
 	bool Equals(const Array& array);
 protected:

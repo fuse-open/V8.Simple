@@ -219,7 +219,6 @@ public class Object : Value {
 
   public void Set(string key, Value value) {
     v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
   public SWIGTYPE_p_std__vectorT_V8Simple__String_t Keys() {
@@ -298,7 +297,6 @@ public class Array : Value {
 
   public void Set(int index, Value value) {
     v8PINVOKE.Array_Set(swigCPtr, index, Value.getCPtr(value));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
   public int Length() {

@@ -95,7 +95,7 @@ Value* Object::Get(const char* key)
 	}
 }
 
-void Object::Set(const char* key, Value& value)
+void Object::Set(const char* key, Value* value)
 {
 	try
 	{
@@ -107,7 +107,7 @@ void Object::Set(const char* key, Value& value)
 		auto ret = _object.Get(Context::_isolate)->Set(
 			context,
 			ToV8String(Context::_isolate, key),
-			Context::Unwrap(tryCatch, &value));
+			Context::Unwrap(tryCatch, value));
 		Context::FromJust(context, tryCatch, ret);
 	}
 	catch (ScriptException& e)
@@ -384,7 +384,7 @@ Value* Array::Get(int index)
 	}
 }
 
-void Array::Set(int index, Value& value)
+void Array::Set(int index, Value* value)
 {
 	try
 	{
@@ -399,7 +399,7 @@ void Array::Set(int index, Value& value)
 			_array.Get(Context::_isolate)->Set(
 				context,
 				static_cast<uint32_t>(index),
-				Context::Unwrap(tryCatch, &value)));
+				Context::Unwrap(tryCatch, value)));
 	}
 	catch (ScriptException& e)
 	{
@@ -692,11 +692,18 @@ v8::Local<v8::Value> Context::Unwrap(
 
 					std::vector<Value*> wrappedArgs;
 					wrappedArgs.reserve(info.Length());
-					for (int i = 0; i < info.Length(); ++i)
+					try
 					{
-						wrappedArgs.push_back(Wrap(
-							tryCatch,
-							info[i]));
+						for (int i = 0; i < info.Length(); ++i)
+						{
+							wrappedArgs.push_back(Wrap(
+								tryCatch,
+								info[i]));
+						}
+					}
+					catch (std::runtime_error& e)
+					{
+						Context::HandleRuntimeException(e.what());
 					}
 
 					Callback* callback =
