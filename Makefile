@@ -1,4 +1,4 @@
-LDFLAGS+= -fPIC -fno-rtti -Wl,--whole-archive -lv8_base -lv8_libbase -lv8_libplatform -lv8_nosnapshot -Wl,--no-whole-archive -dead_strip
+LDFLAGS+= -fPIC -fno-rtti -dead_strip
 CXXFLAGS+= -Wall -std=c++11
 
 FILE=V8Simple
