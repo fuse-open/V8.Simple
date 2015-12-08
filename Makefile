@@ -2,7 +2,6 @@ LDFLAGS+= -fPIC -fno-rtti -dead_strip
 CXXFLAGS+= -Wall -std=c++11
 
 FILE=V8Simple
-OBJ_DIR=obj
 LIB_DIR=lib
 LIB_FILE=lib$(FILE).dylib
 ANDROID_LIB_FILE=lib$(FILE).so
