@@ -735,7 +735,7 @@ v8::Local<v8::Value> Context::Unwrap(
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
-					Value* result = callback->Call(UniqueValueVector(std::move(wrappedArgs)));
+					Value* result = callback->Call(UniqueValueVector((std::vector<Value*>&&)wrappedArgs));
 
 					info.GetReturnValue().Set(Unwrap(
 						tryCatch,
