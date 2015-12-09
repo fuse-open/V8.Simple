@@ -803,10 +803,16 @@ void Context::ProcessDebugMessages()
 Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler)
 {
 	_scriptExceptionHandler = scriptExceptionHandler;
-	_scriptExceptionHandler->Retain();
+	if (_scriptExceptionHandler != nullptr)
+	{
+		_scriptExceptionHandler->Retain();
+	}
 
 	_runtimeExceptionHandler = runtimeExceptionHandler;
-	_runtimeExceptionHandler->Retain();
+	if (_runtimeExceptionHandler != nullptr)
+	{
+		_runtimeExceptionHandler->Retain();
+	}
 
 	// TODO remove
 	v8::V8::SetFlagsFromString("--expose-gc", 11);
@@ -848,10 +854,16 @@ Context::~Context()
 	delete _instanceOf;
 	_instanceOf = nullptr;
 
-	_runtimeExceptionHandler->Release();
+	if (_runtimeExceptionHandler != nullptr)
+	{
+		_runtimeExceptionHandler->Release();
+	}
 	_runtimeExceptionHandler = nullptr;
 
-	_scriptExceptionHandler->Release();
+	if (_runtimeExceptionHandler != nullptr)
+	{
+		_scriptExceptionHandler->Release();
+	}
 	_scriptExceptionHandler = nullptr;
 
 	{
