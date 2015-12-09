@@ -627,7 +627,7 @@ SwigDirector_Callback::~SwigDirector_Callback() {
 }
 
 
-V8Simple::Value *SwigDirector_Callback::Call(std::vector< V8Simple::Value * > const &args) {
+V8Simple::Value *SwigDirector_Callback::Call(V8Simple::UniqueValueVector const &args) {
   V8Simple::Value *c_result = 0 ;
   void * jresult = 0 ;
   void * jargs = 0 ;
@@ -635,7 +635,7 @@ V8Simple::Value *SwigDirector_Callback::Call(std::vector< V8Simple::Value * > co
   if (!swig_callbackCall) {
     return V8Simple::Callback::Call(args);
   } else {
-    jargs = (std::vector< V8Simple::Value * > *) &args; 
+    jargs = (V8Simple::UniqueValueVector *) &args; 
     jresult = (void *) swig_callbackCall(jargs);
     c_result = (V8Simple::Value *)jresult; 
   }
@@ -1153,6 +1153,56 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Array(void * jarg1) {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_UniqueValueVector(void * jarg1) {
+  void * jresult ;
+  std::vector< V8Simple::Value * > *arg1 = 0 ;
+  V8Simple::UniqueValueVector *result = 0 ;
+  
+  arg1 = (std::vector< V8Simple::Value * > *)jarg1;
+  if (!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< V8Simple::Value * > const && type is null", 0);
+    return 0;
+  } 
+  result = (V8Simple::UniqueValueVector *)new V8Simple::UniqueValueVector((std::vector< V8Simple::Value * > const &&)*arg1);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_UniqueValueVector(void * jarg1) {
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_UniqueValueVector_Length(void * jarg1) {
+  int jresult ;
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  int result;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  result = (int)(arg1)->Length();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_UniqueValueVector_Get(void * jarg1, int jarg2) {
+  void * jresult ;
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  int arg2 ;
+  V8Simple::Value *result = 0 ;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (V8Simple::Value *)(arg1)->Get(arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_Callback() {
   void * jresult ;
   V8Simple::Callback *result = 0 ;
@@ -1190,16 +1240,16 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Callback_GetValueTypeSwigExplicitCallback(void
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  std::vector< V8Simple::Value * > *arg2 = 0 ;
+  V8Simple::UniqueValueVector *arg2 = 0 ;
   V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  arg2 = (std::vector< V8Simple::Value * > *)jarg2;
+  arg2 = (V8Simple::UniqueValueVector *)jarg2;
   if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< V8Simple::Value * > const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::UniqueValueVector const & type is null", 0);
     return 0;
   } 
-  result = (V8Simple::Value *)(arg1)->Call((std::vector< V8Simple::Value * > const &)*arg2);
+  result = (V8Simple::Value *)(arg1)->Call((V8Simple::UniqueValueVector const &)*arg2);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1208,16 +1258,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CallSwigExplicitCallback(void * jarg1, void * jarg2) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  std::vector< V8Simple::Value * > *arg2 = 0 ;
+  V8Simple::UniqueValueVector *arg2 = 0 ;
   V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  arg2 = (std::vector< V8Simple::Value * > *)jarg2;
+  arg2 = (V8Simple::UniqueValueVector *)jarg2;
   if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector< V8Simple::Value * > const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::UniqueValueVector const & type is null", 0);
     return 0;
   } 
-  result = (V8Simple::Value *)(arg1)->V8Simple::Callback::Call((std::vector< V8Simple::Value * > const &)*arg2);
+  result = (V8Simple::Value *)(arg1)->V8Simple::Callback::Call((V8Simple::UniqueValueVector const &)*arg2);
   jresult = (void *)result; 
   return jresult;
 }

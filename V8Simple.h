@@ -119,12 +119,24 @@ private:
 	v8::Persistent<v8::Array> _array;
 };
 
+class UniqueValueVector
+{
+public:
+	UniqueValueVector(const std::vector<Value*>&& values);
+	~UniqueValueVector();
+	int Length();
+	Value* Get(int index);
+private:
+	friend class Context;
+	std::vector<Value*> _values;
+};
+
 class Callback: public Value
 {
 public:
 	Callback();
 	virtual Type GetValueType() const override /* final */;
-	virtual Value* Call(const std::vector<Value*>& args);
+	virtual Value* Call(const UniqueValueVector& args);
 	virtual void Retain() { }
 	virtual void Release() { }
 private:

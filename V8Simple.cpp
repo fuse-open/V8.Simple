@@ -439,12 +439,37 @@ bool Array::Equals(const Array& array)
 
 }
 
+UniqueValueVector::UniqueValueVector(const std::vector<Value*>&& values)
+	: _values(values)
+{
+}
+
+UniqueValueVector::~UniqueValueVector()
+{
+	for (Value* v: _values)
+	{
+		delete v;
+	}
+}
+
+int UniqueValueVector::Length()
+{
+	return _values.size();
+}
+
+Value* UniqueValueVector::Get(int index)
+{
+	Value* result = nullptr;
+	std::swap(_values.at(index), result);
+	return result;
+}
+
 Callback::Callback()
 	: Value(Type::Callback)
 {
 }
 
-Value* Callback::Call(const std::vector<Value*>& args)
+Value* Callback::Call(const UniqueValueVector& args)
 {
 	return nullptr;
 }
@@ -696,9 +721,9 @@ v8::Local<v8::Value> Context::Unwrap(
 					{
 						for (int i = 0; i < info.Length(); ++i)
 						{
-							wrappedArgs.push_back(Wrap(
-								tryCatch,
-								info[i]));
+						wrappedArgs.push_back(Wrap(
+							tryCatch,
+							info[i]));
 						}
 					}
 					catch (std::runtime_error& e)
@@ -710,15 +735,8 @@ v8::Local<v8::Value> Context::Unwrap(
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
-					Value* result = callback->Call(wrappedArgs);
+					Value* result = callback->Call(UniqueValueVector(std::move(wrappedArgs)));
 
-					// TODO this needs to be done in CIL but not C++ backend...
-					// Do some Swig magic to fix it?
-					/* for (Value* value: wrappedArgs)
-					{
-						delete value;
-					}
-					*/
 					info.GetReturnValue().Set(Unwrap(
 						tryCatch,
 						result));

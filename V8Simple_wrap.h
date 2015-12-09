@@ -17,7 +17,7 @@ public:
     SwigDirector_Callback();
     virtual V8Simple::Type GetValueType() const;
     virtual ~SwigDirector_Callback();
-    virtual V8Simple::Value *Call(std::vector< V8Simple::Value * > const &args);
+    virtual V8Simple::Value *Call(V8Simple::UniqueValueVector const &args);
     virtual void Retain();
     virtual void Release();
 
