@@ -7,7 +7,7 @@ static class Test
 {
 	static void DoStuff()
 	{
-		using (var context = new Context(new ExceptionHandler()))
+		using (var context = new Context(new ExceptionHandler(), null))
 		{
 			Value val = context.Evaluate("hej.js", "12 + 13");
 			Value val2 = context.Evaluate("hej.js", "12.3 + 13.5");
@@ -25,7 +25,7 @@ static class Test
 
 	static void DoStuff2()
 	{
-		using (var context = new Context(new ExceptionHandler()))
+		using (var context = new Context(new ExceptionHandler(), null))
 		{
 			Function f = context.Evaluate("hej.js", "(function(x, y) { return x + y; })") as Function;
 			V8Simple.Array a = context.Evaluate("arr.js", "([2,3,1,4])") as V8Simple.Array;
@@ -77,12 +77,13 @@ static class Test
 
 		public CB() : base() { Console.WriteLine("constructing CB"); }
 
-		public override Value Call(ValueVector args)
+		public override Value Call(UniqueValueVector args)
 		{
 			Console.WriteLine("Callback with arg types");
-			foreach (Value v in args)
+			int len = args.Length();
+			for (int i = 0; i < len; ++i)
 			{
-				Console.WriteLine(v.GetValueType());
+				Console.WriteLine(args.Get(i).GetValueType());
 			}
 			return new V8Simple.String("callback return value");
 		}
@@ -127,7 +128,7 @@ static class Test
 
 	static void DoStuff4()
 	{
-		using (var context = new Context(new ExceptionHandler()))
+		using (var context = new Context(new ExceptionHandler(), null))
 		{
 			try
 			{
@@ -149,7 +150,7 @@ static class Test
 		GC.WaitForPendingFinalizers();
 		Console.WriteLine("after collect 3");
 		DoStuff4();
-		using (var context = new Context(new ExceptionHandler()))
+		using (var context = new Context(new ExceptionHandler(), null))
 		{
 			DoStuff3(context);
 			for (int i = 0; i < 100; ++i)
