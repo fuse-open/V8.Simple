@@ -33,6 +33,6 @@ $(LIB_DIR)/$(FILE).dll: $(FILE).cs
 .PHONY: clean
 
 clean:
-	rm $(FILE)_wrap.cxx
-	rm  $(LIB_DIR)/*.so $(LIB_DIR)/*.dll
-	rm -r $(OBJ_DIR)
+	$(RM) $(FILE)_wrap.cxx
+	$(RM)  -r lib
+	$(RM) -r obj
