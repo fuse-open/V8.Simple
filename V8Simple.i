@@ -57,5 +57,5 @@ V8Simple::Value*
 %template(Int) V8Simple::Primitive<int>;
 %template(Double) V8Simple::Primitive<double>;
 %template(Bool) V8Simple::Primitive<bool>;
-%template(StringVector) std::vector<const char*>;
+%template(StringVector) std::vector<V8Simple::String>;
 %template(ValueVector) std::vector<V8Simple::Value*>;

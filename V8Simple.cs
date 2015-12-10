@@ -221,8 +221,8 @@ public class Object : Value {
     v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
   }
 
-  public SWIGTYPE_p_std__vectorT_V8Simple__String_t Keys() {
-    SWIGTYPE_p_std__vectorT_V8Simple__String_t ret = new SWIGTYPE_p_std__vectorT_V8Simple__String_t(v8PINVOKE.Object_Keys(swigCPtr), true);
+  public StringVector Keys() {
+    StringVector ret = new StringVector(v8PINVOKE.Object_Keys(swigCPtr), true);
     return ret;
   }
 
@@ -931,7 +931,7 @@ public class Bool : Value {
 namespace Fuse.Scripting.V8.Simple {
 
 public class StringVector : global::System.IDisposable, global::System.Collections.IEnumerable
-    , global::System.Collections.Generic.IList<string>
+    , global::System.Collections.Generic.IEnumerable<String>
  {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
@@ -965,7 +965,7 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
   public StringVector(global::System.Collections.ICollection c) : this() {
     if (c == null)
       throw new global::System.ArgumentNullException("c");
-    foreach (string element in c) {
+    foreach (String element in c) {
       this.Add(element);
     }
   }
@@ -982,7 +982,7 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     }
   }
 
-  public string this[int index]  {
+  public String this[int index]  {
     get {
       return getitem(index);
     }
@@ -1014,17 +1014,17 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     }
   }
 
-  public void CopyTo(string[] array)
+  public void CopyTo(String[] array)
   {
     CopyTo(0, array, 0, this.Count);
   }
 
-  public void CopyTo(string[] array, int arrayIndex)
+  public void CopyTo(String[] array, int arrayIndex)
   {
     CopyTo(0, array, arrayIndex, this.Count);
   }
 
-  public void CopyTo(int index, string[] array, int arrayIndex, int count)
+  public void CopyTo(int index, String[] array, int arrayIndex, int count)
   {
     if (array == null)
       throw new global::System.ArgumentNullException("array");
@@ -1042,7 +1042,7 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
       array.SetValue(getitemcopy(index+i), arrayIndex+i);
   }
 
-  global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator() {
+  global::System.Collections.Generic.IEnumerator<String> global::System.Collections.Generic.IEnumerable<String>.GetEnumerator() {
     return new StringVectorEnumerator(this);
   }
 
@@ -1060,7 +1060,7 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
   /// collection but not when one of the elements of the collection is modified as it is a bit
   /// tricky to detect unmanaged code that modifies the collection under our feet.
   public sealed class StringVectorEnumerator : global::System.Collections.IEnumerator
-    , global::System.Collections.Generic.IEnumerator<string>
+    , global::System.Collections.Generic.IEnumerator<String>
   {
     private StringVector collectionRef;
     private int currentIndex;
@@ -1075,7 +1075,7 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     }
 
     // Type-safe iterator Current
-    public string Current {
+    public String Current {
       get {
         if (currentIndex == -1)
           throw new global::System.InvalidOperationException("Enumeration not started.");
@@ -1083,7 +1083,7 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
           throw new global::System.InvalidOperationException("Enumeration finished.");
         if (currentObject == null)
           throw new global::System.InvalidOperationException("Collection modified.");
-        return (string)currentObject;
+        return (String)currentObject;
       }
     }
 
@@ -1124,8 +1124,9 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     v8PINVOKE.StringVector_Clear(swigCPtr);
   }
 
-  public void Add(string x) {
-    v8PINVOKE.StringVector_Add(swigCPtr, x);
+  public void Add(String x) {
+    v8PINVOKE.StringVector_Add(swigCPtr, String.getCPtr(x));
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
   private uint size() {
@@ -1153,20 +1154,20 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
-  private string getitemcopy(int index) {
-    string ret = v8PINVOKE.StringVector_getitemcopy(swigCPtr, index);
+  private String getitemcopy(int index) {
+    String ret = new String(v8PINVOKE.StringVector_getitemcopy(swigCPtr, index), true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  private string getitem(int index) {
-    string ret = v8PINVOKE.StringVector_getitem(swigCPtr, index);
+  private String getitem(int index) {
+    String ret = new String(v8PINVOKE.StringVector_getitem(swigCPtr, index), false);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  private void setitem(int index, string val) {
-    v8PINVOKE.StringVector_setitem(swigCPtr, index, val);
+  private void setitem(int index, String val) {
+    v8PINVOKE.StringVector_setitem(swigCPtr, index, String.getCPtr(val));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -1182,8 +1183,8 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     return ret;
   }
 
-  public void Insert(int index, string x) {
-    v8PINVOKE.StringVector_Insert(swigCPtr, index, x);
+  public void Insert(int index, String x) {
+    v8PINVOKE.StringVector_Insert(swigCPtr, index, String.getCPtr(x));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -1202,8 +1203,8 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static StringVector Repeat(string value, int count) {
-    global::System.IntPtr cPtr = v8PINVOKE.StringVector_Repeat(value, count);
+  public static StringVector Repeat(String value, int count) {
+    global::System.IntPtr cPtr = v8PINVOKE.StringVector_Repeat(String.getCPtr(value), count);
     StringVector ret = (cPtr == global::System.IntPtr.Zero) ? null : new StringVector(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -1221,26 +1222,6 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
   public void SetRange(int index, StringVector values) {
     v8PINVOKE.StringVector_SetRange(swigCPtr, index, StringVector.getCPtr(values));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public bool Contains(string value) {
-    bool ret = v8PINVOKE.StringVector_Contains(swigCPtr, value);
-    return ret;
-  }
-
-  public int IndexOf(string value) {
-    int ret = v8PINVOKE.StringVector_IndexOf(swigCPtr, value);
-    return ret;
-  }
-
-  public int LastIndexOf(string value) {
-    int ret = v8PINVOKE.StringVector_LastIndexOf(swigCPtr, value);
-    return ret;
-  }
-
-  public bool Remove(string value) {
-    bool ret = v8PINVOKE.StringVector_Remove(swigCPtr, value);
-    return ret;
   }
 
 }
@@ -2035,7 +2016,7 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   public static extern void StringVector_Clear(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Add")]
-  public static extern void StringVector_Add(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+  public static extern void StringVector_Add(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_size")]
   public static extern uint StringVector_size(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -2056,13 +2037,13 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   public static extern global::System.IntPtr new_StringVector__SWIG_2(int jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_getitemcopy")]
-  public static extern string StringVector_getitemcopy(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+  public static extern global::System.IntPtr StringVector_getitemcopy(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_getitem")]
-  public static extern string StringVector_getitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+  public static extern global::System.IntPtr StringVector_getitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_setitem")]
-  public static extern void StringVector_setitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, string jarg3);
+  public static extern void StringVector_setitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_AddRange")]
   public static extern void StringVector_AddRange(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -2071,7 +2052,7 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   public static extern global::System.IntPtr StringVector_GetRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Insert")]
-  public static extern void StringVector_Insert(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, string jarg3);
+  public static extern void StringVector_Insert(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_InsertRange")]
   public static extern void StringVector_InsertRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
@@ -2083,7 +2064,7 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   public static extern void StringVector_RemoveRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Repeat")]
-  public static extern global::System.IntPtr StringVector_Repeat(string jarg1, int jarg2);
+  public static extern global::System.IntPtr StringVector_Repeat(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Reverse__SWIG_0")]
   public static extern void StringVector_Reverse__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -2093,18 +2074,6 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_SetRange")]
   public static extern void StringVector_SetRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
-
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Contains")]
-  public static extern bool StringVector_Contains(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_IndexOf")]
-  public static extern int StringVector_IndexOf(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_LastIndexOf")]
-  public static extern int StringVector_LastIndexOf(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Remove")]
-  public static extern bool StringVector_Remove(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_StringVector")]
   public static extern void delete_StringVector(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -2216,25 +2185,6 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
 namespace Fuse.Scripting.V8.Simple {
 
 public class v8 {
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
-public class SWIGTYPE_p_std__vectorT_V8Simple__String_t {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-
-  internal SWIGTYPE_p_std__vectorT_V8Simple__String_t(global::System.IntPtr cPtr, bool futureUse) {
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  protected SWIGTYPE_p_std__vectorT_V8Simple__String_t() {
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(SWIGTYPE_p_std__vectorT_V8Simple__String_t obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
 }
 
 }
