@@ -151,11 +151,10 @@ std::vector<String> Object::Keys()
 
 bool Object::InstanceOf(Function& type)
 {
-	Value* thisValue = static_cast<Value*>(this);
 	std::vector<Value*> args;
 	args.reserve(2);
-	args.push_back(thisValue);
-	args.push_back(static_cast<Value*>(&type));
+	args.push_back(this);
+	args.push_back(&type);
 	Bool* callResult =
 		static_cast<Bool*>(Context::_instanceOf->Call(args));
 	bool result = callResult->GetValue();
