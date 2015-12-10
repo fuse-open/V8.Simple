@@ -6,4 +6,5 @@ fetch v8
 git checkout branch-heads/4.8
 gclient sync
 python build\gyp_v8 -Dcomponent=static_library -Dv8_enable_i18n_support=0 -Dv8_use_snapshot=0
+# use -Dtarget_arch=x64 for 64-bit (seems to require a separate build)
 # Open in VS2013
