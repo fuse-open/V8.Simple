@@ -4,11 +4,14 @@
 #include <stdlib.h>
 #include <string>
 
+// TODO remove
+#include <iostream>
+
 namespace V8Simple
 {
 
 String::String(const char* value)
-	: String(value, std::strlen(value))
+	: String(value, value == nullptr ? 0 : std::strlen(value))
 {
 }
 
@@ -17,8 +20,11 @@ String::String(const char* value, int length)
 	, _value(new char[length + 1])
 	, _length(length)
 {
-	// std::cout << "String constructor" << std::endl;
-	std::memcpy(_value, value, _length + 1);
+	if (length > 0 && value != nullptr)
+	{
+		std::memcpy(_value, value, _length);
+	}
+	_value[_length] = 0;
 }
 
 String& String::operator=(const String& str)
@@ -36,7 +42,7 @@ String::String(const String& str)
 }
 
 String::String(const v8::String::Utf8Value& v)
-	: String(*v, v.length())
+	: String(v.length() > 0 ? *v : nullptr, v.length())
 {
 }
 
@@ -45,7 +51,6 @@ const char* String::GetValue() const { return _value; }
 
 String::~String()
 {
-	// std::cout << "String destructor " << this << std::endl;
 	delete[] _value;
 }
 
@@ -83,12 +88,12 @@ Value* Object::Get(const char* key)
 				Context::_isolate->GetCurrentContext(),
 				ToV8String(Context::_isolate, key)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 		return nullptr;
 	}
-	catch (std::runtime_error& e)
+	catch (const std::runtime_error& e)
 	{
 		Context::HandleRuntimeException(e.what());
 		return nullptr;
@@ -110,7 +115,7 @@ void Object::Set(const char* key, Value* value)
 			Context::Unwrap(tryCatch, value));
 		Context::FromJust(context, tryCatch, ret);
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 	}
@@ -142,7 +147,7 @@ std::vector<String> Object::Keys()
 		}
 		return result;
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 		return std::vector<String>();
@@ -151,18 +156,32 @@ std::vector<String> Object::Keys()
 
 bool Object::InstanceOf(Function& type)
 {
-	std::vector<Value*> args;
-	args.reserve(2);
-	args.push_back(this);
-	args.push_back(&type);
-	Bool* callResult =
-		static_cast<Bool*>(Context::_instanceOf->Call(args));
-	bool result = callResult->GetValue();
-	if (callResult != nullptr)
+	Value* callResult = nullptr;
+	try
+	{
+		std::vector<Value*> args;
+		args.reserve(2);
+		args.push_back(this);
+		args.push_back(&type);
+		callResult = Context::_instanceOf->Call(args);
+		bool result = (callResult == nullptr || callResult->GetValueType() != Type::Bool)
+			? false
+			: static_cast<Bool*>(callResult)->GetValue();
+		return result;
+	}
+	catch (const ScriptException& e)
+	{
+		Context::HandleScriptException(e);
+	}
+	catch (const std::runtime_error& e)
+	{
+		Context::HandleRuntimeException(e.what());
+	}
+	finally
 	{
 		delete callResult;
 	}
-	return result;
+	return false;
 }
 
 // Workaround for pre-C++11
@@ -203,11 +222,11 @@ Value* Object::CallMethod(
 				static_cast<int>(unwrappedArgs.size()),
 				DataPointer(unwrappedArgs)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 	}
-	catch (std::runtime_error& e)
+	catch (const std::runtime_error& e)
 	{
 		Context::HandleRuntimeException(e.what());
 	}
@@ -230,7 +249,7 @@ bool Object::ContainsKey(const char* key)
 				context,
 				ToV8String(Context::_isolate, key)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 		return false;
@@ -254,7 +273,7 @@ bool Object::Equals(const Object& o)
 				context,
 				o._object.Get(Context::_isolate)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 		return false;
@@ -287,11 +306,11 @@ Value* Function::Call(const std::vector<Value*>& args)
 				static_cast<int>(unwrappedArgs.size()),
 				DataPointer(unwrappedArgs)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 	}
-	catch (std::runtime_error& e)
+	catch (const std::runtime_error& e)
 	{
 		Context::HandleRuntimeException(e.what());
 	}
@@ -318,7 +337,7 @@ Object* Function::Construct(const std::vector<Value*>& args)
 					unwrappedArgs.size(),
 					DataPointer(unwrappedArgs))));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 	}
@@ -342,7 +361,7 @@ bool Function::Equals(const Function& function)
 				context,
 				function._function.Get(Context::_isolate)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 	}
@@ -371,12 +390,12 @@ Value* Array::Get(int index)
 				context,
 				static_cast<uint32_t>(index)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 		return nullptr;
 	}
-	catch (std::runtime_error& e)
+	catch (const std::runtime_error& e)
 	{
 		Context::HandleRuntimeException(e.what());
 		return nullptr;
@@ -400,7 +419,7 @@ void Array::Set(int index, Value* value)
 				static_cast<uint32_t>(index),
 				Context::Unwrap(tryCatch, value)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 	}
@@ -430,7 +449,7 @@ bool Array::Equals(const Array& array)
 				context,
 				array._array.Get(Context::_isolate)));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
 		return false;
@@ -520,30 +539,46 @@ void Context::Throw(
 	v8::Local<v8::Context> context,
 	const v8::TryCatch& tryCatch)
 {
-	v8::String::Utf8Value exception(tryCatch.Exception());
-	auto message = tryCatch.Message();
 	auto isolate = context->GetIsolate();
-	auto emptyString = v8::String::Empty(isolate);
-	v8::String::Utf8Value stackTrace(
+	v8::Local<v8::Value> emptyString = v8::String::Empty(isolate);
+
+	auto message = tryCatch.Message();
+	auto sourceLine(emptyString);
+	auto messageStr(emptyString);
+	auto fileName(emptyString);
+	int lineNumber = -1;
+	if (!message.IsEmpty())
+	{
+		sourceLine = message->GetSourceLine(context).FromMaybe(emptyString);
+		auto messageStrLocal = message->Get();
+		if (!messageStrLocal.IsEmpty())
+		{
+			messageStr = messageStrLocal;
+		}
+		fileName = message->GetScriptResourceName();
+		lineNumber = message->GetLineNumber(context).FromMaybe(-1);
+	}
+
+	v8::Local<v8::Value> exception = tryCatch.Exception().IsEmpty()
+		? emptyString
+		: tryCatch.Exception();
+
+	auto stackTrace(
 		tryCatch
 		.StackTrace(context)
 		.FromMaybe(emptyString.As<v8::Value>()));
-	v8::String::Utf8Value sourceLine(
-		message->GetSourceLine(context)
-		.FromMaybe(emptyString));
 
 	throw ScriptException(
-		exception,
-		v8::String::Utf8Value(message->Get()),
-		v8::String::Utf8Value(message->GetScriptOrigin().ResourceName()),
-		message->GetLineNumber(context).FromMaybe(-1),
-		stackTrace,
-		sourceLine);
+		v8::String::Utf8Value(exception),
+		v8::String::Utf8Value(messageStr),
+		v8::String::Utf8Value(fileName),
+		lineNumber,
+		v8::String::Utf8Value(stackTrace),
+		v8::String::Utf8Value(sourceLine));
 }
 
 void Context::HandleScriptException(const ScriptException& e)
 {
-	// std::cout << "handle script exception" << std::endl;
 	if (_scriptExceptionHandler != nullptr)
 	{
 		_scriptExceptionHandler->Handle(e);
@@ -552,7 +587,6 @@ void Context::HandleScriptException(const ScriptException& e)
 
 void Context::HandleRuntimeException(const char* e)
 {
-	// std::cout << "handle script exception" << std::endl;
 	if (_runtimeExceptionHandler != nullptr)
 	{
 		_runtimeExceptionHandler->Handle(e);
@@ -720,12 +754,12 @@ v8::Local<v8::Value> Context::Unwrap(
 					{
 						for (int i = 0; i < info.Length(); ++i)
 						{
-						wrappedArgs.push_back(Wrap(
-							tryCatch,
-							info[i]));
+							wrappedArgs.push_back(Wrap(
+								tryCatch,
+								info[i]));
 						}
 					}
-					catch (std::runtime_error& e)
+					catch (const std::runtime_error& e)
 					{
 						Context::HandleRuntimeException(e.what());
 					}
@@ -842,10 +876,18 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	localContext->Enter();
 
 	_context = new v8::Persistent<v8::Context>(_isolate, localContext);
-	_instanceOf = static_cast<Function*>(
-		Evaluate(
-			"instanceof",
-			"(function(x, y) { return (x instanceof y); })"));
+	
+	Value* instanceOf = Evaluate(
+		"instanceof",
+		"(function(x, y) { return (x instanceof y); })");
+	if (!instanceOf || instanceOf->GetValueType() != Type::Function)
+	{
+		Context::HandleRuntimeException("V8Simple could not create an instanceof function");
+	}
+	else
+	{
+		_instanceOf = static_cast<Function*>(instanceOf);
+	}
 }
 
 Context::~Context()
@@ -903,12 +945,12 @@ Value* Context::Evaluate(const char* fileName, const char* code)
 
 		return Wrap(tryCatch, script->Run(context));
 	}
-	catch (ScriptException& e)
+	catch (const ScriptException& e)
 	{
 		HandleScriptException(e);
 		return nullptr;
 	}
-	catch (std::runtime_error& e)
+	catch (const std::runtime_error& e)
 	{
 		HandleRuntimeException(e.what());
 		return nullptr;
