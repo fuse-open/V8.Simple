@@ -205,6 +205,8 @@ struct ScriptExceptionHandler
 	virtual void Release() { }
 };
 
+struct V8Scope;
+
 class Context
 {
 public:
@@ -221,36 +223,33 @@ private:
 	static MessageHandler* _debugMessageHandler;
 	static v8::Platform* _platform;
 	static v8::Isolate* _isolate;
-	v8::Persistent<v8::Context>* _context;
+	static v8::Persistent<v8::Context>* _context;
 	static Function* _instanceOf;
 	static ScriptExceptionHandler* _scriptExceptionHandler;
 	static MessageHandler* _runtimeExceptionHandler;
 	static Value* Wrap(
-		const v8::TryCatch& tryCatch,
+		const V8Scope& scope,
 		v8::Local<v8::Value> value)
 		throw(std::runtime_error);
 	static Value* Wrap(
-		const v8::TryCatch& tryCatch,
+		const V8Scope& scope,
 		v8::MaybeLocal<v8::Value> mvalue)
 		throw(std::runtime_error);
 	static v8::Local<v8::Value> Unwrap(
-		const v8::TryCatch& tryCatch,
+		const V8Scope& scope,
 		Value* value);
 	static std::vector<v8::Local<v8::Value>> UnwrapVector(
-		const v8::TryCatch& tryCatch,
+		const V8Scope& scope,
 		const std::vector<Value*>& values);
 	static void Throw(
-		v8::Local<v8::Context> context,
-		const v8::TryCatch& tryCatch);
+		const V8Scope& scope);
 	template<class A>
 	static v8::Local<A> FromJust(
-		v8::Local<v8::Context> context,
-		const v8::TryCatch& tryCatch,
+		const V8Scope& scope,
 		v8::MaybeLocal<A> a);
 	template<class A>
 	static A FromJust(
-		v8::Local<v8::Context> context,
-		const v8::TryCatch& tryCatch,
+		const V8Scope& scope,
 		v8::Maybe<A> a);
 	static void HandleScriptException(
 		const ScriptException& e);
@@ -261,6 +260,7 @@ private:
 	friend class Array;
 	friend class Function;
 	friend class Object;
+	friend struct V8Scope;
 };
 
 } // namespace V8Simple
