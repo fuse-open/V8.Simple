@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <string>
 
-// TODO remove
-#include <iostream>
-
 namespace V8Simple
 {
 
@@ -16,8 +13,7 @@ String::String(const char* value)
 }
 
 String::String(const char* value, int length)
-	: Value(Type::String)
-	, _value(new char[length + 1])
+	: _value(new char[length + 1])
 	, _length(length)
 {
 	if (length > 0 && value != nullptr)
@@ -89,8 +85,7 @@ struct V8Scope
 };
 
 Object::Object(v8::Local<v8::Object> object)
-	: Value(Type::Object)
-	, _object(Context::_isolate, object)
+	: _object(Context::_isolate, object)
 { }
 
 Type Object::GetValueType() const { return Type::Object; }
@@ -283,8 +278,7 @@ bool Object::Equals(const Object& o)
 }
 
 Function::Function(v8::Local<v8::Function> function)
-	: Value(Type::Function)
-	, _function(Context::_isolate, function)
+	: _function(Context::_isolate, function)
 {
 }
 
@@ -362,8 +356,7 @@ bool Function::Equals(const Function& function)
 }
 
 Array::Array(v8::Local<v8::Array> array)
-	: Value(Type::Array)
-	, _array(Context::_isolate, array)
+	: _array(Context::_isolate, array)
 { }
 
 Type Array::GetValueType() const { return Type::Array; }
@@ -442,36 +435,36 @@ bool Array::Equals(const Array& array)
 }
 
 UniqueValueVector::UniqueValueVector(const std::vector<Value*>&& values)
-	: _values(values)
+	: _values(new std::vector<Value*>(values))
 {
 }
 
 UniqueValueVector::~UniqueValueVector()
 {
-	for (Value* v: _values)
+	for (Value* v: *_values)
 	{
 		delete v;
 	}
+	delete _values;
 }
 
 int UniqueValueVector::Length()
 {
-	return _values.size();
+	return _values->size();
 }
 
 Value* UniqueValueVector::Get(int index)
 {
 	Value* result = nullptr;
-	std::swap(_values.at(index), result);
+	std::swap(_values->at(index), result);
 	return result;
 }
 
 Callback::Callback()
-	: Value(Type::Callback)
 {
 }
 
-Value* Callback::Call(const UniqueValueVector& args)
+Value* Callback::Call(UniqueValueVector args)
 {
 	return nullptr;
 }
@@ -820,8 +813,7 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 		_runtimeExceptionHandler->Retain();
 	}
 
-	// TODO remove
-	v8::V8::SetFlagsFromString("--expose-gc", 11);
+	// v8::V8::SetFlagsFromString("--expose-gc", 11);
 	if (_platform == nullptr)
 	{
 		v8::V8::InitializeICU();
@@ -932,8 +924,7 @@ Object* Context::GlobalObject()
 
 bool Context::IdleNotificationDeadline(double deadline_in_seconds)
 {
-	// TODO remove
-	_isolate->RequestGarbageCollectionForTesting(v8::Isolate::kFullGarbageCollection);
+	// _isolate->RequestGarbageCollectionForTesting(v8::Isolate::kFullGarbageCollection);
 	return _isolate->IdleNotificationDeadline(deadline_in_seconds);
 }
 

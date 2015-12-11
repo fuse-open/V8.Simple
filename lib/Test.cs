@@ -30,6 +30,7 @@ static class Test
 			Function f = context.Evaluate("hej.js", "(function(x, y) { return x + y; })") as Function;
 			V8Simple.Array a = context.Evaluate("arr.js", "([2,3,1,4])") as V8Simple.Array;
 			V8Simple.Object o = context.Evaluate("obj.js", "({test: \"blah\", test2: \"xyz\"})") as V8Simple.Object;
+			Console.WriteLine(o.InstanceOf(f));
 			Console.WriteLine(f == null ? "f is null" : "f is not null");
 			ValueVector args = new ValueVector { new Int(3), new Int(4) };
 			int result = (f.Call(args) as Int).GetValue();

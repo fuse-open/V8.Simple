@@ -1,7 +1,5 @@
 #pragma once
 #include <include/v8.h>
-// TODO remove
-// #include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -24,9 +22,6 @@ enum class Type
 	Callback,
 };
 
-// TODO remove
-// const std::string TypeNames[] = { "Int", "Double", "String", "Bool", "Object", "Array", "Function", "Callback" };
-
 template<class T> struct TypeTag { };
 
 class Value
@@ -35,13 +30,6 @@ public:
 	virtual Type GetValueType() const = 0;
 	virtual ~Value()
 	{
-		// std::cout << "- " << this << std::endl;
-	}
-protected:
-	// TODO remove
-	Value(Type t)
-	{
-		// std::cout << "+ " << TypeNames[static_cast<int>(t)] << " " << this << std::endl;
 	}
 };
 
@@ -74,9 +62,6 @@ public:
 	bool Equals(const Function& f);
 	virtual ~Function()
 	{
-		// TODO remove
-		// std::cout << "Function destructor " << this << " " << &_function << std::endl;
-		// delete _function;
 	}
 protected:
 	Function(v8::Local<v8::Function> function);
@@ -122,13 +107,13 @@ private:
 class UniqueValueVector
 {
 public:
-	UniqueValueVector(const std::vector<Value*>&& values);
 	~UniqueValueVector();
 	int Length();
 	Value* Get(int index);
 private:
+	UniqueValueVector(const std::vector<Value*>&& values);
 	friend class Context;
-	std::vector<Value*> _values;
+	std::vector<Value*>* _values;
 };
 
 class Callback: public Value
@@ -136,7 +121,7 @@ class Callback: public Value
 public:
 	Callback();
 	virtual Type GetValueType() const override /* final */;
-	virtual Value* Call(const UniqueValueVector& args);
+	virtual Value* Call(UniqueValueVector args);
 	virtual void Retain() { }
 	virtual void Release() { }
 private:
@@ -147,7 +132,7 @@ template<class T>
 class Primitive: public Value
 {
 public:
-	Primitive(const T& value) : Value(TypeTag<Primitive<T>>::Tag), _value(value) { }
+	Primitive(const T& value) : _value(value) { }
 	virtual Type GetValueType() const override final { return TypeTag<Primitive<T>>::Tag; }
 	T GetValue() const { return _value; }
 private:
