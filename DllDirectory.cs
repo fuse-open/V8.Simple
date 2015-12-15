@@ -12,7 +12,6 @@ namespace Fuse.Scripting.V8.Simple
 			if (Path.DirectorySeparatorChar == '\\') // Super-awesome and reliable Windows detection
 			{
 				var asmDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-				Console.WriteLine("asmDir: " + asmDir);
 
 				switch (IntPtr.Size)
 				{
