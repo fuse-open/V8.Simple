@@ -5,22 +5,6 @@
 // Make sure we return the correct objects in C#:
 // See: http://johnnado.com/swig-csharp-java-downcast/
 %pragma(csharp) imclasscode=%{
-	static $imclassname()
-	{
-		if (System.IO.Path.DirectorySeparatorChar == '\\') // Super-awesome and reliable Windows detection
-		{
-			var asmDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-			switch (System.IntPtr.Size)
-			{
-				case 4: SetDllDirectory(System.IO.Path.Combine(asmDir, "x86")); break;
-				case 8: SetDllDirectory(System.IO.Path.Combine(asmDir, "x64")); break;
-				default: throw new System.Exception("Invalid IntPtr.Size: " + System.IntPtr.Size);
-			}
-		}
-	}
-	[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]
-	private static extern bool SetDllDirectory(string path);
 	public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool owner)
 	{
 		if (cPtr == global::System.IntPtr.Zero)
