@@ -107,11 +107,10 @@ private:
 class UniqueValueVector
 {
 public:
-	~UniqueValueVector();
 	int Length();
 	Value* Get(int index);
 private:
-	UniqueValueVector(const std::vector<Value*>&& values);
+	UniqueValueVector(std::vector<Value*>* values);
 	friend class Context;
 	std::vector<Value*>* _values;
 };
@@ -121,7 +120,7 @@ class Callback: public Value
 public:
 	Callback();
 	virtual Type GetValueType() const override /* final */;
-	virtual Value* Call(UniqueValueVector& args);
+	virtual Value* Call(UniqueValueVector args);
 	virtual void Retain() { }
 	virtual void Release() { }
 private:
@@ -214,12 +213,10 @@ private:
 	static MessageHandler* _runtimeExceptionHandler;
 	static Value* Wrap(
 		const V8Scope& scope,
-		v8::Local<v8::Value> value)
-		throw(std::runtime_error);
+		v8::Local<v8::Value> value);
 	static Value* Wrap(
 		const V8Scope& scope,
-		v8::MaybeLocal<v8::Value> mvalue)
-		throw(std::runtime_error);
+		v8::MaybeLocal<v8::Value> mvalue);
 	static v8::Local<v8::Value> Unwrap(
 		const V8Scope& scope,
 		Value* value);

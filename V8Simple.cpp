@@ -434,18 +434,9 @@ bool Array::Equals(const Array& array)
 
 }
 
-UniqueValueVector::UniqueValueVector(const std::vector<Value*>&& values)
-	: _values(new std::vector<Value*>(values))
+UniqueValueVector::UniqueValueVector(std::vector<Value*>* values)
+	: _values(values)
 {
-}
-
-UniqueValueVector::~UniqueValueVector()
-{
-	for (Value* v: *_values)
-	{
-		delete v;
-	}
-	delete _values;
 }
 
 int UniqueValueVector::Length()
@@ -464,7 +455,7 @@ Callback::Callback()
 {
 }
 
-Value* Callback::Call(UniqueValueVector& args)
+Value* Callback::Call(UniqueValueVector args)
 {
 	return nullptr;
 }
@@ -576,7 +567,7 @@ v8::Local<A> Context::FromJust(
 	const V8Scope& scope,
 	v8::MaybeLocal<A> a)
 {
-	if (a.IsEmpty())
+	if (scope.TryCatch.HasCaught() || a.IsEmpty())
 	{
 		Throw(scope);
 	}
@@ -588,7 +579,7 @@ A Context::FromJust(
 	const V8Scope& scope,
 	v8::Maybe<A> a)
 {
-	if (a.IsNothing())
+	if (scope.TryCatch.HasCaught() || a.IsNothing())
 	{
 		Throw(scope);
 	}
@@ -597,7 +588,7 @@ A Context::FromJust(
 
 Value* Context::Wrap(
 	const V8Scope& scope,
-	v8::Local<v8::Value> value) throw(std::runtime_error)
+	v8::Local<v8::Value> value)
 {
 	auto context = Context::_context->Get(Context::_isolate);
 	if (value->IsInt32())
@@ -652,7 +643,7 @@ Value* Context::Wrap(
 
 Value* Context::Wrap(
 	const V8Scope& scope,
-	v8::MaybeLocal<v8::Value> mvalue) throw(std::runtime_error)
+	v8::MaybeLocal<v8::Value> mvalue)
 {
 	return Wrap(scope, FromJust(scope, mvalue));
 }
@@ -735,8 +726,13 @@ v8::Local<v8::Value> Context::Unwrap(
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
-					UniqueValueVector args((std::vector<Value*>&&)wrappedArgs);
+					UniqueValueVector args(&wrappedArgs);
 					Value* result = callback->Call(args);
+					int len = args.Length();
+					for (int i = 0; i < len; ++i)
+					{
+						delete args.Get(i);
+					}
 
 					info.GetReturnValue().Set(Unwrap(
 						scope,

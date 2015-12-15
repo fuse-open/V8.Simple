@@ -1828,14 +1828,14 @@ public static Value InstantiateConcreteValue(global::System.IntPtr cPtr, bool ow
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Array")]
   public static extern void delete_Array(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_UniqueValueVector")]
-  public static extern void delete_UniqueValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_UniqueValueVector_Length")]
   public static extern int UniqueValueVector_Length(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_UniqueValueVector_Get")]
   public static extern global::System.IntPtr UniqueValueVector_Get(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_UniqueValueVector")]
+  public static extern void delete_UniqueValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_Callback")]
   public static extern global::System.IntPtr new_Callback();
