@@ -8,7 +8,7 @@ namespace V8Simple
 {
 
 String::String(const char* value)
-	: String(value, value == nullptr ? 0 : std::strlen(value))
+	: String(value, value == nullptr ? 0 : static_cast<int>(std::strlen(value)))
 {
 }
 
@@ -325,7 +325,7 @@ Object* Function::Construct(const std::vector<Value*>& args)
 				scope,
 				_function.Get(Context::_isolate)->NewInstance(
 					context,
-					unwrappedArgs.size(),
+					static_cast<int>(unwrappedArgs.size()),
 					DataPointer(unwrappedArgs))));
 	}
 	catch (const ScriptException& e)
@@ -441,7 +441,7 @@ UniqueValueVector::UniqueValueVector(std::vector<Value*>& values)
 
 int UniqueValueVector::Length()
 {
-	return _values.size();
+	return static_cast<int>(_values.size());
 }
 
 Value* UniqueValueVector::Get(int index)
