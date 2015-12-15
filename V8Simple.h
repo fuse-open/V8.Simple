@@ -110,9 +110,9 @@ public:
 	int Length();
 	Value* Get(int index);
 private:
-	UniqueValueVector(std::vector<Value*>* values);
+	UniqueValueVector(std::vector<Value*>& values);
 	friend class Context;
-	std::vector<Value*>* _values;
+	std::vector<Value*>& _values;
 };
 
 class Callback: public Value

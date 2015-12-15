@@ -434,20 +434,20 @@ bool Array::Equals(const Array& array)
 
 }
 
-UniqueValueVector::UniqueValueVector(std::vector<Value*>* values)
+UniqueValueVector::UniqueValueVector(std::vector<Value*>& values)
 	: _values(values)
 {
 }
 
 int UniqueValueVector::Length()
 {
-	return _values->size();
+	return _values.size();
 }
 
 Value* UniqueValueVector::Get(int index)
 {
 	Value* result = nullptr;
-	std::swap(_values->at(index), result);
+	std::swap(_values.at(index), result);
 	return result;
 }
 
@@ -726,7 +726,7 @@ v8::Local<v8::Value> Context::Unwrap(
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
-					UniqueValueVector args(&wrappedArgs);
+					UniqueValueVector args(wrappedArgs);
 					Value* result = callback->Call(args);
 					int len = args.Length();
 					for (int i = 0; i < len; ++i)
