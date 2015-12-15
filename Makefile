@@ -25,7 +25,7 @@ $(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o
 	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 $(FILE).cs $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
-	swig -csharp -dllimport lib$(FILE) -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
+	swig -DSWIG_CSHARP_NO_IMCLASS_STATIC_CONSTRUCTOR -csharp -dllimport lib$(FILE) -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
 
 $(LIB_DIR)/$(FILE).dll: $(FILE).cs
 	mcs -t:library $^ -out:$@
