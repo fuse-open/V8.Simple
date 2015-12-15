@@ -121,7 +121,7 @@ class Callback: public Value
 public:
 	Callback();
 	virtual Type GetValueType() const override /* final */;
-	virtual Value* Call(UniqueValueVector args);
+	virtual Value* Call(UniqueValueVector& args);
 	virtual void Retain() { }
 	virtual void Release() { }
 private:

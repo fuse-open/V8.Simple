@@ -602,15 +602,15 @@ SwigDirector_Callback::~SwigDirector_Callback() {
 }
 
 
-V8Simple::Value *SwigDirector_Callback::Call(V8Simple::UniqueValueVector args) {
+V8Simple::Value *SwigDirector_Callback::Call(V8Simple::UniqueValueVector &args) {
   V8Simple::Value *c_result = 0 ;
   void * jresult = 0 ;
-  void * jargs  ;
+  void * jargs = 0 ;
   
   if (!swig_callbackCall) {
     return V8Simple::Callback::Call(args);
   } else {
-    jargs = (void *)&args; 
+    jargs = (V8Simple::UniqueValueVector *) &args; 
     jresult = (void *) swig_callbackCall(jargs);
     c_result = (V8Simple::Value *)jresult; 
   }
@@ -1199,18 +1199,16 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Callback_GetValueTypeSwigExplicitCallback(void
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  SwigValueWrapper< V8Simple::UniqueValueVector > arg2 ;
-  V8Simple::UniqueValueVector *argp2 ;
+  V8Simple::UniqueValueVector *arg2 = 0 ;
   V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  argp2 = (V8Simple::UniqueValueVector *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null V8Simple::UniqueValueVector", 0);
+  arg2 = (V8Simple::UniqueValueVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::UniqueValueVector & type is null", 0);
     return 0;
-  }
-  arg2 = *argp2; 
-  result = (V8Simple::Value *)(arg1)->Call(arg2);
+  } 
+  result = (V8Simple::Value *)(arg1)->Call(*arg2);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1219,18 +1217,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CallSwigExplicitCallback(void * jarg1, void * jarg2) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  SwigValueWrapper< V8Simple::UniqueValueVector > arg2 ;
-  V8Simple::UniqueValueVector *argp2 ;
+  V8Simple::UniqueValueVector *arg2 = 0 ;
   V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  argp2 = (V8Simple::UniqueValueVector *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null V8Simple::UniqueValueVector", 0);
+  arg2 = (V8Simple::UniqueValueVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::UniqueValueVector & type is null", 0);
     return 0;
-  }
-  arg2 = *argp2; 
-  result = (V8Simple::Value *)(arg1)->V8Simple::Callback::Call(arg2);
+  } 
+  result = (V8Simple::Value *)(arg1)->V8Simple::Callback::Call(*arg2);
   jresult = (void *)result; 
   return jresult;
 }

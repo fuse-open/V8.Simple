@@ -464,7 +464,7 @@ Callback::Callback()
 {
 }
 
-Value* Callback::Call(UniqueValueVector args)
+Value* Callback::Call(UniqueValueVector& args)
 {
 	return nullptr;
 }
@@ -735,7 +735,8 @@ v8::Local<v8::Value> Context::Unwrap(
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
-					Value* result = callback->Call(UniqueValueVector((std::vector<Value*>&&)wrappedArgs));
+					UniqueValueVector args((std::vector<Value*>&&)wrappedArgs);
+					Value* result = callback->Call(args);
 
 					info.GetReturnValue().Set(Unwrap(
 						scope,
