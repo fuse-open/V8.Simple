@@ -1568,7 +1568,7 @@ class v8PINVOKE {
     static ExceptionArgumentDelegate argumentNullDelegate = new ExceptionArgumentDelegate(SetPendingArgumentNullException);
     static ExceptionArgumentDelegate argumentOutOfRangeDelegate = new ExceptionArgumentDelegate(SetPendingArgumentOutOfRangeException);
 
-    [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="SWIGRegisterExceptionCallbacks_v8")]
+    [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="SWIGRegisterExceptionCallbacks_v8")]
     public static extern void SWIGRegisterExceptionCallbacks_v8(
                                 ExceptionDelegate applicationDelegate,
                                 ExceptionDelegate arithmeticDelegate,
@@ -1582,7 +1582,7 @@ class v8PINVOKE {
                                 ExceptionDelegate overflowDelegate, 
                                 ExceptionDelegate systemExceptionDelegate);
 
-    [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="SWIGRegisterExceptionArgumentCallbacks_v8")]
+    [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="SWIGRegisterExceptionArgumentCallbacks_v8")]
     public static extern void SWIGRegisterExceptionCallbacksArgument_v8(
                                 ExceptionArgumentDelegate argumentDelegate,
                                 ExceptionArgumentDelegate argumentNullDelegate,
@@ -1704,7 +1704,7 @@ class v8PINVOKE {
     public delegate string SWIGStringDelegate(string message);
     static SWIGStringDelegate stringDelegate = new SWIGStringDelegate(CreateString);
 
-    [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="SWIGRegisterStringCallback_v8")]
+    [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="SWIGRegisterStringCallback_v8")]
     public static extern void SWIGRegisterStringCallback_v8(SWIGStringDelegate stringDelegate);
 
     static string CreateString(string cString) {
@@ -1744,433 +1744,433 @@ class v8PINVOKE {
 	}
 
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Value_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Value_GetValueType")]
   public static extern int Value_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Value")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Value")]
   public static extern void delete_Value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_String__SWIG_0")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_0")]
   public static extern global::System.IntPtr new_String__SWIG_0(string jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_String__SWIG_1")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_1")]
   public static extern global::System.IntPtr new_String__SWIG_1(string jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_String__SWIG_2")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_2")]
   public static extern global::System.IntPtr new_String__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_String_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_GetValueType")]
   public static extern int String_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_String_GetValue")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_GetValue")]
   public static extern string String_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_String")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_String")]
   public static extern void delete_String(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Function_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_GetValueType")]
   public static extern int Function_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Function_Call")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_Call")]
   public static extern global::System.IntPtr Function_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Function_Construct")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_Construct")]
   public static extern global::System.IntPtr Function_Construct(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Function_Equals")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_Equals")]
   public static extern bool Function_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Function")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Function")]
   public static extern void delete_Function(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_GetValueType")]
   public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_Get")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Get")]
   public static extern global::System.IntPtr Object_Get(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_Set")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Set")]
   public static extern void Object_Set(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_Keys")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Keys")]
   public static extern global::System.IntPtr Object_Keys(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_InstanceOf")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_InstanceOf")]
   public static extern bool Object_InstanceOf(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_CallMethod")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_CallMethod")]
   public static extern global::System.IntPtr Object_CallMethod(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_ContainsKey")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_ContainsKey")]
   public static extern bool Object_ContainsKey(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_Equals")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Equals")]
   public static extern bool Object_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Object")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Object")]
   public static extern void delete_Object(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Array_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_GetValueType")]
   public static extern int Array_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Array_Get")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_Get")]
   public static extern global::System.IntPtr Array_Get(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Array_Set")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_Set")]
   public static extern void Array_Set(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Array_Length")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_Length")]
   public static extern int Array_Length(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Array_Equals")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_Equals")]
   public static extern bool Array_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Array")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Array")]
   public static extern void delete_Array(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_UniqueValueVector_Length")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Length")]
   public static extern int UniqueValueVector_Length(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_UniqueValueVector_Get")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Get")]
   public static extern global::System.IntPtr UniqueValueVector_Get(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_UniqueValueVector")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_UniqueValueVector")]
   public static extern void delete_UniqueValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_Callback")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Callback")]
   public static extern global::System.IntPtr new_Callback();
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_GetValueType")]
   public static extern int Callback_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_GetValueTypeSwigExplicitCallback")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_GetValueTypeSwigExplicitCallback")]
   public static extern int Callback_GetValueTypeSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_Call")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_Call")]
   public static extern global::System.IntPtr Callback_Call(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_CallSwigExplicitCallback")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_CallSwigExplicitCallback")]
   public static extern global::System.IntPtr Callback_CallSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_Retain")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_Retain")]
   public static extern void Callback_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_RetainSwigExplicitCallback")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_RetainSwigExplicitCallback")]
   public static extern void Callback_RetainSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_Release")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_Release")]
   public static extern void Callback_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_ReleaseSwigExplicitCallback")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_ReleaseSwigExplicitCallback")]
   public static extern void Callback_ReleaseSwigExplicitCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Callback")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Callback")]
   public static extern void delete_Callback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_director_connect")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_director_connect")]
   public static extern void Callback_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, Callback.SwigDelegateCallback_0 delegate0, Callback.SwigDelegateCallback_1 delegate1, Callback.SwigDelegateCallback_2 delegate2, Callback.SwigDelegateCallback_3 delegate3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptException_GetName")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetName")]
   public static extern global::System.IntPtr ScriptException_GetName(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptException_GetErrorMessage")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetErrorMessage")]
   public static extern global::System.IntPtr ScriptException_GetErrorMessage(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptException_GetFileName")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetFileName")]
   public static extern global::System.IntPtr ScriptException_GetFileName(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptException_GetLineNumber")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetLineNumber")]
   public static extern int ScriptException_GetLineNumber(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptException_GetStackTrace")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetStackTrace")]
   public static extern global::System.IntPtr ScriptException_GetStackTrace(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptException_GetSourceLine")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetSourceLine")]
   public static extern global::System.IntPtr ScriptException_GetSourceLine(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_ScriptException")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ScriptException")]
   public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_Handle")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Handle")]
   public static extern void MessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_HandleSwigExplicitMessageHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_HandleSwigExplicitMessageHandler")]
   public static extern void MessageHandler_HandleSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_MessageHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_MessageHandler")]
   public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_Retain")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Retain")]
   public static extern void MessageHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_RetainSwigExplicitMessageHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_RetainSwigExplicitMessageHandler")]
   public static extern void MessageHandler_RetainSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_Release")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Release")]
   public static extern void MessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_ReleaseSwigExplicitMessageHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_ReleaseSwigExplicitMessageHandler")]
   public static extern void MessageHandler_ReleaseSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_MessageHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_MessageHandler")]
   public static extern global::System.IntPtr new_MessageHandler();
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_MessageHandler_director_connect")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_director_connect")]
   public static extern void MessageHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, MessageHandler.SwigDelegateMessageHandler_0 delegate0, MessageHandler.SwigDelegateMessageHandler_1 delegate1, MessageHandler.SwigDelegateMessageHandler_2 delegate2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
   public static extern void ScriptExceptionHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler")]
   public static extern void ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
   public static extern void delete_ScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Retain")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Retain")]
   public static extern void ScriptExceptionHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler")]
   public static extern void ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_Release")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Release")]
   public static extern void ScriptExceptionHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler")]
   public static extern void ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_ScriptExceptionHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ScriptExceptionHandler")]
   public static extern global::System.IntPtr new_ScriptExceptionHandler();
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
   public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_1 delegate1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_2 delegate2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_Context")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Context")]
   public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Context_Evaluate")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_Evaluate")]
   public static extern global::System.IntPtr Context_Evaluate(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, string jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Context_GlobalObject")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_GlobalObject")]
   public static extern global::System.IntPtr Context_GlobalObject(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Context_IdleNotificationDeadline")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_IdleNotificationDeadline")]
   public static extern bool Context_IdleNotificationDeadline(global::System.Runtime.InteropServices.HandleRef jarg1, double jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Context")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Context")]
   public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
   public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Context_SendDebugCommand")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_SendDebugCommand")]
   public static extern void Context_SendDebugCommand(string jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Context_ProcessDebugMessages")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_ProcessDebugMessages")]
   public static extern void Context_ProcessDebugMessages();
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_Int")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Int")]
   public static extern global::System.IntPtr new_Int(int jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Int_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Int_GetValueType")]
   public static extern int Int_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Int_GetValue")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Int_GetValue")]
   public static extern int Int_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Int")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Int")]
   public static extern void delete_Int(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_Double")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Double")]
   public static extern global::System.IntPtr new_Double(double jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Double_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Double_GetValueType")]
   public static extern int Double_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Double_GetValue")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Double_GetValue")]
   public static extern double Double_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Double")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Double")]
   public static extern void delete_Double(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_Bool")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Bool")]
   public static extern global::System.IntPtr new_Bool(bool jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Bool_GetValueType")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Bool_GetValueType")]
   public static extern int Bool_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Bool_GetValue")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Bool_GetValue")]
   public static extern bool Bool_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_Bool")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Bool")]
   public static extern void delete_Bool(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Clear")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_Clear")]
   public static extern void StringVector_Clear(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Add")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_Add")]
   public static extern void StringVector_Add(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_size")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_size")]
   public static extern uint StringVector_size(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_capacity")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_capacity")]
   public static extern uint StringVector_capacity(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_reserve")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_reserve")]
   public static extern void StringVector_reserve(global::System.Runtime.InteropServices.HandleRef jarg1, uint jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_StringVector__SWIG_0")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_StringVector__SWIG_0")]
   public static extern global::System.IntPtr new_StringVector__SWIG_0();
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_StringVector__SWIG_1")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_StringVector__SWIG_1")]
   public static extern global::System.IntPtr new_StringVector__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_StringVector__SWIG_2")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_StringVector__SWIG_2")]
   public static extern global::System.IntPtr new_StringVector__SWIG_2(int jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_getitemcopy")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_getitemcopy")]
   public static extern global::System.IntPtr StringVector_getitemcopy(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_getitem")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_getitem")]
   public static extern global::System.IntPtr StringVector_getitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_setitem")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_setitem")]
   public static extern void StringVector_setitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_AddRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_AddRange")]
   public static extern void StringVector_AddRange(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_GetRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_GetRange")]
   public static extern global::System.IntPtr StringVector_GetRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Insert")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_Insert")]
   public static extern void StringVector_Insert(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_InsertRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_InsertRange")]
   public static extern void StringVector_InsertRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_RemoveAt")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_RemoveAt")]
   public static extern void StringVector_RemoveAt(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_RemoveRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_RemoveRange")]
   public static extern void StringVector_RemoveRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Repeat")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_Repeat")]
   public static extern global::System.IntPtr StringVector_Repeat(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Reverse__SWIG_0")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_Reverse__SWIG_0")]
   public static extern void StringVector_Reverse__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_Reverse__SWIG_1")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_Reverse__SWIG_1")]
   public static extern void StringVector_Reverse__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_StringVector_SetRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_StringVector_SetRange")]
   public static extern void StringVector_SetRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_StringVector")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_StringVector")]
   public static extern void delete_StringVector(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Clear")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Clear")]
   public static extern void ValueVector_Clear(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Add")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Add")]
   public static extern void ValueVector_Add(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_size")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_size")]
   public static extern uint ValueVector_size(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_capacity")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_capacity")]
   public static extern uint ValueVector_capacity(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_reserve")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_reserve")]
   public static extern void ValueVector_reserve(global::System.Runtime.InteropServices.HandleRef jarg1, uint jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_ValueVector__SWIG_0")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ValueVector__SWIG_0")]
   public static extern global::System.IntPtr new_ValueVector__SWIG_0();
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_ValueVector__SWIG_1")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ValueVector__SWIG_1")]
   public static extern global::System.IntPtr new_ValueVector__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_new_ValueVector__SWIG_2")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ValueVector__SWIG_2")]
   public static extern global::System.IntPtr new_ValueVector__SWIG_2(int jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_getitemcopy")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_getitemcopy")]
   public static extern global::System.IntPtr ValueVector_getitemcopy(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_getitem")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_getitem")]
   public static extern global::System.IntPtr ValueVector_getitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_setitem")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_setitem")]
   public static extern void ValueVector_setitem(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_AddRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_AddRange")]
   public static extern void ValueVector_AddRange(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_GetRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_GetRange")]
   public static extern global::System.IntPtr ValueVector_GetRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Insert")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Insert")]
   public static extern void ValueVector_Insert(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_InsertRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_InsertRange")]
   public static extern void ValueVector_InsertRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_RemoveAt")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_RemoveAt")]
   public static extern void ValueVector_RemoveAt(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_RemoveRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_RemoveRange")]
   public static extern void ValueVector_RemoveRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Repeat")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Repeat")]
   public static extern global::System.IntPtr ValueVector_Repeat(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Reverse__SWIG_0")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Reverse__SWIG_0")]
   public static extern void ValueVector_Reverse__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Reverse__SWIG_1")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Reverse__SWIG_1")]
   public static extern void ValueVector_Reverse__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, int jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_SetRange")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_SetRange")]
   public static extern void ValueVector_SetRange(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Contains")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Contains")]
   public static extern bool ValueVector_Contains(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_IndexOf")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_IndexOf")]
   public static extern int ValueVector_IndexOf(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_LastIndexOf")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_LastIndexOf")]
   public static extern int ValueVector_LastIndexOf(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_ValueVector_Remove")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ValueVector_Remove")]
   public static extern bool ValueVector_Remove(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_delete_ValueVector")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ValueVector")]
   public static extern void delete_ValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_String_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_SWIGUpcast")]
   public static extern global::System.IntPtr String_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Function_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_SWIGUpcast")]
   public static extern global::System.IntPtr Function_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Object_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_SWIGUpcast")]
   public static extern global::System.IntPtr Object_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Array_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_SWIGUpcast")]
   public static extern global::System.IntPtr Array_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Callback_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_SWIGUpcast")]
   public static extern global::System.IntPtr Callback_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Int_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Int_SWIGUpcast")]
   public static extern global::System.IntPtr Int_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Double_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Double_SWIGUpcast")]
   public static extern global::System.IntPtr Double_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("libV8Simple", EntryPoint="CSharp_Bool_SWIGUpcast")]
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Bool_SWIGUpcast")]
   public static extern global::System.IntPtr Bool_SWIGUpcast(global::System.IntPtr jarg1);
 }
 

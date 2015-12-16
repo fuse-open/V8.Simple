@@ -6,7 +6,7 @@ LIB_DIR=lib
 LIB_FILE=lib$(FILE).dylib
 ANDROID_LIB_FILE=lib$(FILE).so
 
-all: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).dll
+all: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).net.dll
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
@@ -25,9 +25,9 @@ $(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o
 	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 $(FILE).cs $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
-	swig -csharp -dllimport lib$(FILE) -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
+	swig -csharp -dllimport $(FILE).dll -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
 
-$(LIB_DIR)/$(FILE).dll: $(FILE).cs DllDirectory.cs
+$(LIB_DIR)/$(FILE).net.dll: $(FILE).cs DllDirectory.cs
 	mcs -t:library $^ -out:$@
 
 .PHONY: clean
