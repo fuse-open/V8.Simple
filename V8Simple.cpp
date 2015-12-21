@@ -212,12 +212,18 @@ Value* Object::CallMethod(
 		auto context = Context::_context->Get(Context::_isolate);
 
 		auto localObject = _object.Get(Context::_isolate);
-		auto fun = Context::FromJust(
+		auto prop = Context::FromJust(
 			scope,
 			localObject->Get(
 				context,
-				ToV8String(Context::_isolate, name).As<v8::Value>()))
-			.As<v8::Function>();
+				ToV8String(Context::_isolate, name).As<v8::Value>()));
+
+		if (!prop->IsFunction())
+		{
+			Context::Throw(scope);
+		}
+		auto fun = prop.As<v8::Function>();
+
 		auto unwrappedArgs = Context::UnwrapVector(scope, args);
 		return Context::Wrap(
 			scope,
