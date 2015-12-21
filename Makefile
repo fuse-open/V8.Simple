@@ -30,7 +30,13 @@ $(FILE).cs $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
 $(LIB_DIR)/$(FILE).net.dll: $(FILE).cs DllDirectory.cs
 	mcs -t:library $^ -out:$@
 
-.PHONY: clean
+.PHONY: clean check
+
+check: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).net.dll
+	cp $(LIB_DIR)/$(LIB_FILE) test
+	cp $(LIB_DIR)/$(FILE).net.dll test
+	mcs -t:library -lib:lib -r:V8Simple.net.dll,nunit.framework test/Test.cs
+	nunit-console test/Test.dll
 
 clean:
 	$(RM) $(FILE)_wrap.cxx
