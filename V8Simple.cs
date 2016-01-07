@@ -567,8 +567,9 @@ public class MessageHandler : global::System.IDisposable {
     }
   }
 
-  public virtual void Handle(string jsonMessage) {
-    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.MessageHandler_HandleSwigExplicitMessageHandler(swigCPtr, jsonMessage); else v8PINVOKE.MessageHandler_Handle(swigCPtr, jsonMessage);
+  public virtual void Handle(String message) {
+    if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.MessageHandler_HandleSwigExplicitMessageHandler(swigCPtr, String.getCPtr(message)); else v8PINVOKE.MessageHandler_Handle(swigCPtr, String.getCPtr(message));
+    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
   public virtual void Retain() {
@@ -599,8 +600,8 @@ public class MessageHandler : global::System.IDisposable {
     return hasDerivedMethod;
   }
 
-  private void SwigDirectorHandle(string jsonMessage) {
-    Handle(jsonMessage);
+  private void SwigDirectorHandle(global::System.IntPtr message) {
+    Handle(new String(message, false));
   }
 
   private void SwigDirectorRetain() {
@@ -611,7 +612,7 @@ public class MessageHandler : global::System.IDisposable {
     Release();
   }
 
-  public delegate void SwigDelegateMessageHandler_0(string jsonMessage);
+  public delegate void SwigDelegateMessageHandler_0(global::System.IntPtr message);
   public delegate void SwigDelegateMessageHandler_1();
   public delegate void SwigDelegateMessageHandler_2();
 
@@ -619,7 +620,7 @@ public class MessageHandler : global::System.IDisposable {
   private SwigDelegateMessageHandler_1 swigDelegate1;
   private SwigDelegateMessageHandler_2 swigDelegate2;
 
-  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(string) };
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(String) };
   private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
 }
@@ -1892,10 +1893,10 @@ class v8PINVOKE {
   public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Handle")]
-  public static extern void MessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+  public static extern void MessageHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_HandleSwigExplicitMessageHandler")]
-  public static extern void MessageHandler_HandleSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+  public static extern void MessageHandler_HandleSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_MessageHandler")]
   public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);

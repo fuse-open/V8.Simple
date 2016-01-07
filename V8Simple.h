@@ -175,7 +175,7 @@ private:
 
 struct MessageHandler
 {
-	virtual void Handle(const char* jsonMessage) { }
+	virtual void Handle(const String& message) { }
 	virtual ~MessageHandler() { }
 	virtual void Retain() { }
 	virtual void Release() { }

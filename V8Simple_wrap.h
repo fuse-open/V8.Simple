@@ -39,12 +39,12 @@ struct SwigDirector_MessageHandler : public V8Simple::MessageHandler, public Swi
 
 public:
     SwigDirector_MessageHandler();
-    virtual void Handle(char const *jsonMessage);
+    virtual void Handle(V8Simple::String const &message);
     virtual ~SwigDirector_MessageHandler();
     virtual void Retain();
     virtual void Release();
 
-    typedef void (SWIGSTDCALL* SWIG_Callback0_t)(char *);
+    typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);
     typedef void (SWIGSTDCALL* SWIG_Callback1_t)();
     typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
     void swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease);

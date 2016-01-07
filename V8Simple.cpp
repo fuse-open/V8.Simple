@@ -57,12 +57,6 @@ static v8::Local<v8::String> ToV8String(
 	return v8::String::NewFromUtf8(isolate, str);
 }
 
-template<class T>
-static const char* ToString(const T& t)
-{
-	return *v8::String::Utf8Value(t);
-}
-
 struct V8Scope
 {
 	V8Scope(v8::Isolate* isolate, v8::Persistent<v8::Context>* context)
@@ -784,7 +778,9 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 	{
 		v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
 		{
-			_debugMessageHandler->Handle(ToString(message.GetJSON()));
+
+			v8::String::Utf8Value str(message.GetJSON());
+			_debugMessageHandler->Handle(String(*str, str.length()));
 		});
 	}
 	_debugMessageHandler = debugMessageHandler;

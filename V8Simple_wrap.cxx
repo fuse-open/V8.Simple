@@ -653,15 +653,15 @@ SwigDirector_MessageHandler::SwigDirector_MessageHandler() : V8Simple::MessageHa
   swig_init_callbacks();
 }
 
-void SwigDirector_MessageHandler::Handle(char const *jsonMessage) {
-  char * jjsonMessage = 0 ;
+void SwigDirector_MessageHandler::Handle(V8Simple::String const &message) {
+  void * jmessage = 0 ;
   
   if (!swig_callbackHandle) {
-    V8Simple::MessageHandler::Handle(jsonMessage);
+    V8Simple::MessageHandler::Handle(message);
     return;
   } else {
-    jjsonMessage = SWIG_csharp_string_callback((const char *)jsonMessage); 
-    swig_callbackHandle(jjsonMessage);
+    jmessage = (V8Simple::String *) &message; 
+    swig_callbackHandle(jmessage);
   }
 }
 
@@ -1365,23 +1365,31 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ScriptException(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_Handle(void * jarg1, char * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_Handle(void * jarg1, void * jarg2) {
   V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  char *arg2 = (char *) 0 ;
+  V8Simple::String *arg2 = 0 ;
   
   arg1 = (V8Simple::MessageHandler *)jarg1; 
-  arg2 = (char *)jarg2; 
-  (arg1)->Handle((char const *)arg2);
+  arg2 = (V8Simple::String *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::String const & type is null", 0);
+    return ;
+  } 
+  (arg1)->Handle((V8Simple::String const &)*arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_HandleSwigExplicitMessageHandler(void * jarg1, char * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_HandleSwigExplicitMessageHandler(void * jarg1, void * jarg2) {
   V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  char *arg2 = (char *) 0 ;
+  V8Simple::String *arg2 = 0 ;
   
   arg1 = (V8Simple::MessageHandler *)jarg1; 
-  arg2 = (char *)jarg2; 
-  (arg1)->V8Simple::MessageHandler::Handle((char const *)arg2);
+  arg2 = (V8Simple::String *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::String const & type is null", 0);
+    return ;
+  } 
+  (arg1)->V8Simple::MessageHandler::Handle((V8Simple::String const &)*arg2);
 }
 
 
