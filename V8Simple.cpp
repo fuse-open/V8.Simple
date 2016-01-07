@@ -765,10 +765,17 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 {
 	v8::Isolate::Scope isolateScope(_isolate);
+
+	if (debugMessageHandler != nullptr)
+	{
+		debugMessageHandler->Retain();
+	}
+
 	if (_debugMessageHandler != nullptr)
 	{
 		_debugMessageHandler->Release();
 	}
+
 	if (debugMessageHandler == nullptr)
 	{
 		v8::Debug::SetMessageHandler(nullptr);
@@ -779,7 +786,6 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 		{
 			_debugMessageHandler->Handle(ToString(message.GetJSON()));
 		});
-		debugMessageHandler->Retain();
 	}
 	_debugMessageHandler = debugMessageHandler;
 }
