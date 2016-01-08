@@ -758,7 +758,7 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 
 void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 {
-	v8::Isolate::Scope isolateScope(_isolate);
+	V8Scope scope;
 
 	if (debugMessageHandler != nullptr)
 	{
@@ -800,7 +800,7 @@ void Context::SendDebugCommand(const char* command)
 
 void Context::ProcessDebugMessages()
 {
-	v8::Isolate::Scope isolateScope(_isolate);
+	V8Scope scope;
 	v8::Debug::ProcessDebugMessages();
 }
 
@@ -863,23 +863,32 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 
 Context::~Context()
 {
-	delete _instanceOf;
-	_instanceOf = nullptr;
-
-	if (_runtimeExceptionHandler != nullptr)
 	{
-		_runtimeExceptionHandler->Release();
-	}
-	_runtimeExceptionHandler = nullptr;
+		v8::Locker locker(_isolate);
+		v8::Isolate::Scope isolateScope(_isolate);
+		v8::HandleScope handleScope(_isolate);
 
-	if (_runtimeExceptionHandler != nullptr)
-	{
-		_scriptExceptionHandler->Release();
-	}
-	_scriptExceptionHandler = nullptr;
+		{
+			v8::Context::Scope contextScope(_context->Get(_isolate));
+			delete _instanceOf;
+			_instanceOf = nullptr;
 
-	delete _context;
-	_context = nullptr;
+			if (_runtimeExceptionHandler != nullptr)
+			{
+				_runtimeExceptionHandler->Release();
+			}
+			_runtimeExceptionHandler = nullptr;
+
+			if (_runtimeExceptionHandler != nullptr)
+			{
+				_scriptExceptionHandler->Release();
+			}
+			_scriptExceptionHandler = nullptr;
+		}
+
+		delete _context;
+		_context = nullptr;
+	}
 
 	_isolate->Dispose();
 	_isolate = nullptr;
