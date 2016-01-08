@@ -197,4 +197,42 @@ public class V8SimpleTests
 			Assert.IsTrue(handled, "Test3");
 		}
 	}
+
+	public class DelegateMessageHandler: MessageHandler
+	{
+		Action<string> _handler;
+		static List<object> _retained = new List<object>();
+		public override void Retain()
+		{
+			_retained.Add(this);
+		}
+		public override void Release()
+		{
+			_retained.Remove(this);
+		}
+
+		public DelegateMessageHandler(Action<string> handler)
+		{
+			_handler = handler;
+		}
+
+		public override void Handle(V8Simple.String e)
+		{
+			_handler(e.GetValue());
+		}
+	}
+
+
+	// Has to be last
+	[Test]
+	public void ZZZContextTests()
+	{
+		bool handled;
+		var context = new Context(
+			new DelegateScriptExceptionHandler(x => { handled = true; }),
+			new DelegateMessageHandler(x => { handled = true; }));
+		Assert.AreEqual(
+			((V8Simple.Int)context.Evaluate("ContextTests", "1 + 2")).GetValue(),
+			3);
+	}
 }

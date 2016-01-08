@@ -28,6 +28,7 @@ $(FILE).cs $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
 	swig -csharp -dllimport $(FILE).dll -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
 
 $(LIB_DIR)/$(FILE).net.dll: $(FILE).cs DllDirectory.cs
+	@mkdir -p $(LIB_DIR)
 	mcs -t:library $^ -out:$@
 
 .PHONY: clean check
@@ -36,7 +37,7 @@ check: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).net.dll
 	cp $(LIB_DIR)/$(LIB_FILE) test
 	cp $(LIB_DIR)/$(FILE).net.dll test
 	mcs -t:library -lib:lib -r:V8Simple.net.dll,nunit.framework test/Test.cs
-	nunit-console test/Test.dll
+	nunit-console -labels test/Test.dll
 
 clean:
 	$(RM) $(FILE)_wrap.cxx
