@@ -879,7 +879,7 @@ Context::~Context()
 			}
 			_runtimeExceptionHandler = nullptr;
 
-			if (_runtimeExceptionHandler != nullptr)
+			if (_scriptExceptionHandler != nullptr)
 			{
 				_scriptExceptionHandler->Release();
 			}
