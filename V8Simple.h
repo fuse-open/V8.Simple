@@ -60,9 +60,6 @@ public:
 	Value* Call(const std::vector<Value*>& args);
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function& f);
-	virtual ~Function()
-	{
-	}
 protected:
 	Function(v8::Local<v8::Function> function);
 private:
