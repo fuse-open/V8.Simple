@@ -226,6 +226,7 @@ public class V8SimpleTests
 	public void DebuggerTests()
 	{
 		V8Simple.Context.SetDebugMessageHandler(null);
+		V8Simple.Context.ProcessDebugMessages();
 		using (var context = new Context(null, null))
 		{
 			V8Simple.Context.SetDebugMessageHandler(new DelegateMessageHandler(x => { return; }));
@@ -233,6 +234,7 @@ public class V8SimpleTests
 			V8Simple.Context.ProcessDebugMessages();
 		}
 		V8Simple.Context.SetDebugMessageHandler(null);
+		V8Simple.Context.ProcessDebugMessages();
 	}
 
 	// Has to be last

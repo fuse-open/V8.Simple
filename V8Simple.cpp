@@ -758,8 +758,6 @@ std::vector<v8::Local<v8::Value>> Context::UnwrapVector(
 
 void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 {
-	V8Scope scope;
-
 	if (debugMessageHandler != nullptr)
 	{
 		debugMessageHandler->Retain();
@@ -770,29 +768,41 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 		_debugMessageHandler->Release();
 	}
 
-	if (debugMessageHandler == nullptr)
+	if (_isolate != nullptr)
 	{
-		v8::Debug::SetMessageHandler(nullptr);
-	}
-	else
-	{
-		v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
-		{
+		V8Scope scope;
 
-			v8::String::Utf8Value str(message.GetJSON());
-			_debugMessageHandler->Handle(String(*str, str.length()));
-		});
+		if (debugMessageHandler == nullptr)
+		{
+			v8::Debug::SetMessageHandler(nullptr);
+		}
+		else
+		{
+			v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
+			{
+
+				v8::String::Utf8Value str(message.GetJSON());
+				_debugMessageHandler->Handle(String(*str, str.length()));
+			});
+		}
 	}
 	_debugMessageHandler = debugMessageHandler;
 }
 
 void Context::SendDebugCommand(const char* command)
 {
+	if (_isolate == nullptr)
+	{
+		Context::HandleRuntimeException("Trying to send a debug command to V8 without a valid isolate");
+		return;
+	}
+
+
 	V8Scope scope;
 
-	auto str = Context::ToV8String(scope, command);
+	auto str = v8::String::NewFromUtf8(_isolate, command, v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_isolate));
 	auto len = str->Length();
-	uint16_t* buffer = new uint16_t[len];
+	auto buffer = new uint16_t[len];
 	str->Write(buffer);
 	v8::Debug::SendCommand(_isolate, buffer, len);
 	delete[] buffer;
@@ -800,9 +810,11 @@ void Context::SendDebugCommand(const char* command)
 
 void Context::ProcessDebugMessages()
 {
-	V8Scope scope;
-
-	v8::Debug::ProcessDebugMessages();
+	if (_isolate != nullptr)
+	{
+		V8Scope scope;
+		v8::Debug::ProcessDebugMessages();
+	}
 }
 
 Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler)
@@ -860,6 +872,8 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	{
 		_instanceOf = static_cast<Function*>(instanceOf);
 	}
+
+	SetDebugMessageHandler(_debugMessageHandler);
 }
 
 Context::~Context()
