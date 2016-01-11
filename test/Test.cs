@@ -222,6 +222,18 @@ public class V8SimpleTests
 		}
 	}
 
+	[Test]
+	public void DebuggerTests()
+	{
+		V8Simple.Context.SetDebugMessageHandler(null);
+		using (var context = new Context(null, null))
+		{
+			V8Simple.Context.SetDebugMessageHandler(new DelegateMessageHandler(x => { return; }));
+			V8Simple.Context.SendDebugCommand("{}");
+			V8Simple.Context.ProcessDebugMessages();
+		}
+		V8Simple.Context.SetDebugMessageHandler(null);
+	}
 
 	// Has to be last
 	[Test]
