@@ -230,6 +230,9 @@ private:
 	static A FromJust(
 		const V8Scope& scope,
 		v8::Maybe<A> a);
+	static v8::Local<v8::String> ToV8String(
+		const V8Scope& scope,
+		const char* str);
 	static void HandleScriptException(
 		const ScriptException& e);
 	static void HandleRuntimeException(

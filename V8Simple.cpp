@@ -50,13 +50,6 @@ String::~String()
 	delete[] _value;
 }
 
-static v8::Local<v8::String> ToV8String(
-	v8::Isolate* isolate,
-	const char* str)
-{
-	return v8::String::NewFromUtf8(isolate, str);
-}
-
 struct V8Scope
 {
 	V8Scope(v8::Isolate* isolate, v8::Persistent<v8::Context>* context)
@@ -78,6 +71,13 @@ struct V8Scope
 	v8::TryCatch TryCatch;
 };
 
+v8::Local<v8::String> Context::ToV8String(
+	const V8Scope& scope,
+	const char* str)
+{
+	return Context::FromJust(scope, v8::String::NewFromUtf8(scope.HandleScope.GetIsolate(), str, v8::NewStringType::kNormal));
+}
+
 Object::Object(v8::Local<v8::Object> object)
 	: _object(Context::_isolate, object)
 { }
@@ -95,7 +95,7 @@ Value* Object::Get(const char* key)
 			scope,
 			_object.Get(Context::_isolate)->Get(
 				context,
-				ToV8String(Context::_isolate, key)));
+				Context::ToV8String(scope, key)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -118,7 +118,7 @@ void Object::Set(const char* key, Value* value)
 
 		auto ret = _object.Get(Context::_isolate)->Set(
 			context,
-			ToV8String(Context::_isolate, key),
+			Context::ToV8String(scope, key),
 			Context::Unwrap(scope, value));
 		Context::FromJust(scope, ret);
 	}
@@ -210,7 +210,7 @@ Value* Object::CallMethod(
 			scope,
 			localObject->Get(
 				context,
-				ToV8String(Context::_isolate, name).As<v8::Value>()));
+				Context::ToV8String(scope, name).As<v8::Value>()));
 
 		if (!prop->IsFunction())
 		{
@@ -248,7 +248,7 @@ bool Object::ContainsKey(const char* key)
 			scope,
 			_object.Get(Context::_isolate)->Has(
 				context,
-				ToV8String(Context::_isolate, key)));
+				Context::ToV8String(scope, key)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -668,8 +668,8 @@ v8::Local<v8::Value> Context::Unwrap(
 				_isolate,
 				static_cast<Double*>(value)->GetValue());
 		case Type::String:
-			return ToV8String(
-				_isolate,
+			return Context::ToV8String(
+				scope,
 				static_cast<String*>(value)->GetValue());
 		case Type::Bool:
 			return v8::Boolean::New(
@@ -790,7 +790,7 @@ void Context::SendDebugCommand(const char* command)
 {
 	V8Scope scope;
 
-	auto str = ToV8String(_isolate, command);
+	auto str = Context::ToV8String(scope, command);
 	auto len = str->Length();
 	uint16_t* buffer = new uint16_t[len];
 	str->Write(buffer);
@@ -801,6 +801,7 @@ void Context::SendDebugCommand(const char* command)
 void Context::ProcessDebugMessages()
 {
 	V8Scope scope;
+
 	v8::Debug::ProcessDebugMessages();
 }
 
@@ -907,12 +908,12 @@ Value* Context::Evaluate(const char* fileName, const char* code)
 		V8Scope scope;
 		auto context = _context->Get(_isolate);
 
-		v8::ScriptOrigin origin(ToV8String(_isolate, fileName));
+		v8::ScriptOrigin origin(Context::ToV8String(scope, fileName));
 		auto script = FromJust(
 			scope,
 			v8::Script::Compile(
 				context,
-				ToV8String(_isolate, code),
+				Context::ToV8String(scope, code),
 				&origin));
 
 		return Wrap(scope, script->Run(context));
