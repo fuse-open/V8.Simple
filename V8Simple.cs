@@ -42,7 +42,6 @@ public class Value : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -51,7 +50,6 @@ public class Value : global::System.IDisposable {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public virtual Type GetValueType() {
@@ -80,7 +78,6 @@ public class String : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -90,7 +87,6 @@ public class String : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public String(string value) : this(v8PINVOKE.new_String__SWIG_0(value), true) {
@@ -134,7 +130,6 @@ public class Function : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -144,7 +139,6 @@ public class Function : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public override Type GetValueType() {
@@ -193,7 +187,6 @@ public class Object : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -203,7 +196,6 @@ public class Object : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public override Type GetValueType() {
@@ -271,7 +263,6 @@ public class Array : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -281,7 +272,6 @@ public class Array : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public override Type GetValueType() {
@@ -333,7 +323,6 @@ public class UniqueValueVector : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -342,7 +331,6 @@ public class UniqueValueVector : global::System.IDisposable {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public int Length() {
@@ -377,7 +365,6 @@ public class Callback : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -387,7 +374,6 @@ public class Callback : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public Callback() : this(v8PINVOKE.new_Callback(), true) {
@@ -485,7 +471,6 @@ public class ScriptException : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -494,7 +479,6 @@ public class ScriptException : global::System.IDisposable {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public String GetName() {
@@ -555,7 +539,6 @@ public class MessageHandler : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -564,7 +547,6 @@ public class MessageHandler : global::System.IDisposable {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public virtual void Handle(String message) {
@@ -646,7 +628,6 @@ public class ScriptExceptionHandler : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -655,7 +636,6 @@ public class ScriptExceptionHandler : global::System.IDisposable {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public virtual void Handle(ScriptException e) {
@@ -737,7 +717,6 @@ public class Context : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -746,7 +725,6 @@ public class Context : global::System.IDisposable {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public Context(ScriptExceptionHandler scriptExceptionHandler, MessageHandler runtimeExceptionHandler) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler), MessageHandler.getCPtr(runtimeExceptionHandler)), true) {
@@ -802,7 +780,6 @@ public class Int : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -812,7 +789,6 @@ public class Int : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public Int(int value) : this(v8PINVOKE.new_Int(value), true) {
@@ -849,7 +825,6 @@ public class Double : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -859,7 +834,6 @@ public class Double : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public Double(double value) : this(v8PINVOKE.new_Double(value), true) {
@@ -896,7 +870,6 @@ public class Bool : Value {
   }
 
   public override void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -906,7 +879,6 @@ public class Bool : Value {
       }
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
-    }
   }
 
   public Bool(bool value) : this(v8PINVOKE.new_Bool(value), true) {
@@ -947,7 +919,6 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -956,7 +927,6 @@ public class StringVector : global::System.IDisposable, global::System.Collectio
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public StringVector(global::System.Collections.ICollection c) : this() {
@@ -1246,7 +1216,6 @@ public class ValueVector : global::System.IDisposable, global::System.Collection
   }
 
   public virtual void Dispose() {
-    lock(this) {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
@@ -1255,7 +1224,6 @@ public class ValueVector : global::System.IDisposable, global::System.Collection
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
   }
 
   public ValueVector(global::System.Collections.ICollection c) : this() {

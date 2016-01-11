@@ -2,6 +2,31 @@
 %{
 #include "V8Simple.h"
 %}
+
+%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") SWIGTYPE {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          $imcall;
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+  }
+
+%typemap(csdestruct_derived, methodname="Dispose", methodmodifiers="public") SWIGTYPE {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          $imcall;
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+      base.Dispose();
+  }
+
+
 // Make sure we return the correct objects in C#:
 // See: http://johnnado.com/swig-csharp-java-downcast/
 %pragma(csharp) imclasscode=%{
