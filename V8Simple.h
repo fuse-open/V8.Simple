@@ -10,6 +10,13 @@
 namespace V8Simple
 {
 
+struct V8Scope;
+class Object;
+
+v8::Isolate* CurrentIsolate();
+v8::Local<v8::Context> CurrentContext();
+void Throw(const V8Scope& scope);
+
 enum class Type
 {
 	Int,
@@ -31,6 +38,20 @@ public:
 	virtual ~Value()
 	{
 	}
+protected:
+	static Value* Wrap(
+		const V8Scope& scope,
+		v8::Local<v8::Value> value);
+	static Value* Wrap(
+		const V8Scope& scope,
+		v8::MaybeLocal<v8::Value> mvalue);
+	static v8::Local<v8::Value> Unwrap(
+		const V8Scope& scope,
+		Value* value);
+	std::vector<v8::Local<v8::Value>> UnwrapVector(
+		const V8Scope& scope,
+		const std::vector<Value*>& values);
+	friend class Context;
 };
 
 class String: public Value
@@ -45,13 +66,11 @@ public:
 	virtual ~String();
 private:
 	String(const v8::String::Utf8Value& v);
-	friend class Object;
-	friend struct ScriptException;
 	char* _value;
 	int _length;
+	friend class Object;
+	friend struct ScriptException;
 };
-
-class Object;
 
 class Function: public Value
 {
@@ -60,11 +79,10 @@ public:
 	Value* Call(const std::vector<Value*>& args);
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function& f);
-protected:
-	Function(v8::Local<v8::Function> function);
 private:
-	friend class Context;
+	Function(v8::Local<v8::Function> function);
 	v8::Persistent<v8::Function> _function;
+	friend class Value;
 };
 
 class Object: public Value
@@ -78,11 +96,11 @@ public:
 	Value* CallMethod(const char* name, const std::vector<Value*>& args);
 	bool ContainsKey(const char* key);
 	bool Equals(const Object& object);
-protected:
-	Object(v8::Local<v8::Object> object);
 private:
+	Object(v8::Local<v8::Object> object);
 	v8::Persistent<v8::Object> _object;
 	friend class Context;
+	friend class Value;
 	friend class Function;
 };
 
@@ -94,11 +112,10 @@ public:
 	void Set(int index, Value* value);
 	int Length();
 	bool Equals(const Array& array);
-protected:
-	Array(v8::Local<v8::Array> array);
 private:
-	friend class Context;
+	Array(v8::Local<v8::Array> array);
 	v8::Persistent<v8::Array> _array;
+	friend class Value;
 };
 
 class UniqueValueVector
@@ -108,8 +125,8 @@ public:
 	Value* Get(int index);
 private:
 	UniqueValueVector(std::vector<Value*>& values);
-	friend class Context;
 	std::vector<Value*>& _values;
+	friend class Value;
 };
 
 class Callback: public Value
@@ -120,8 +137,6 @@ public:
 	virtual Value* Call(UniqueValueVector args);
 	virtual void Retain() { }
 	virtual void Release() { }
-private:
-	friend class Context;
 };
 
 template<class T>
@@ -167,7 +182,7 @@ private:
 		int lineNumber,
 		const ::v8::String::Utf8Value& stackTrace,
 		const ::v8::String::Utf8Value& sourceLine);
-	friend class Context;
+	friend void Throw(const V8Scope& scope);
 };
 
 struct MessageHandler
@@ -186,8 +201,6 @@ struct ScriptExceptionHandler
 	virtual void Release() { }
 };
 
-struct V8Scope;
-
 class Context
 {
 public:
@@ -201,48 +214,29 @@ public:
 	static void SendDebugCommand(const char* command);
 	static void ProcessDebugMessages();
 private:
-	static MessageHandler* _debugMessageHandler;
+	static Context* _globalContext;
 	static v8::Platform* _platform;
-	static v8::Isolate* _isolate;
-	static v8::Persistent<v8::Context>* _context;
-	static Function* _instanceOf;
-	static ScriptExceptionHandler* _scriptExceptionHandler;
-	static MessageHandler* _runtimeExceptionHandler;
-	static Value* Wrap(
-		const V8Scope& scope,
-		v8::Local<v8::Value> value);
-	static Value* Wrap(
-		const V8Scope& scope,
-		v8::MaybeLocal<v8::Value> mvalue);
-	static v8::Local<v8::Value> Unwrap(
-		const V8Scope& scope,
-		Value* value);
-	static std::vector<v8::Local<v8::Value>> UnwrapVector(
-		const V8Scope& scope,
-		const std::vector<Value*>& values);
-	static void Throw(
-		const V8Scope& scope);
-	template<class A>
-	static v8::Local<A> FromJust(
-		const V8Scope& scope,
-		v8::MaybeLocal<A> a);
-	template<class A>
-	static A FromJust(
-		const V8Scope& scope,
-		v8::Maybe<A> a);
-	static v8::Local<v8::String> ToV8String(
-		const V8Scope& scope,
-		const char* str);
+
+	MessageHandler* _debugMessageHandler;
+	v8::Isolate* _isolate;
+	v8::Isolate* _conversionIsolate;
+	v8::Persistent<v8::Context>* _context;
+	Function* _instanceOf;
+	ScriptExceptionHandler* _scriptExceptionHandler;
+	MessageHandler* _runtimeExceptionHandler;
+
 	static void HandleScriptException(
 		const ScriptException& e);
 	static void HandleRuntimeException(
 		const char* e);
 
+	friend v8::Isolate* CurrentIsolate();
+	friend v8::Local<v8::Context> CurrentContext();
+	friend struct V8Scope;
 	friend class Value;
 	friend class Array;
 	friend class Function;
 	friend class Object;
-	friend struct V8Scope;
 };
 
 } // namespace V8Simple
