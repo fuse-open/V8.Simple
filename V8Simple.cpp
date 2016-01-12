@@ -3,7 +3,6 @@
 #include <include/libplatform/libplatform.h>
 #include <stdlib.h>
 #include <string>
-#include <iostream>
 
 namespace V8Simple
 {
