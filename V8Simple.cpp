@@ -842,6 +842,12 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	}
 
 	// v8::V8::SetFlagsFromString("--expose-gc", 11);
+	{
+		// For compatibility with node.js
+		const char flags[] = "--expose_debug_as=v8debug";
+		v8::V8::SetFlagsFromString(flags, sizeof(flags));
+	}
+
 	if (_platform == nullptr)
 	{
 		v8::V8::InitializeICU();
