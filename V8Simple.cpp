@@ -3,6 +3,7 @@
 #include <include/libplatform/libplatform.h>
 #include <stdlib.h>
 #include <string>
+#include <iostream>
 
 namespace V8Simple
 {
@@ -797,9 +798,11 @@ void Context::SendDebugCommand(const char* command)
 
 		auto str = v8::String::NewFromUtf8(_globalContext->_conversionIsolate, command, v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_globalContext->_conversionIsolate));
 		auto len = str->Length();
-		auto buffer = new uint16_t[len];
+		auto buffer = new uint16_t[len + 1];
 		str->Write(buffer);
 		v8::Debug::SendCommand(_globalContext->_isolate, buffer, len);
+		// If we don't do this the line after crashes sometimes
+		ProcessDebugMessages();
 		delete[] buffer;
 	}
 }
