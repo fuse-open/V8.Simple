@@ -800,8 +800,6 @@ void Context::SendDebugCommand(const char* command)
 		auto buffer = new uint16_t[len + 1];
 		str->Write(buffer);
 		v8::Debug::SendCommand(_globalContext->_isolate, buffer, len);
-		// If we don't do this the line after crashes sometimes
-		ProcessDebugMessages();
 		delete[] buffer;
 	}
 }
