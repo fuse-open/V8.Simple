@@ -7,6 +7,12 @@
 // that the caller takes ownership of and deletes the pointer when appropriate.
 // The Values should be deallocated with the delete operator.
 
+#ifdef _MSC_VER
+#define DllExport __declspec(dllexport)
+#else
+#define DllExport
+#endif
+
 namespace V8Simple
 {
 
@@ -17,7 +23,7 @@ v8::Isolate* CurrentIsolate();
 v8::Local<v8::Context> CurrentContext();
 void Throw(const V8Scope& scope);
 
-enum class Type
+enum class DllExport Type
 {
 	Int,
 	Double,
@@ -31,7 +37,7 @@ enum class Type
 
 template<class T> struct TypeTag { };
 
-class Value
+class DllExport Value
 {
 public:
 	virtual Type GetValueType() const = 0;
@@ -54,7 +60,7 @@ protected:
 	friend class Context;
 };
 
-class String: public Value
+class DllExport String: public Value
 {
 public:
 	String(const char* value);
@@ -72,20 +78,23 @@ private:
 	friend struct ScriptException;
 };
 
-class Function: public Value
+class DllExport Function: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
 	Value* Call(const std::vector<Value*>& args);
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function& f);
+
+	Function(const Function&) = delete;
+	Function& operator=(const Function&) = delete;
 private:
 	Function(v8::Local<v8::Function> function);
 	v8::Persistent<v8::Function> _function;
 	friend class Value;
 };
 
-class Object: public Value
+class DllExport Object: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
@@ -96,6 +105,9 @@ public:
 	Value* CallMethod(const char* name, const std::vector<Value*>& args);
 	bool ContainsKey(const char* key);
 	bool Equals(const Object& object);
+
+	Object(const Object&) = delete;
+	Object& operator=(const Object&) = delete;
 private:
 	Object(v8::Local<v8::Object> object);
 	v8::Persistent<v8::Object> _object;
@@ -104,7 +116,7 @@ private:
 	friend class Function;
 };
 
-class Array: public Value
+class DllExport Array: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
@@ -112,13 +124,16 @@ public:
 	void Set(int index, Value* value);
 	int Length();
 	bool Equals(const Array& array);
+
+	Array(const Array&) = delete;
+	Array& operator=(const Array&) = delete;
 private:
 	Array(v8::Local<v8::Array> array);
 	v8::Persistent<v8::Array> _array;
 	friend class Value;
 };
 
-class UniqueValueVector
+class DllExport UniqueValueVector
 {
 public:
 	int Length();
@@ -129,7 +144,7 @@ private:
 	friend class Value;
 };
 
-class Callback: public Value
+class DllExport Callback: public Value
 {
 public:
 	Callback();
@@ -140,7 +155,7 @@ public:
 };
 
 template<class T>
-class Primitive: public Value
+class DllExport Primitive: public Value
 {
 public:
 	Primitive(const T& value) : _value(value) { }
@@ -163,7 +178,7 @@ template<> struct TypeTag<Double> { static const Type Tag = Type::Double; };
 template<> struct TypeTag<String> { static const Type Tag = Type::String; };
 template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 
-struct ScriptException
+struct DllExport ScriptException
 {
 	String* GetName() { return new String(Name); }
 	String* GetErrorMessage() { return new String(ErrorMessage); }
@@ -185,7 +200,7 @@ private:
 	friend void Throw(const V8Scope& scope);
 };
 
-struct MessageHandler
+struct DllExport MessageHandler
 {
 	virtual void Handle(const String& message) { }
 	virtual ~MessageHandler() { }
@@ -193,7 +208,7 @@ struct MessageHandler
 	virtual void Release() { }
 };
 
-struct ScriptExceptionHandler
+struct DllExport ScriptExceptionHandler
 {
 	virtual void Handle(const ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
@@ -201,7 +216,7 @@ struct ScriptExceptionHandler
 	virtual void Release() { }
 };
 
-class Context
+class DllExport Context
 {
 public:
 	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
