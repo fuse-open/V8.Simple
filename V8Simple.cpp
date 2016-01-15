@@ -245,13 +245,13 @@ v8::Local<v8::Value> Value::Unwrap(
 				static_cast<Bool*>(value)->GetValue());
 		case Type::Object:
 			return static_cast<Object*>(value)
-				->_object.Get(isolate);
+				->_object->Get(isolate);
 		case Type::Array:
 			return static_cast<Array*>(value)
-				->_array.Get(isolate);
+				->_array->Get(isolate);
 		case Type::Function:
 			return static_cast<Function*>(value)
-				->_function.Get(isolate);
+				->_function->Get(isolate);
 		case Type::Callback:
 			Callback* callback = static_cast<Callback*>(value);
 			callback->Retain();
@@ -324,8 +324,13 @@ std::vector<v8::Local<v8::Value>> Value::UnwrapVector(
 }
 
 Object::Object(v8::Local<v8::Object> object)
-	: _object(CurrentIsolate(), object)
+	: _object(new v8::Persistent<v8::Object>(CurrentIsolate(), object))
 { }
+
+Object::~Object()
+{
+	delete _object;
+}
 
 Type Object::GetValueType() const { return Type::Object; }
 
@@ -342,7 +347,7 @@ Value* Object::Get(const char* key)
 
 		return Wrap(
 			scope,
-			_object.Get(CurrentIsolate())->Get(
+			_object->Get(CurrentIsolate())->Get(
 				CurrentContext(),
 				ToV8String(scope, key)));
 	}
@@ -369,7 +374,7 @@ void Object::Set(const char* key, Value* value)
 	{
 		V8Scope scope;
 
-		auto ret = _object.Get(CurrentIsolate())->Set(
+		auto ret = _object->Get(CurrentIsolate())->Set(
 			CurrentContext(),
 			ToV8String(scope, key),
 			Unwrap(scope, value));
@@ -390,7 +395,7 @@ std::vector<String> Object::Keys()
 
 		auto propArr = FromJust(
 			scope,
-			_object.Get(CurrentIsolate())->GetPropertyNames(context));
+			_object->Get(CurrentIsolate())->GetPropertyNames(context));
 
 		auto length = propArr->Length();
 		std::vector<String> result;
@@ -468,7 +473,7 @@ Value* Object::CallMethod(
 		auto isolate = CurrentIsolate();
 		auto context = CurrentContext();
 
-		auto localObject = _object.Get(isolate);
+		auto localObject = _object->Get(isolate);
 		auto prop = FromJust(
 			scope,
 			localObject->Get(
@@ -513,7 +518,7 @@ bool Object::ContainsKey(const char* key)
 
 		return FromJust(
 			scope,
-			_object.Get(CurrentIsolate())->Has(
+			_object->Get(CurrentIsolate())->Has(
 				CurrentContext(),
 				ToV8String(scope, key)));
 	}
@@ -537,9 +542,9 @@ bool Object::Equals(const Object* object)
 
 		return FromJust(
 			scope,
-			_object.Get(isolate)->Equals(
+			_object->Get(isolate)->Equals(
 				CurrentContext(),
-				object->_object.Get(isolate)));
+				object->_object->Get(isolate)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -549,8 +554,13 @@ bool Object::Equals(const Object* object)
 }
 
 Function::Function(v8::Local<v8::Function> function)
-	: _function(CurrentIsolate(), function)
+	: _function(new v8::Persistent<v8::Function>(CurrentIsolate(), function))
 {
+}
+
+Function::~Function()
+{
+	delete _function;
 }
 
 Type Function::GetValueType() const { return Type::Function; }
@@ -565,7 +575,7 @@ Value* Function::Call(const std::vector<Value*>& args)
 		auto unwrappedArgs = UnwrapVector(scope, args);
 		return Wrap(
 			scope,
-			_function.Get(CurrentIsolate())->Call(
+			_function->Get(CurrentIsolate())->Call(
 				context,
 				context->Global(),
 				static_cast<int>(unwrappedArgs.size()),
@@ -594,7 +604,7 @@ Object* Function::Construct(const std::vector<Value*>& args)
 		return new Object(
 			FromJust(
 				scope,
-				_function.Get(isolate)->NewInstance(
+				_function->Get(isolate)->NewInstance(
 					CurrentContext(),
 					static_cast<int>(unwrappedArgs.size()),
 					DataPointer(unwrappedArgs))));
@@ -619,9 +629,9 @@ bool Function::Equals(const Function* function)
 
 		return FromJust(
 			scope,
-			_function.Get(isolate)->Equals(
+			_function->Get(isolate)->Equals(
 				CurrentContext(),
-				function->_function.Get(isolate)));
+				function->_function->Get(isolate)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -631,8 +641,13 @@ bool Function::Equals(const Function* function)
 }
 
 Array::Array(v8::Local<v8::Array> array)
-	: _array(CurrentIsolate(), array)
+	: _array(new v8::Persistent<v8::Array>(CurrentIsolate(), array))
 { }
+
+Array::~Array()
+{
+	delete _array;
+}
 
 Type Array::GetValueType() const { return Type::Array; }
 
@@ -644,7 +659,7 @@ Value* Array::Get(int index)
 
 		return Wrap(
 			scope,
-			_array.Get(CurrentIsolate())->Get(
+			_array->Get(CurrentIsolate())->Get(
 				CurrentContext(),
 				static_cast<uint32_t>(index)));
 	}
@@ -669,7 +684,7 @@ void Array::Set(int index, Value* value)
 
 		FromJust(
 			scope,
-			_array.Get(isolate)->Set(
+			_array->Get(isolate)->Set(
 				CurrentContext(),
 				static_cast<uint32_t>(index),
 				Unwrap(scope, value)));
@@ -684,7 +699,7 @@ int Array::Length()
 {
 	V8Scope scope;
 
-	return static_cast<int>(_array.Get(CurrentIsolate())->Length());
+	return static_cast<int>(_array->Get(CurrentIsolate())->Length());
 }
 
 bool Array::Equals(const Array* array)
@@ -700,9 +715,9 @@ bool Array::Equals(const Array* array)
 
 		return FromJust(
 			scope,
-			_array.Get(isolate)->Equals(
+			_array->Get(isolate)->Equals(
 				CurrentContext(),
-				array->_array.Get(isolate)));
+				array->_array->Get(isolate)));
 	}
 	catch (const ScriptException& e)
 	{

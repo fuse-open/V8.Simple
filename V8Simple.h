@@ -86,11 +86,10 @@ public:
 	Object* Construct(const std::vector<Value*>& args);
 	bool Equals(const Function* f);
 
-	Function(const Function&) = delete;
-	Function& operator=(const Function&) = delete;
+	virtual ~Function();
 private:
 	Function(v8::Local<v8::Function> function);
-	v8::Persistent<v8::Function> _function;
+	v8::Persistent<v8::Function>* _function;
 	friend class Value;
 };
 
@@ -106,11 +105,10 @@ public:
 	bool ContainsKey(const char* key);
 	bool Equals(const Object* object);
 
-	Object(const Object&) = delete;
-	Object& operator=(const Object&) = delete;
+	virtual ~Object();
 private:
 	Object(v8::Local<v8::Object> object);
-	v8::Persistent<v8::Object> _object;
+	v8::Persistent<v8::Object>* _object;
 	friend class Context;
 	friend class Value;
 	friend class Function;
@@ -125,11 +123,10 @@ public:
 	int Length();
 	bool Equals(const Array* array);
 
-	Array(const Array&) = delete;
-	Array& operator=(const Array&) = delete;
+	virtual ~Array();
 private:
 	Array(v8::Local<v8::Array> array);
-	v8::Persistent<v8::Array> _array;
+	v8::Persistent<v8::Array>* _array;
 	friend class Value;
 };
 
