@@ -84,7 +84,7 @@ public:
 	virtual Type GetValueType() const override final;
 	Value* Call(const std::vector<Value*>& args);
 	Object* Construct(const std::vector<Value*>& args);
-	bool Equals(const Function& f);
+	bool Equals(const Function* f);
 
 	Function(const Function&) = delete;
 	Function& operator=(const Function&) = delete;
@@ -101,10 +101,10 @@ public:
 	Value* Get(const char* key);
 	void Set(const char* key, Value* value);
 	std::vector<String> Keys();
-	bool InstanceOf(Function& type);
+	bool InstanceOf(Function* type);
 	Value* CallMethod(const char* name, const std::vector<Value*>& args);
 	bool ContainsKey(const char* key);
-	bool Equals(const Object& object);
+	bool Equals(const Object* object);
 
 	Object(const Object&) = delete;
 	Object& operator=(const Object&) = delete;
@@ -123,7 +123,7 @@ public:
 	Value* Get(int index);
 	void Set(int index, Value* value);
 	int Length();
-	bool Equals(const Array& array);
+	bool Equals(const Array* array);
 
 	Array(const Array&) = delete;
 	Array& operator=(const Array&) = delete;

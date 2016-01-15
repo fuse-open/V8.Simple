@@ -162,7 +162,6 @@ public class Function : Value {
 
   public bool Equals(Function f) {
     bool ret = v8PINVOKE.Function_Equals(swigCPtr, Function.getCPtr(f));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
@@ -220,7 +219,6 @@ public class Object : Value {
 
   public bool InstanceOf(Function type) {
     bool ret = v8PINVOKE.Object_InstanceOf(swigCPtr, Function.getCPtr(type));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
@@ -238,7 +236,6 @@ public class Object : Value {
 
   public bool Equals(Object arg0) {
     bool ret = v8PINVOKE.Object_Equals(swigCPtr, Object.getCPtr(arg0));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
@@ -296,7 +293,6 @@ public class Array : Value {
 
   public bool Equals(Array array) {
     bool ret = v8PINVOKE.Array_Equals(swigCPtr, Array.getCPtr(array));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 

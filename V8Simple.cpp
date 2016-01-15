@@ -410,15 +410,19 @@ std::vector<String> Object::Keys()
 	}
 }
 
-bool Object::InstanceOf(Function& type)
+bool Object::InstanceOf(Function* type)
 {
+	if (type == nullptr)
+	{
+		return false;
+	}
 	Value* callResult = nullptr;
 	try
 	{
 		std::vector<Value*> args;
 		args.reserve(2);
 		args.push_back(this);
-		args.push_back(&type);
+		args.push_back(type);
 		callResult = Context::_globalContext->_instanceOf->Call(args);
 		bool result = (callResult == nullptr || callResult->GetValueType() != Type::Bool)
 			? false
@@ -520,8 +524,12 @@ bool Object::ContainsKey(const char* key)
 	}
 }
 
-bool Object::Equals(const Object& o)
+bool Object::Equals(const Object* object)
 {
+	if (object == nullptr)
+	{
+		return false;
+	}
 	try
 	{
 		V8Scope scope;
@@ -531,7 +539,7 @@ bool Object::Equals(const Object& o)
 			scope,
 			_object.Get(isolate)->Equals(
 				CurrentContext(),
-				o._object.Get(isolate)));
+				object->_object.Get(isolate)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -598,8 +606,12 @@ Object* Function::Construct(const std::vector<Value*>& args)
 	return nullptr;
 }
 
-bool Function::Equals(const Function& function)
+bool Function::Equals(const Function* function)
 {
+	if (function == nullptr)
+	{
+		return false;
+	}
 	try
 	{
 		V8Scope scope;
@@ -609,7 +621,7 @@ bool Function::Equals(const Function& function)
 			scope,
 			_function.Get(isolate)->Equals(
 				CurrentContext(),
-				function._function.Get(isolate)));
+				function->_function.Get(isolate)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -675,8 +687,12 @@ int Array::Length()
 	return static_cast<int>(_array.Get(CurrentIsolate())->Length());
 }
 
-bool Array::Equals(const Array& array)
+bool Array::Equals(const Array* array)
 {
+	if (array == nullptr)
+	{
+		return false;
+	}
 	try
 	{
 		V8Scope scope;
@@ -686,7 +702,7 @@ bool Array::Equals(const Array& array)
 			scope,
 			_array.Get(isolate)->Equals(
 				CurrentContext(),
-				array._array.Get(isolate)));
+				array->_array.Get(isolate)));
 	}
 	catch (const ScriptException& e)
 	{
