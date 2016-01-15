@@ -218,12 +218,16 @@ public class V8SimpleTests
 			Assert.IsTrue(runtimeHandled, "Test7");
 
 			runtimeHandled = false;
-			obj.CallMethod(null, new ValueVector { });
+			V8Simple.Context.SendDebugCommand(null);
 			Assert.IsTrue(runtimeHandled, "Test8");
 
 			runtimeHandled = false;
-			V8Simple.Context.SendDebugCommand(null);
+			context.Evaluate(null, "({})");
 			Assert.IsTrue(runtimeHandled, "Test9");
+
+			runtimeHandled = false;
+			context.Evaluate("ErrorTests", null);
+			Assert.IsTrue(runtimeHandled, "Test10");
 		}
 	}
 
