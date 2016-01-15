@@ -182,7 +182,10 @@ public class V8SimpleTests
 	public void ErrorTests()
 	{
 		bool handled;
-		using (var context = new Context(new DelegateScriptExceptionHandler(x => { handled = true; }), null))
+		bool runtimeHandled;
+		using (var context = new Context(
+			new DelegateScriptExceptionHandler(x => { handled = true; }),
+			new DelegateMessageHandler(x => { runtimeHandled = true; })))
 		{
 			handled = false;
 			context.Evaluate("ErrorTests", "new ....");
@@ -195,6 +198,32 @@ public class V8SimpleTests
 			handled = false;
 			context.Evaluate("ErrorTests", "throw \"Hello\";");
 			Assert.IsTrue(handled, "Test3");
+
+			var obj = (V8Simple.Object)context.Evaluate("ErrorTests", "({})");
+
+			runtimeHandled = false;
+			obj.ContainsKey(null);
+			Assert.IsTrue(runtimeHandled, "Test4");
+
+			runtimeHandled = false;
+			obj.Get(null);
+			Assert.IsTrue(runtimeHandled, "Test5");
+
+			runtimeHandled = false;
+			obj.Set(null, null);
+			Assert.IsTrue(runtimeHandled, "Test6");
+
+			runtimeHandled = false;
+			obj.CallMethod(null, new ValueVector { });
+			Assert.IsTrue(runtimeHandled, "Test7");
+
+			runtimeHandled = false;
+			obj.CallMethod(null, new ValueVector { });
+			Assert.IsTrue(runtimeHandled, "Test8");
+
+			runtimeHandled = false;
+			V8Simple.Context.SendDebugCommand(null);
+			Assert.IsTrue(runtimeHandled, "Test9");
 		}
 	}
 

@@ -81,8 +81,7 @@ struct V8Scope
 	v8::TryCatch TryCatch;
 };
 
-void Throw(
-	const V8Scope& scope)
+void Throw(const V8Scope& scope)
 {
 	auto context = CurrentContext();
 	v8::Local<v8::Value> emptyString = v8::String::Empty(CurrentIsolate());
@@ -332,6 +331,11 @@ Type Object::GetValueType() const { return Type::Object; }
 
 Value* Object::Get(const char* key)
 {
+	if (key == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Object::Get is not defined for nullptr argument");
+		return nullptr;
+	}
 	try
 	{
 		V8Scope scope;
@@ -356,6 +360,11 @@ Value* Object::Get(const char* key)
 
 void Object::Set(const char* key, Value* value)
 {
+	if (key == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Object::Set is not defined for nullptr `key` argument");
+		return;
+	}
 	try
 	{
 		V8Scope scope;
@@ -444,6 +453,11 @@ Value* Object::CallMethod(
 	const char* name,
 	const std::vector<Value*>& args)
 {
+	if (name == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Object::CallMethod is not defined for nullptr `name` argument");
+		return nullptr;
+	}
 	try
 	{
 		V8Scope scope;
@@ -484,6 +498,11 @@ Value* Object::CallMethod(
 
 bool Object::ContainsKey(const char* key)
 {
+	if (key == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Object::ContainsKey is not defined for nullptr");
+		return false;
+	}
 	try
 	{
 		V8Scope scope;
@@ -789,6 +808,11 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 
 void Context::SendDebugCommand(const char* command)
 {
+	if (command == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Context::SendDebugCommand is not defined for nullptr argument");
+		return;
+	}
 	if (_globalContext != nullptr)
 	{
 		v8::Locker locker(_globalContext->_conversionIsolate);
@@ -820,7 +844,7 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 {
 	if (_globalContext != nullptr)
 	{
-		HandleRuntimeException("V8Simple Contexts are not re-entrant");
+		HandleRuntimeException("V8Simple::Contexts are not re-entrant");
 		return;
 	}
 
@@ -927,6 +951,16 @@ Context::~Context()
 
 Value* Context::Evaluate(const char* fileName, const char* code)
 {
+	if (fileName == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Context::Evaluate is not defined for nullptr `fileName` argument");
+		return nullptr;
+	}
+	if (code == nullptr)
+	{
+		Context::HandleRuntimeException("V8Simple::Context::Evaluate is not defined for nullptr `code` argument");
+		return nullptr;
+	}
 	try
 	{
 		V8Scope scope;
