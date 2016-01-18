@@ -41,18 +41,12 @@ public:
     SwigDirector_MessageHandler();
     virtual void Handle(V8Simple::String const &message);
     virtual ~SwigDirector_MessageHandler();
-    virtual void Retain();
-    virtual void Release();
 
     typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);
-    typedef void (SWIGSTDCALL* SWIG_Callback1_t)();
-    typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
-    void swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease);
+    void swig_connect_director(SWIG_Callback0_t callbackHandle);
 
 private:
     SWIG_Callback0_t swig_callbackHandle;
-    SWIG_Callback1_t swig_callbackRetain;
-    SWIG_Callback2_t swig_callbackRelease;
     void swig_init_callbacks();
 };
 
@@ -62,18 +56,12 @@ public:
     SwigDirector_ScriptExceptionHandler();
     virtual void Handle(V8Simple::ScriptException const &e);
     virtual ~SwigDirector_ScriptExceptionHandler();
-    virtual void Retain();
-    virtual void Release();
 
     typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);
-    typedef void (SWIGSTDCALL* SWIG_Callback1_t)();
-    typedef void (SWIGSTDCALL* SWIG_Callback2_t)();
-    void swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease);
+    void swig_connect_director(SWIG_Callback0_t callbackHandle);
 
 private:
     SWIG_Callback0_t swig_callbackHandle;
-    SWIG_Callback1_t swig_callbackRetain;
-    SWIG_Callback2_t swig_callbackRelease;
     void swig_init_callbacks();
 };
 

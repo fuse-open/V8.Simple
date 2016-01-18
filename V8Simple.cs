@@ -550,14 +550,6 @@ public class MessageHandler : global::System.IDisposable {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void Retain() {
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1)) v8PINVOKE.MessageHandler_RetainSwigExplicitMessageHandler(swigCPtr); else v8PINVOKE.MessageHandler_Retain(swigCPtr);
-  }
-
-  public virtual void Release() {
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2)) v8PINVOKE.MessageHandler_ReleaseSwigExplicitMessageHandler(swigCPtr); else v8PINVOKE.MessageHandler_Release(swigCPtr);
-  }
-
   public MessageHandler() : this(v8PINVOKE.new_MessageHandler(), true) {
     SwigDirectorConnect();
   }
@@ -565,11 +557,7 @@ public class MessageHandler : global::System.IDisposable {
   private void SwigDirectorConnect() {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0))
       swigDelegate0 = new SwigDelegateMessageHandler_0(SwigDirectorHandle);
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1))
-      swigDelegate1 = new SwigDelegateMessageHandler_1(SwigDirectorRetain);
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2))
-      swigDelegate2 = new SwigDelegateMessageHandler_2(SwigDirectorRelease);
-    v8PINVOKE.MessageHandler_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2);
+    v8PINVOKE.MessageHandler_director_connect(swigCPtr, swigDelegate0);
   }
 
   private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
@@ -582,25 +570,11 @@ public class MessageHandler : global::System.IDisposable {
     Handle(new String(message, false));
   }
 
-  private void SwigDirectorRetain() {
-    Retain();
-  }
-
-  private void SwigDirectorRelease() {
-    Release();
-  }
-
   public delegate void SwigDelegateMessageHandler_0(global::System.IntPtr message);
-  public delegate void SwigDelegateMessageHandler_1();
-  public delegate void SwigDelegateMessageHandler_2();
 
   private SwigDelegateMessageHandler_0 swigDelegate0;
-  private SwigDelegateMessageHandler_1 swigDelegate1;
-  private SwigDelegateMessageHandler_2 swigDelegate2;
 
   private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(String) };
-  private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
 }
 
 }
@@ -639,14 +613,6 @@ public class ScriptExceptionHandler : global::System.IDisposable {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void Retain() {
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1)) v8PINVOKE.ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(swigCPtr); else v8PINVOKE.ScriptExceptionHandler_Retain(swigCPtr);
-  }
-
-  public virtual void Release() {
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2)) v8PINVOKE.ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(swigCPtr); else v8PINVOKE.ScriptExceptionHandler_Release(swigCPtr);
-  }
-
   public ScriptExceptionHandler() : this(v8PINVOKE.new_ScriptExceptionHandler(), true) {
     SwigDirectorConnect();
   }
@@ -654,11 +620,7 @@ public class ScriptExceptionHandler : global::System.IDisposable {
   private void SwigDirectorConnect() {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0))
       swigDelegate0 = new SwigDelegateScriptExceptionHandler_0(SwigDirectorHandle);
-    if (SwigDerivedClassHasMethod("Retain", swigMethodTypes1))
-      swigDelegate1 = new SwigDelegateScriptExceptionHandler_1(SwigDirectorRetain);
-    if (SwigDerivedClassHasMethod("Release", swigMethodTypes2))
-      swigDelegate2 = new SwigDelegateScriptExceptionHandler_2(SwigDirectorRelease);
-    v8PINVOKE.ScriptExceptionHandler_director_connect(swigCPtr, swigDelegate0, swigDelegate1, swigDelegate2);
+    v8PINVOKE.ScriptExceptionHandler_director_connect(swigCPtr, swigDelegate0);
   }
 
   private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
@@ -671,25 +633,11 @@ public class ScriptExceptionHandler : global::System.IDisposable {
     Handle(new ScriptException(e, false));
   }
 
-  private void SwigDirectorRetain() {
-    Retain();
-  }
-
-  private void SwigDirectorRelease() {
-    Release();
-  }
-
   public delegate void SwigDelegateScriptExceptionHandler_0(global::System.IntPtr e);
-  public delegate void SwigDelegateScriptExceptionHandler_1();
-  public delegate void SwigDelegateScriptExceptionHandler_2();
 
   private SwigDelegateScriptExceptionHandler_0 swigDelegate0;
-  private SwigDelegateScriptExceptionHandler_1 swigDelegate1;
-  private SwigDelegateScriptExceptionHandler_2 swigDelegate2;
 
   private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(ScriptException) };
-  private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] {  };
 }
 
 }
@@ -1865,23 +1813,11 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_MessageHandler")]
   public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Retain")]
-  public static extern void MessageHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_RetainSwigExplicitMessageHandler")]
-  public static extern void MessageHandler_RetainSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Release")]
-  public static extern void MessageHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_ReleaseSwigExplicitMessageHandler")]
-  public static extern void MessageHandler_ReleaseSwigExplicitMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_MessageHandler")]
   public static extern global::System.IntPtr new_MessageHandler();
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_director_connect")]
-  public static extern void MessageHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, MessageHandler.SwigDelegateMessageHandler_0 delegate0, MessageHandler.SwigDelegateMessageHandler_1 delegate1, MessageHandler.SwigDelegateMessageHandler_2 delegate2);
+  public static extern void MessageHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, MessageHandler.SwigDelegateMessageHandler_0 delegate0);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Handle")]
   public static extern void ScriptExceptionHandler_Handle(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -1892,23 +1828,11 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
   public static extern void delete_ScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Retain")]
-  public static extern void ScriptExceptionHandler_Retain(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler")]
-  public static extern void ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Release")]
-  public static extern void ScriptExceptionHandler_Release(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler")]
-  public static extern void ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ScriptExceptionHandler")]
   public static extern global::System.IntPtr new_ScriptExceptionHandler();
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
-  public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_1 delegate1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_2 delegate2);
+  public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Context")]
   public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);

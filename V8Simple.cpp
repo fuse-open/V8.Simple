@@ -809,17 +809,9 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 {
 	if (_globalContext != nullptr)
 	{
-		if (debugMessageHandler != nullptr)
-		{
-			debugMessageHandler->Retain();
-		}
-
-		if (_globalContext->_debugMessageHandler != nullptr)
-		{
-			_globalContext->_debugMessageHandler->Release();
-		}
-
 		V8Scope scope;
+
+		_globalContext->_debugMessageHandler = debugMessageHandler;
 
 		if (debugMessageHandler == nullptr)
 		{
@@ -833,7 +825,6 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 				_globalContext->_debugMessageHandler->Handle(String(*str, str.length()));
 			});
 		}
-		_globalContext->_debugMessageHandler = debugMessageHandler;
 	}
 }
 
@@ -883,16 +874,7 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	_debugMessageHandler = nullptr;
 
 	_scriptExceptionHandler = scriptExceptionHandler;
-	if (_scriptExceptionHandler != nullptr)
-	{
-		_scriptExceptionHandler->Retain();
-	}
-
 	_runtimeExceptionHandler = runtimeExceptionHandler;
-	if (_runtimeExceptionHandler != nullptr)
-	{
-		_runtimeExceptionHandler->Retain();
-	}
 
 	// v8::V8::SetFlagsFromString("--expose-gc", 11);
 	{
@@ -951,18 +933,6 @@ Context::~Context()
 		{
 			v8::Context::Scope contextScope(_context->Get(_isolate));
 			delete _instanceOf;
-
-			if (_runtimeExceptionHandler != nullptr)
-			{
-				_runtimeExceptionHandler->Release();
-			}
-			_runtimeExceptionHandler = nullptr;
-
-			if (_scriptExceptionHandler != nullptr)
-			{
-				_scriptExceptionHandler->Release();
-			}
-			_scriptExceptionHandler = nullptr;
 		}
 
 		delete _context;

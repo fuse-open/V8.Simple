@@ -201,16 +201,12 @@ struct DllExport MessageHandler
 {
 	virtual void Handle(const String& message) { }
 	virtual ~MessageHandler() { }
-	virtual void Retain() { }
-	virtual void Release() { }
 };
 
 struct DllExport ScriptExceptionHandler
 {
 	virtual void Handle(const ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
-	virtual void Retain() { }
-	virtual void Release() { }
 };
 
 class DllExport Context

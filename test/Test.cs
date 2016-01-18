@@ -157,15 +157,6 @@ public class V8SimpleTests
 	public class DelegateScriptExceptionHandler: ScriptExceptionHandler
 	{
 		Action<ScriptException> _handler;
-		static List<object> _retained = new List<object>();
-		public override void Retain()
-		{
-			_retained.Add(this);
-		}
-		public override void Release()
-		{
-			_retained.Remove(this);
-		}
 
 		public DelegateScriptExceptionHandler(Action<ScriptException> handler)
 		{
@@ -183,9 +174,11 @@ public class V8SimpleTests
 	{
 		bool handled;
 		bool runtimeHandled;
+		var scriptExceptionHandler = new DelegateScriptExceptionHandler(x => { handled = true; });
+		var runtimeExceptionHandler = new DelegateMessageHandler(x => { runtimeHandled = true; });
 		using (var context = new Context(
-			new DelegateScriptExceptionHandler(x => { handled = true; }),
-			new DelegateMessageHandler(x => { runtimeHandled = true; })))
+			scriptExceptionHandler,
+			runtimeExceptionHandler))
 		{
 			handled = false;
 			context.Evaluate("ErrorTests", "new ....");
@@ -234,15 +227,6 @@ public class V8SimpleTests
 	public class DelegateMessageHandler: MessageHandler
 	{
 		Action<string> _handler;
-		static List<object> _retained = new List<object>();
-		public override void Retain()
-		{
-			_retained.Add(this);
-		}
-		public override void Release()
-		{
-			_retained.Remove(this);
-		}
 
 		public DelegateMessageHandler(Action<string> handler)
 		{
@@ -262,7 +246,8 @@ public class V8SimpleTests
 		V8Simple.Context.ProcessDebugMessages();
 		using (var context = new Context(null, null))
 		{
-			V8Simple.Context.SetDebugMessageHandler(new DelegateMessageHandler(x => { return; }));
+			var messageHandler = new DelegateMessageHandler(x => { return; });
+			V8Simple.Context.SetDebugMessageHandler(messageHandler);
 			V8Simple.Context.SendDebugCommand("{}");
 			V8Simple.Context.ProcessDebugMessages();
 		}
@@ -275,9 +260,9 @@ public class V8SimpleTests
 	public void ZZZContextTests()
 	{
 		bool handled;
-		var context = new Context(
-			new DelegateScriptExceptionHandler(x => { handled = true; }),
-			new DelegateMessageHandler(x => { handled = true; }));
+		var scriptExceptionHandler = new DelegateScriptExceptionHandler(x => { handled = true; });
+		var runtimeExceptionHandler = new DelegateMessageHandler(x => { handled = true; });
+		var context = new Context(scriptExceptionHandler, runtimeExceptionHandler);
 		Assert.AreEqual(
 			((V8Simple.Int)context.Evaluate("ContextTests", "1 + 2")).GetValue(),
 			3);

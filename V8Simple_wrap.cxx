@@ -670,34 +670,12 @@ SwigDirector_MessageHandler::~SwigDirector_MessageHandler() {
 }
 
 
-void SwigDirector_MessageHandler::Retain() {
-  if (!swig_callbackRetain) {
-    V8Simple::MessageHandler::Retain();
-    return;
-  } else {
-    swig_callbackRetain();
-  }
-}
-
-void SwigDirector_MessageHandler::Release() {
-  if (!swig_callbackRelease) {
-    V8Simple::MessageHandler::Release();
-    return;
-  } else {
-    swig_callbackRelease();
-  }
-}
-
-void SwigDirector_MessageHandler::swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease) {
+void SwigDirector_MessageHandler::swig_connect_director(SWIG_Callback0_t callbackHandle) {
   swig_callbackHandle = callbackHandle;
-  swig_callbackRetain = callbackRetain;
-  swig_callbackRelease = callbackRelease;
 }
 
 void SwigDirector_MessageHandler::swig_init_callbacks() {
   swig_callbackHandle = 0;
-  swig_callbackRetain = 0;
-  swig_callbackRelease = 0;
 }
 
 SwigDirector_ScriptExceptionHandler::SwigDirector_ScriptExceptionHandler() : V8Simple::ScriptExceptionHandler(), Swig::Director() {
@@ -721,34 +699,12 @@ SwigDirector_ScriptExceptionHandler::~SwigDirector_ScriptExceptionHandler() {
 }
 
 
-void SwigDirector_ScriptExceptionHandler::Retain() {
-  if (!swig_callbackRetain) {
-    V8Simple::ScriptExceptionHandler::Retain();
-    return;
-  } else {
-    swig_callbackRetain();
-  }
-}
-
-void SwigDirector_ScriptExceptionHandler::Release() {
-  if (!swig_callbackRelease) {
-    V8Simple::ScriptExceptionHandler::Release();
-    return;
-  } else {
-    swig_callbackRelease();
-  }
-}
-
-void SwigDirector_ScriptExceptionHandler::swig_connect_director(SWIG_Callback0_t callbackHandle, SWIG_Callback1_t callbackRetain, SWIG_Callback2_t callbackRelease) {
+void SwigDirector_ScriptExceptionHandler::swig_connect_director(SWIG_Callback0_t callbackHandle) {
   swig_callbackHandle = callbackHandle;
-  swig_callbackRetain = callbackRetain;
-  swig_callbackRelease = callbackRelease;
 }
 
 void SwigDirector_ScriptExceptionHandler::swig_init_callbacks() {
   swig_callbackHandle = 0;
-  swig_callbackRetain = 0;
-  swig_callbackRelease = 0;
 }
 
 
@@ -1385,38 +1341,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_MessageHandler(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_Retain(void * jarg1) {
-  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  
-  arg1 = (V8Simple::MessageHandler *)jarg1; 
-  (arg1)->Retain();
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_RetainSwigExplicitMessageHandler(void * jarg1) {
-  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  
-  arg1 = (V8Simple::MessageHandler *)jarg1; 
-  (arg1)->V8Simple::MessageHandler::Retain();
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_Release(void * jarg1) {
-  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  
-  arg1 = (V8Simple::MessageHandler *)jarg1; 
-  (arg1)->Release();
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_ReleaseSwigExplicitMessageHandler(void * jarg1) {
-  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  
-  arg1 = (V8Simple::MessageHandler *)jarg1; 
-  (arg1)->V8Simple::MessageHandler::Release();
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_MessageHandler() {
   void * jresult ;
   V8Simple::MessageHandler *result = 0 ;
@@ -1427,11 +1351,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_MessageHandler() {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_director_connect(void *objarg, SwigDirector_MessageHandler::SWIG_Callback0_t callback0, SwigDirector_MessageHandler::SWIG_Callback1_t callback1, SwigDirector_MessageHandler::SWIG_Callback2_t callback2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_director_connect(void *objarg, SwigDirector_MessageHandler::SWIG_Callback0_t callback0) {
   V8Simple::MessageHandler *obj = (V8Simple::MessageHandler *)objarg;
   SwigDirector_MessageHandler *director = dynamic_cast<SwigDirector_MessageHandler *>(obj);
   if (director) {
-    director->swig_connect_director(callback0, callback1, callback2);
+    director->swig_connect_director(callback0);
   }
 }
 
@@ -1472,38 +1396,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ScriptExceptionHandler(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_Retain(void * jarg1) {
-  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
-  
-  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
-  (arg1)->Retain();
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_RetainSwigExplicitScriptExceptionHandler(void * jarg1) {
-  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
-  
-  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
-  (arg1)->V8Simple::ScriptExceptionHandler::Retain();
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_Release(void * jarg1) {
-  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
-  
-  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
-  (arg1)->Release();
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_ReleaseSwigExplicitScriptExceptionHandler(void * jarg1) {
-  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
-  
-  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
-  (arg1)->V8Simple::ScriptExceptionHandler::Release();
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScriptExceptionHandler() {
   void * jresult ;
   V8Simple::ScriptExceptionHandler *result = 0 ;
@@ -1514,11 +1406,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScriptExceptionHandler() {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_director_connect(void *objarg, SwigDirector_ScriptExceptionHandler::SWIG_Callback0_t callback0, SwigDirector_ScriptExceptionHandler::SWIG_Callback1_t callback1, SwigDirector_ScriptExceptionHandler::SWIG_Callback2_t callback2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_director_connect(void *objarg, SwigDirector_ScriptExceptionHandler::SWIG_Callback0_t callback0) {
   V8Simple::ScriptExceptionHandler *obj = (V8Simple::ScriptExceptionHandler *)objarg;
   SwigDirector_ScriptExceptionHandler *director = dynamic_cast<SwigDirector_ScriptExceptionHandler *>(obj);
   if (director) {
-    director->swig_connect_director(callback0, callback1, callback2);
+    director->swig_connect_director(callback0);
   }
 }
 
