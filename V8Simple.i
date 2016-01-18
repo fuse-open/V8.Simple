@@ -68,6 +68,12 @@ V8Simple::Value*
 %ignore V8Simple::Function::Call(Value** args, int numArgs);
 %newobject V8Simple::Function::Construct(const std::vector<Value*>&);
 %ignore V8Simple::Function::Construct(Value** args, int numArgs);
+%ignore V8Simple::Value::Delete();
+%ignore V8Simple::String::New(const char* value, int length);
+%ignore V8Simple::Primitive<int>::New(const int& value);
+%ignore V8Simple::Primitive<double>::New(const double& value);
+%ignore V8Simple::Primitive<bool>::New(const bool& value);
+%ignore V8Simple::Context::New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::ScriptException::GetName();
 %newobject V8Simple::ScriptException::GetErrorMessage();

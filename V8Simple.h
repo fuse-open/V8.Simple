@@ -44,7 +44,7 @@ public:
 	virtual ~Value()
 	{
 	}
-	void Delete();
+	virtual void Delete();
 protected:
 	static Value* Wrap(
 		const V8Scope& scope,
@@ -66,6 +66,7 @@ class DllExport String: public Value
 public:
 	String(const char* value);
 	String(const char* value, int length);
+	static String* New(const char* value, int length);
 	String(const String& str);
 	String& operator=(const String& str);
 	virtual Type GetValueType() const override final;
@@ -164,8 +165,16 @@ class DllExport Primitive: public Value
 {
 public:
 	Primitive(const T& value) : _value(value) { }
+	static Primitive<T>* New(const T& value)
+	{
+		return new Primitive<T>(value);
+	}
 	virtual Type GetValueType() const override final { return TypeTag<Primitive<T>>::Tag; }
 	T GetValue() const { return _value; }
+	virtual void Delete() override
+	{
+		delete this;
+	}
 private:
 	const T _value;
 };
@@ -212,20 +221,19 @@ struct DllExport MessageHandler
 {
 	virtual void Handle(const String& message) { }
 	virtual ~MessageHandler() { }
-	void Delete();
 };
 
 struct DllExport ScriptExceptionHandler
 {
 	virtual void Handle(const ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
-	void Delete();
 };
 
 class DllExport Context
 {
 public:
 	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
+	static Context* New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
 	Value* Evaluate(const char* fileName, const char* code);
 	Object* GlobalObject();
 	bool IdleNotificationDeadline(double deadline_in_seconds);

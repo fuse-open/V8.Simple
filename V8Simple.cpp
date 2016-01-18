@@ -22,6 +22,10 @@ String::String(const char* value, int length)
 	}
 	_value[_length] = 0;
 }
+String* String::New(const char* value, int length)
+{
+	return new String(value, length);
+}
 
 String& String::operator=(const String& str)
 {
@@ -839,16 +843,6 @@ void ScriptException::Delete()
 	delete this;
 }
 
-void MessageHandler::Delete()
-{
-	delete this;
-}
-
-void ScriptExceptionHandler::Delete()
-{
-	delete this;
-}
-
 void Context::HandleScriptException(const ScriptException& e)
 {
 	if (_globalContext->_scriptExceptionHandler != nullptr)
@@ -981,6 +975,11 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	{
 		_instanceOf = static_cast<Function*>(instanceOf);
 	}
+}
+
+Context* Context::New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler)
+{
+	return new Context(scriptExceptionHandler, runtimeExceptionHandler);
 }
 
 Context::~Context()

@@ -602,6 +602,10 @@ SwigDirector_Callback::~SwigDirector_Callback() {
 }
 
 
+void SwigDirector_Callback::Delete() {
+  V8Simple::Value::Delete();
+}
+
 V8Simple::Value *SwigDirector_Callback::Call(V8Simple::UniqueValueVector *args) {
   V8Simple::Value *c_result = 0 ;
   void * jresult = 0 ;
@@ -729,14 +733,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Value(void * jarg1) {
   
   arg1 = (V8Simple::Value *)jarg1; 
   delete arg1;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Value_Delete(void * jarg1) {
-  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
-  
-  arg1 = (V8Simple::Value *)jarg1; 
-  (arg1)->Delete();
 }
 
 
@@ -1377,14 +1373,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_MessageHandler(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MessageHandler_Delete(void * jarg1) {
-  V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
-  
-  arg1 = (V8Simple::MessageHandler *)jarg1; 
-  (arg1)->Delete();
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_MessageHandler() {
   void * jresult ;
   V8Simple::MessageHandler *result = 0 ;
@@ -1437,14 +1425,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ScriptExceptionHandler(void * jarg1) {
   
   arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
   delete arg1;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_Delete(void * jarg1) {
-  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
-  
-  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
-  (arg1)->Delete();
 }
 
 
