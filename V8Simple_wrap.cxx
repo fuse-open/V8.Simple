@@ -602,15 +602,15 @@ SwigDirector_Callback::~SwigDirector_Callback() {
 }
 
 
-V8Simple::Value *SwigDirector_Callback::Call(V8Simple::UniqueValueVector args) {
+V8Simple::Value *SwigDirector_Callback::Call(V8Simple::UniqueValueVector *args) {
   V8Simple::Value *c_result = 0 ;
   void * jresult = 0 ;
-  void * jargs  ;
+  void * jargs = 0 ;
   
   if (!swig_callbackCall) {
     return V8Simple::Callback::Call(args);
   } else {
-    jargs = (void *)&args; 
+    jargs = (void *) args; 
     jresult = (void *) swig_callbackCall(jargs);
     c_result = (V8Simple::Value *)jresult; 
   }
@@ -896,6 +896,48 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Function(void * jarg1) {
 }
 
 
+SWIGEXPORT int SWIGSTDCALL CSharp_UniqueValueVector_Length(void * jarg1) {
+  int jresult ;
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  int result;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  result = (int)(arg1)->Length();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_UniqueValueVector_Get(void * jarg1, int jarg2) {
+  void * jresult ;
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  int arg2 ;
+  V8Simple::Value *result = 0 ;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (V8Simple::Value *)(arg1)->Get(arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_UniqueValueVector(void * jarg1) {
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_UniqueValueVector_Delete(void * jarg1) {
+  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
+  
+  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
+  (arg1)->Delete();
+}
+
+
 SWIGEXPORT int SWIGSTDCALL CSharp_Object_GetValueType(void * jarg1) {
   int jresult ;
   V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
@@ -937,11 +979,11 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Object_Set(void * jarg1, char * jarg2, void *
 SWIGEXPORT void * SWIGSTDCALL CSharp_Object_Keys(void * jarg1) {
   void * jresult ;
   V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
-  std::vector< V8Simple::String > result;
+  V8Simple::UniqueValueVector *result = 0 ;
   
   arg1 = (V8Simple::Object *)jarg1; 
-  result = (arg1)->Keys();
-  jresult = new std::vector< V8Simple::String >((const std::vector< V8Simple::String > &)result); 
+  result = (V8Simple::UniqueValueVector *)(arg1)->Keys();
+  jresult = (void *)result; 
   return jresult;
 }
 
@@ -1088,40 +1130,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Array(void * jarg1) {
 }
 
 
-SWIGEXPORT int SWIGSTDCALL CSharp_UniqueValueVector_Length(void * jarg1) {
-  int jresult ;
-  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
-  int result;
-  
-  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
-  result = (int)(arg1)->Length();
-  jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_UniqueValueVector_Get(void * jarg1, int jarg2) {
-  void * jresult ;
-  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
-  int arg2 ;
-  V8Simple::Value *result = 0 ;
-  
-  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
-  arg2 = (int)jarg2; 
-  result = (V8Simple::Value *)(arg1)->Get(arg2);
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_delete_UniqueValueVector(void * jarg1) {
-  V8Simple::UniqueValueVector *arg1 = (V8Simple::UniqueValueVector *) 0 ;
-  
-  arg1 = (V8Simple::UniqueValueVector *)jarg1; 
-  delete arg1;
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_Callback() {
   void * jresult ;
   V8Simple::Callback *result = 0 ;
@@ -1159,17 +1167,11 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Callback_GetValueTypeSwigExplicitCallback(void
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  SwigValueWrapper< V8Simple::UniqueValueVector > arg2 ;
-  V8Simple::UniqueValueVector *argp2 ;
+  V8Simple::UniqueValueVector *arg2 = (V8Simple::UniqueValueVector *) 0 ;
   V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  argp2 = (V8Simple::UniqueValueVector *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null V8Simple::UniqueValueVector", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (V8Simple::UniqueValueVector *)jarg2; 
   result = (V8Simple::Value *)(arg1)->Call(arg2);
   jresult = (void *)result; 
   return jresult;
@@ -1179,17 +1181,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_Call(void * jarg1, void * jarg2) {
 SWIGEXPORT void * SWIGSTDCALL CSharp_Callback_CallSwigExplicitCallback(void * jarg1, void * jarg2) {
   void * jresult ;
   V8Simple::Callback *arg1 = (V8Simple::Callback *) 0 ;
-  SwigValueWrapper< V8Simple::UniqueValueVector > arg2 ;
-  V8Simple::UniqueValueVector *argp2 ;
+  V8Simple::UniqueValueVector *arg2 = (V8Simple::UniqueValueVector *) 0 ;
   V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::Callback *)jarg1; 
-  argp2 = (V8Simple::UniqueValueVector *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null V8Simple::UniqueValueVector", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (V8Simple::UniqueValueVector *)jarg2; 
   result = (V8Simple::Value *)(arg1)->V8Simple::Callback::Call(arg2);
   jresult = (void *)result; 
   return jresult;

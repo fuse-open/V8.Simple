@@ -61,9 +61,13 @@ V8Simple::Value*
 %newobject V8Simple::Context::Evaluate(const char*, const char*);
 %newobject V8Simple::Context::GlobalObject();
 %newobject V8Simple::Object::Get(const char*);
+%newobject V8Simple::Object::Keys();
 %newobject V8Simple::Object::CallMethod(const char*, const std::vector<Value*>&);
+%ignore V8Simple::Object::CallMethod(const char*, Value** args, int numArgs);
 %newobject V8Simple::Function::Call(const std::vector<Value*>&);
+%ignore V8Simple::Function::Call(Value** args, int numArgs);
 %newobject V8Simple::Function::Construct(const std::vector<Value*>&);
+%ignore V8Simple::Function::Construct(Value** args, int numArgs);
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::ScriptException::GetName();
 %newobject V8Simple::ScriptException::GetErrorMessage();

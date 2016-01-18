@@ -303,13 +303,8 @@ v8::Local<v8::Value> Value::Unwrap(
 						static_cast<Callback*>(info.Data()
 							.As<v8::External>()
 							->Value());
-					UniqueValueVector args(wrappedArgs);
-					Value* result = callback->Call(args);
-					int len = args.Length();
-					for (int i = 0; i < len; ++i)
-					{
-						delete args.Get(i);
-					}
+					UniqueValueVector args((const std::vector<Value*>&&)wrappedArgs);
+					Value* result = callback->Call(&args);
 
 					info.GetReturnValue().Set(Unwrap(
 						scope,
@@ -396,8 +391,9 @@ void Object::Set(const char* key, Value* value)
 	}
 }
 
-std::vector<String> Object::Keys()
+UniqueValueVector* Object::Keys()
 {
+	std::vector<Value*> result;
 	try
 	{
 		V8Scope scope;
@@ -408,21 +404,19 @@ std::vector<String> Object::Keys()
 			_object->Get(CurrentIsolate())->GetPropertyNames(context));
 
 		auto length = propArr->Length();
-		std::vector<String> result;
 		result.reserve(length);
 		for (int i = 0; i < static_cast<int>(length); ++i)
 		{
-			result.push_back(String(v8::String::Utf8Value(FromJust(
+			result.push_back(new String(v8::String::Utf8Value(FromJust(
 				scope,
 				propArr->Get(context, static_cast<uint32_t>(i))))));
 		}
-		return result;
 	}
 	catch (const ScriptException& e)
 	{
 		Context::HandleScriptException(e);
-		return std::vector<String>();
 	}
+	return new UniqueValueVector((const std::vector<Value*>&&)result);
 }
 
 bool Object::InstanceOf(Function* type)
@@ -515,6 +509,14 @@ Value* Object::CallMethod(
 	return nullptr;
 }
 
+Value* Object::CallMethod(
+	const char* name,
+	Value** args,
+	int numArgs)
+{
+	return CallMethod(name, std::vector<Value*>(args, args + numArgs));
+}
+
 bool Object::ContainsKey(const char* key)
 {
 	if (key == nullptr)
@@ -602,6 +604,13 @@ Value* Function::Call(const std::vector<Value*>& args)
 	return nullptr;
 }
 
+Value* Function::Call(
+	Value** args,
+	int numArgs)
+{
+	return Call(std::vector<Value*>(args, args + numArgs));
+}
+
 Object* Function::Construct(const std::vector<Value*>& args)
 {
 	try
@@ -624,6 +633,13 @@ Object* Function::Construct(const std::vector<Value*>& args)
 		Context::HandleScriptException(e);
 	}
 	return nullptr;
+}
+
+Object* Function::Construct(
+	Value** args,
+	int numArgs)
+{
+	return Construct(std::vector<Value*>(args, args + numArgs));
 }
 
 bool Function::Equals(const Function* function)
@@ -737,28 +753,42 @@ bool Array::Equals(const Array* array)
 
 }
 
-UniqueValueVector::UniqueValueVector(std::vector<Value*>& values)
-	: _values(values)
+UniqueValueVector::UniqueValueVector(const std::vector<Value*>&& values)
+	: _values(new std::vector<Value*>(values))
 {
 }
 
 int UniqueValueVector::Length()
 {
-	return static_cast<int>(_values.size());
+	return static_cast<int>(_values->size());
 }
 
 Value* UniqueValueVector::Get(int index)
 {
 	Value* result = nullptr;
-	std::swap(_values.at(index), result);
+	std::swap(_values->at(index), result);
 	return result;
+}
+
+UniqueValueVector::~UniqueValueVector()
+{
+	for (Value* v: *_values)
+	{
+		delete v;
+	}
+	delete _values;
+}
+
+void UniqueValueVector::Delete()
+{
+	delete this;
 }
 
 Callback::Callback()
 {
 }
 
-Value* Callback::Call(UniqueValueVector args)
+Value* Callback::Call(UniqueValueVector* args)
 {
 	return nullptr;
 }

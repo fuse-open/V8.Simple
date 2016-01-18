@@ -85,7 +85,9 @@ class DllExport Function: public Value
 public:
 	virtual Type GetValueType() const override final;
 	Value* Call(const std::vector<Value*>& args);
+	Value* Call(Value** args, int numArgs);
 	Object* Construct(const std::vector<Value*>& args);
+	Object* Construct(Value** args, int numArgs);
 	bool Equals(const Function* f);
 
 	virtual ~Function();
@@ -95,15 +97,30 @@ private:
 	friend class Value;
 };
 
+class DllExport UniqueValueVector
+{
+public:
+	int Length();
+	Value* Get(int index);
+	~UniqueValueVector();
+	void Delete();
+private:
+	UniqueValueVector(const std::vector<Value*>&& values);
+	std::vector<Value*>* _values;
+	friend class Value;
+	friend class Object;
+};
+
 class DllExport Object: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
 	Value* Get(const char* key);
 	void Set(const char* key, Value* value);
-	std::vector<String> Keys();
+	UniqueValueVector* Keys();
 	bool InstanceOf(Function* type);
 	Value* CallMethod(const char* name, const std::vector<Value*>& args);
+	Value* CallMethod(const char* name, Value** args, int numArgs);
 	bool ContainsKey(const char* key);
 	bool Equals(const Object* object);
 
@@ -132,23 +149,12 @@ private:
 	friend class Value;
 };
 
-class DllExport UniqueValueVector
-{
-public:
-	int Length();
-	Value* Get(int index);
-private:
-	UniqueValueVector(std::vector<Value*>& values);
-	std::vector<Value*>& _values;
-	friend class Value;
-};
-
 class DllExport Callback: public Value
 {
 public:
 	Callback();
 	virtual Type GetValueType() const override /* final */;
-	virtual Value* Call(UniqueValueVector args);
+	virtual Value* Call(UniqueValueVector* args);
 	virtual void Retain() { }
 	virtual void Release() { }
 };

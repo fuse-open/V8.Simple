@@ -180,6 +180,54 @@ public class Function : Value {
 }
 namespace Fuse.Scripting.V8.Simple {
 
+public class UniqueValueVector : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal UniqueValueVector(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(UniqueValueVector obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~UniqueValueVector() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_UniqueValueVector(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+  }
+
+  public int Length() {
+    int ret = v8PINVOKE.UniqueValueVector_Length(swigCPtr);
+    return ret;
+  }
+
+  public Value Get(int index) {
+	global::System.IntPtr cPtr = v8PINVOKE.UniqueValueVector_Get(swigCPtr, index);
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
+	return ret;
+}
+
+  public void Delete() {
+    v8PINVOKE.UniqueValueVector_Delete(swigCPtr);
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
 public class Object : Value {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
@@ -222,8 +270,9 @@ public class Object : Value {
     v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
   }
 
-  public StringVector Keys() {
-    StringVector ret = new StringVector(v8PINVOKE.Object_Keys(swigCPtr), true);
+  public UniqueValueVector Keys() {
+    global::System.IntPtr cPtr = v8PINVOKE.Object_Keys(swigCPtr);
+    UniqueValueVector ret = (cPtr == global::System.IntPtr.Zero) ? null : new UniqueValueVector(cPtr, true);
     return ret;
   }
 
@@ -311,50 +360,6 @@ public class Array : Value {
 }
 namespace Fuse.Scripting.V8.Simple {
 
-public class UniqueValueVector : global::System.IDisposable {
-  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-  protected bool swigCMemOwn;
-
-  internal UniqueValueVector(global::System.IntPtr cPtr, bool cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-  }
-
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(UniqueValueVector obj) {
-    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-  }
-
-  ~UniqueValueVector() {
-    Dispose();
-  }
-
-  public virtual void Dispose() {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          v8PINVOKE.delete_UniqueValueVector(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-  }
-
-  public int Length() {
-    int ret = v8PINVOKE.UniqueValueVector_Length(swigCPtr);
-    return ret;
-  }
-
-  public Value Get(int index) {
-	global::System.IntPtr cPtr = v8PINVOKE.UniqueValueVector_Get(swigCPtr, index);
-	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
-	return ret;
-}
-
-}
-
-}
-namespace Fuse.Scripting.V8.Simple {
-
 public class Callback : Value {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
@@ -394,7 +399,6 @@ public class Callback : Value {
   public virtual Value Call(UniqueValueVector args) {
 	global::System.IntPtr cPtr = (SwigDerivedClassHasMethod("Call", swigMethodTypes1) ? v8PINVOKE.Callback_CallSwigExplicitCallback(swigCPtr, UniqueValueVector.getCPtr(args)) : v8PINVOKE.Callback_Call(swigCPtr, UniqueValueVector.getCPtr(args)));
 	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, false);
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
 	return ret;
 }
 
@@ -429,7 +433,7 @@ public class Callback : Value {
   }
 
   private global::System.IntPtr SwigDirectorCall(global::System.IntPtr args) {
-    return Value.getCPtr(Call(new UniqueValueVector(args, false))).Handle;
+    return Value.getCPtr(Call((args == global::System.IntPtr.Zero) ? null : new UniqueValueVector(args, false))).Handle;
   }
 
   private void SwigDirectorRetain() {
@@ -1734,6 +1738,18 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Function")]
   public static extern void delete_Function(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Length")]
+  public static extern int UniqueValueVector_Length(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Get")]
+  public static extern global::System.IntPtr UniqueValueVector_Get(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_UniqueValueVector")]
+  public static extern void delete_UniqueValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Delete")]
+  public static extern void UniqueValueVector_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_GetValueType")]
   public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -1778,15 +1794,6 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Array")]
   public static extern void delete_Array(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Length")]
-  public static extern int UniqueValueVector_Length(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_UniqueValueVector_Get")]
-  public static extern global::System.IntPtr UniqueValueVector_Get(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_UniqueValueVector")]
-  public static extern void delete_UniqueValueVector(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Callback")]
   public static extern global::System.IntPtr new_Callback();

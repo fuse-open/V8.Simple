@@ -52,8 +52,20 @@ public class V8SimpleTests
 				Assert.AreEqual(((V8Simple.String)obj.Get("a")).GetValue(), "xyz");
 				obj.Set("c", new V8Simple.Double(123.4));
 				Assert.AreEqual(((V8Simple.Double)obj.Get("c")).GetValue(), 123.4);
-				Assert.AreEqual(obj.Keys().Count, 3);
-				Assert.AreEqual(obj.Keys().Count, 3);
+				var keys1 = obj.Keys();
+				List<Value> keys1l = new List<Value>();
+				for (int i = 0; i < keys1.Length(); ++i)
+				{
+					keys1l.Add(keys1.Get(i));
+				}
+				var keys2 = obj.Keys();
+				List<Value> keys2l = new List<Value>();
+				for (int i = 0; i < keys2.Length(); ++i)
+				{
+					keys2l.Add(keys2.Get(i));
+				}
+				Assert.AreEqual(keys1l.Count, 3);
+				Assert.AreEqual(keys2l.Count, 3);
 				Assert.IsTrue(obj.ContainsKey("a"));
 				Assert.IsTrue(obj.ContainsKey("b"));
 				Assert.IsTrue(obj.ContainsKey("c"));
