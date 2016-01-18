@@ -71,6 +71,8 @@ V8Simple::Value*
 %newobject V8Simple::ScriptException::GetStackTrace();
 %newobject V8Simple::ScriptException::GetSourceLine();
 %newobject V8Simple::UniqueValueVector::Get(int);
+%newobject V8Simple::String::Copy();
+%newobject V8Simple::ScriptException::Copy();
 %feature("director") V8Simple::MessageHandler;
 %feature("director") V8Simple::ScriptExceptionHandler;
 %feature("director") V8Simple::Callback;

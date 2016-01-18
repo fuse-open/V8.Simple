@@ -57,6 +57,10 @@ public class Value : global::System.IDisposable {
     return ret;
   }
 
+  public void Delete() {
+    v8PINVOKE.Value_Delete(swigCPtr);
+  }
+
 }
 
 }
@@ -106,6 +110,12 @@ public class String : Value {
 
   public string GetValue() {
     string ret = v8PINVOKE.String_GetValue(swigCPtr);
+    return ret;
+  }
+
+  public String Copy() {
+    global::System.IntPtr cPtr = v8PINVOKE.String_Copy(swigCPtr);
+    String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, false);
     return ret;
   }
 
@@ -512,6 +522,16 @@ public class ScriptException : global::System.IDisposable {
     return ret;
   }
 
+  public ScriptException Copy() {
+    global::System.IntPtr cPtr = v8PINVOKE.ScriptException_Copy(swigCPtr);
+    ScriptException ret = (cPtr == global::System.IntPtr.Zero) ? null : new ScriptException(cPtr, false);
+    return ret;
+  }
+
+  public void Delete() {
+    v8PINVOKE.ScriptException_Delete(swigCPtr);
+  }
+
 }
 
 }
@@ -548,6 +568,10 @@ public class MessageHandler : global::System.IDisposable {
   public virtual void Handle(String message) {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.MessageHandler_HandleSwigExplicitMessageHandler(swigCPtr, String.getCPtr(message)); else v8PINVOKE.MessageHandler_Handle(swigCPtr, String.getCPtr(message));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public void Delete() {
+    v8PINVOKE.MessageHandler_Delete(swigCPtr);
   }
 
   public MessageHandler() : this(v8PINVOKE.new_MessageHandler(), true) {
@@ -611,6 +635,10 @@ public class ScriptExceptionHandler : global::System.IDisposable {
   public virtual void Handle(ScriptException e) {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler(swigCPtr, ScriptException.getCPtr(e)); else v8PINVOKE.ScriptExceptionHandler_Handle(swigCPtr, ScriptException.getCPtr(e));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public void Delete() {
+    v8PINVOKE.ScriptExceptionHandler_Delete(swigCPtr);
   }
 
   public ScriptExceptionHandler() : this(v8PINVOKE.new_ScriptExceptionHandler(), true) {
@@ -689,6 +717,10 @@ public class Context : global::System.IDisposable {
   public bool IdleNotificationDeadline(double deadline_in_seconds) {
     bool ret = v8PINVOKE.Context_IdleNotificationDeadline(swigCPtr, deadline_in_seconds);
     return ret;
+  }
+
+  public void Delete() {
+    v8PINVOKE.Context_Delete(swigCPtr);
   }
 
   public static void SetDebugMessageHandler(MessageHandler debugMessageHandler) {
@@ -1663,6 +1695,9 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Value")]
   public static extern void delete_Value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Value_Delete")]
+  public static extern void Value_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_0")]
   public static extern global::System.IntPtr new_String__SWIG_0(string jarg1);
 
@@ -1680,6 +1715,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_String")]
   public static extern void delete_String(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_Copy")]
+  public static extern global::System.IntPtr String_Copy(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_GetValueType")]
   public static extern int Function_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1801,6 +1839,12 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetSourceLine")]
   public static extern global::System.IntPtr ScriptException_GetSourceLine(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_Copy")]
+  public static extern global::System.IntPtr ScriptException_Copy(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_Delete")]
+  public static extern void ScriptException_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ScriptException")]
   public static extern void delete_ScriptException(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -1812,6 +1856,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_MessageHandler")]
   public static extern void delete_MessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_MessageHandler_Delete")]
+  public static extern void MessageHandler_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_MessageHandler")]
   public static extern global::System.IntPtr new_MessageHandler();
@@ -1827,6 +1874,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ScriptExceptionHandler")]
   public static extern void delete_ScriptExceptionHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_Delete")]
+  public static extern void ScriptExceptionHandler_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ScriptExceptionHandler")]
   public static extern global::System.IntPtr new_ScriptExceptionHandler();
@@ -1848,6 +1898,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Context")]
   public static extern void delete_Context(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_Delete")]
+  public static extern void Context_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
   public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);

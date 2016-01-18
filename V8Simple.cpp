@@ -50,6 +50,11 @@ String::~String()
 	delete[] _value;
 }
 
+String* String::Copy() const
+{
+	return new String(*this);
+}
+
 v8::Isolate* CurrentIsolate()
 {
 	return Context::_globalContext->_isolate;
@@ -205,6 +210,11 @@ Value* Value::Wrap(
 		return nullptr;
 	}
 	throw std::runtime_error("Unhandled type in V8Simple");
+}
+
+void Value::Delete()
+{
+	delete this;
 }
 
 Value* Value::Wrap(
@@ -789,6 +799,26 @@ ScriptException::ScriptException(
 {
 }
 
+ScriptException* ScriptException::Copy() const
+{
+	return new ScriptException(*this);
+}
+
+void ScriptException::Delete()
+{
+	delete this;
+}
+
+void MessageHandler::Delete()
+{
+	delete this;
+}
+
+void ScriptExceptionHandler::Delete()
+{
+	delete this;
+}
+
 void Context::HandleScriptException(const ScriptException& e)
 {
 	if (_globalContext->_scriptExceptionHandler != nullptr)
@@ -1000,6 +1030,11 @@ bool Context::IdleNotificationDeadline(double deadline_in_seconds)
 {
 	// _isolate->RequestGarbageCollectionForTesting(v8::Isolate::kFullGarbageCollection);
 	return _isolate->IdleNotificationDeadline(deadline_in_seconds);
+}
+
+void Context::Delete()
+{
+	delete this;
 }
 
 } // namespace V8Simple

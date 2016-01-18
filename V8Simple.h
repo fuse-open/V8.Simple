@@ -44,6 +44,7 @@ public:
 	virtual ~Value()
 	{
 	}
+	void Delete();
 protected:
 	static Value* Wrap(
 		const V8Scope& scope,
@@ -70,6 +71,7 @@ public:
 	virtual Type GetValueType() const override final;
 	const char* GetValue() const;
 	virtual ~String();
+	String* Copy() const;
 private:
 	String(const v8::String::Utf8Value& v);
 	char* _value;
@@ -177,12 +179,15 @@ template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 
 struct DllExport ScriptException
 {
-	String* GetName() { return new String(Name); }
-	String* GetErrorMessage() { return new String(ErrorMessage); }
-	String* GetFileName() { return new String(FileName); }
+	String* GetName() { return Name.Copy(); }
+	String* GetErrorMessage() { return ErrorMessage.Copy(); }
+	String* GetFileName() { return FileName.Copy(); }
 	int GetLineNumber() { return LineNumber; }
-	String* GetStackTrace() { return new String(StackTrace); }
-	String* GetSourceLine() { return new String(SourceLine); }
+	String* GetStackTrace() { return StackTrace.Copy(); }
+	String* GetSourceLine() { return SourceLine.Copy(); }
+	ScriptException* Copy() const;
+	void Delete();
+
 private:
 	const String Name, ErrorMessage, FileName, StackTrace, SourceLine;
 	int LineNumber;
@@ -201,12 +206,14 @@ struct DllExport MessageHandler
 {
 	virtual void Handle(const String& message) { }
 	virtual ~MessageHandler() { }
+	void Delete();
 };
 
 struct DllExport ScriptExceptionHandler
 {
 	virtual void Handle(const ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
+	void Delete();
 };
 
 class DllExport Context
@@ -217,6 +224,7 @@ public:
 	Object* GlobalObject();
 	bool IdleNotificationDeadline(double deadline_in_seconds);
 	~Context();
+	void Delete();
 
 	static void SetDebugMessageHandler(MessageHandler* debugMessageHandler);
 	static void SendDebugCommand(const char* command);
