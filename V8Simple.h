@@ -5,7 +5,8 @@
 
 // Note: All public functions that return a Value* (or derived class), require
 // that the caller takes ownership of and deletes the pointer when appropriate.
-// The Values should be deallocated with the delete operator.
+// The Values should be deallocated with the Delete functions (for maximum
+// portability).
 
 #ifdef _MSC_VER
 #define DllExport __declspec(dllexport)
