@@ -52,6 +52,20 @@ public class Value : global::System.IDisposable {
       global::System.GC.SuppressFinalize(this);
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is Value)
+		{
+			return Equals((Value)o);
+		}
+		return false;
+	}
+	public bool Equals(Value o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public virtual Type GetValueType() {
     Type ret = (Type)v8PINVOKE.Value_GetValueType(swigCPtr);
     return ret;
@@ -88,6 +102,20 @@ public class String : Value {
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
   }
+
+	public override bool Equals(object o) {
+		if (o != null && o is String)
+		{
+			return Equals((String)o);
+		}
+		return false;
+	}
+	public bool Equals(String o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
 
   public String(string value) : this(v8PINVOKE.new_String__SWIG_0(value), true) {
   }
@@ -147,6 +175,20 @@ public class Function : Value {
       base.Dispose();
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is Function)
+		{
+			return Equals((Function)o);
+		}
+		return false;
+	}
+	public bool Equals(Function o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public override Type GetValueType() {
     Type ret = (Type)v8PINVOKE.Function_GetValueType(swigCPtr);
     return ret;
@@ -166,8 +208,8 @@ public class Function : Value {
     return ret;
   }
 
-  public bool Equals(Function f) {
-    bool ret = v8PINVOKE.Function_Equals(swigCPtr, Function.getCPtr(f));
+  public bool StrictEquals(Function f) {
+    bool ret = v8PINVOKE.Function_StrictEquals(swigCPtr, Function.getCPtr(f));
     return ret;
   }
 
@@ -203,6 +245,20 @@ public class UniqueValueVector : global::System.IDisposable {
       }
       global::System.GC.SuppressFinalize(this);
   }
+
+	public override bool Equals(object o) {
+		if (o != null && o is UniqueValueVector)
+		{
+			return Equals((UniqueValueVector)o);
+		}
+		return false;
+	}
+	public bool Equals(UniqueValueVector o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
 
   public int Length() {
     int ret = v8PINVOKE.UniqueValueVector_Length(swigCPtr);
@@ -251,6 +307,20 @@ public class Object : Value {
       base.Dispose();
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is Object)
+		{
+			return Equals((Object)o);
+		}
+		return false;
+	}
+	public bool Equals(Object o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public override Type GetValueType() {
     Type ret = (Type)v8PINVOKE.Object_GetValueType(swigCPtr);
     return ret;
@@ -289,8 +359,8 @@ public class Object : Value {
     return ret;
   }
 
-  public bool Equals(Object arg0) {
-    bool ret = v8PINVOKE.Object_Equals(swigCPtr, Object.getCPtr(arg0));
+  public bool StrictEquals(Object arg0) {
+    bool ret = v8PINVOKE.Object_StrictEquals(swigCPtr, Object.getCPtr(arg0));
     return ret;
   }
 
@@ -326,6 +396,20 @@ public class Array : Value {
       base.Dispose();
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is Array)
+		{
+			return Equals((Array)o);
+		}
+		return false;
+	}
+	public bool Equals(Array o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public override Type GetValueType() {
     Type ret = (Type)v8PINVOKE.Array_GetValueType(swigCPtr);
     return ret;
@@ -346,8 +430,8 @@ public class Array : Value {
     return ret;
   }
 
-  public bool Equals(Array array) {
-    bool ret = v8PINVOKE.Array_Equals(swigCPtr, Array.getCPtr(array));
+  public bool StrictEquals(Array array) {
+    bool ret = v8PINVOKE.Array_StrictEquals(swigCPtr, Array.getCPtr(array));
     return ret;
   }
 
@@ -382,6 +466,20 @@ public class Callback : Value {
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
   }
+
+	public override bool Equals(object o) {
+		if (o != null && o is Callback)
+		{
+			return Equals((Callback)o);
+		}
+		return false;
+	}
+	public bool Equals(Callback o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
 
   public Callback() : this(v8PINVOKE.new_Callback(), true) {
     SwigDirectorConnect();
@@ -487,6 +585,20 @@ public class ScriptException : global::System.IDisposable {
       global::System.GC.SuppressFinalize(this);
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is ScriptException)
+		{
+			return Equals((ScriptException)o);
+		}
+		return false;
+	}
+	public bool Equals(ScriptException o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public String GetName() {
     global::System.IntPtr cPtr = v8PINVOKE.ScriptException_GetName(swigCPtr);
     String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, true);
@@ -565,6 +677,20 @@ public class MessageHandler : global::System.IDisposable {
       global::System.GC.SuppressFinalize(this);
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is MessageHandler)
+		{
+			return Equals((MessageHandler)o);
+		}
+		return false;
+	}
+	public bool Equals(MessageHandler o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public virtual void Handle(String message) {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.MessageHandler_HandleSwigExplicitMessageHandler(swigCPtr, String.getCPtr(message)); else v8PINVOKE.MessageHandler_Handle(swigCPtr, String.getCPtr(message));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
@@ -628,6 +754,20 @@ public class ScriptExceptionHandler : global::System.IDisposable {
       global::System.GC.SuppressFinalize(this);
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is ScriptExceptionHandler)
+		{
+			return Equals((ScriptExceptionHandler)o);
+		}
+		return false;
+	}
+	public bool Equals(ScriptExceptionHandler o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public virtual void Handle(ScriptException e) {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.ScriptExceptionHandler_HandleSwigExplicitScriptExceptionHandler(swigCPtr, ScriptException.getCPtr(e)); else v8PINVOKE.ScriptExceptionHandler_Handle(swigCPtr, ScriptException.getCPtr(e));
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
@@ -690,6 +830,20 @@ public class Context : global::System.IDisposable {
       }
       global::System.GC.SuppressFinalize(this);
   }
+
+	public override bool Equals(object o) {
+		if (o != null && o is Context)
+		{
+			return Equals((Context)o);
+		}
+		return false;
+	}
+	public bool Equals(Context o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
 
   public Context(ScriptExceptionHandler scriptExceptionHandler, MessageHandler runtimeExceptionHandler) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler), MessageHandler.getCPtr(runtimeExceptionHandler)), true) {
   }
@@ -759,6 +913,20 @@ public class Int : Value {
       base.Dispose();
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is Int)
+		{
+			return Equals((Int)o);
+		}
+		return false;
+	}
+	public bool Equals(Int o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public Int(int value) : this(v8PINVOKE.new_Int(value), true) {
   }
 
@@ -804,6 +972,20 @@ public class Double : Value {
       base.Dispose();
   }
 
+	public override bool Equals(object o) {
+		if (o != null && o is Double)
+		{
+			return Equals((Double)o);
+		}
+		return false;
+	}
+	public bool Equals(Double o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
   public Double(double value) : this(v8PINVOKE.new_Double(value), true) {
   }
 
@@ -848,6 +1030,20 @@ public class Bool : Value {
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
   }
+
+	public override bool Equals(object o) {
+		if (o != null && o is Bool)
+		{
+			return Equals((Bool)o);
+		}
+		return false;
+	}
+	public bool Equals(Bool o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
 
   public Bool(bool value) : this(v8PINVOKE.new_Bool(value), true) {
   }
@@ -1717,8 +1913,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_Construct")]
   public static extern global::System.IntPtr Function_Construct(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_Equals")]
-  public static extern bool Function_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Function_StrictEquals")]
+  public static extern bool Function_StrictEquals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Function")]
   public static extern void delete_Function(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1756,8 +1952,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_ContainsKey")]
   public static extern bool Object_ContainsKey(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Equals")]
-  public static extern bool Object_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_StrictEquals")]
+  public static extern bool Object_StrictEquals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Object")]
   public static extern void delete_Object(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1774,8 +1970,8 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_Length")]
   public static extern int Array_Length(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_Equals")]
-  public static extern bool Array_Equals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Array_StrictEquals")]
+  public static extern bool Array_StrictEquals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Array")]
   public static extern void delete_Array(global::System.Runtime.InteropServices.HandleRef jarg1);

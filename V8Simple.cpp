@@ -545,7 +545,7 @@ bool Object::ContainsKey(const char* key)
 	}
 }
 
-bool Object::Equals(const Object* object)
+bool Object::StrictEquals(const Object* object)
 {
 	if (object == nullptr)
 	{
@@ -556,11 +556,8 @@ bool Object::Equals(const Object* object)
 		V8Scope scope;
 		auto isolate = CurrentIsolate();
 
-		return FromJust(
-			scope,
-			_object->Get(isolate)->Equals(
-				CurrentContext(),
-				object->_object->Get(isolate)));
+		return _object->Get(isolate)->StrictEquals(
+			object->_object->Get(isolate));
 	}
 	catch (const ScriptException& e)
 	{
@@ -646,7 +643,7 @@ Object* Function::Construct(
 	return Construct(std::vector<Value*>(args, args + numArgs));
 }
 
-bool Function::Equals(const Function* function)
+bool Function::StrictEquals(const Function* function)
 {
 	if (function == nullptr)
 	{
@@ -657,11 +654,8 @@ bool Function::Equals(const Function* function)
 		V8Scope scope;
 		auto isolate = CurrentIsolate();
 
-		return FromJust(
-			scope,
-			_function->Get(isolate)->Equals(
-				CurrentContext(),
-				function->_function->Get(isolate)));
+		return _function->Get(isolate)->StrictEquals(
+			function->_function->Get(isolate));
 	}
 	catch (const ScriptException& e)
 	{
@@ -732,7 +726,7 @@ int Array::Length()
 	return static_cast<int>(_array->Get(CurrentIsolate())->Length());
 }
 
-bool Array::Equals(const Array* array)
+bool Array::StrictEquals(const Array* array)
 {
 	if (array == nullptr)
 	{
@@ -743,11 +737,8 @@ bool Array::Equals(const Array* array)
 		V8Scope scope;
 		auto isolate = CurrentIsolate();
 
-		return FromJust(
-			scope,
-			_array->Get(isolate)->Equals(
-				CurrentContext(),
-				array->_array->Get(isolate)));
+		return _array->Get(isolate)->StrictEquals(
+			array->_array->Get(isolate));
 	}
 	catch (const ScriptException& e)
 	{

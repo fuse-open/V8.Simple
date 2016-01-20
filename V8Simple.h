@@ -89,7 +89,7 @@ public:
 	Value* Call(Value** args, int numArgs);
 	Object* Construct(const std::vector<Value*>& args);
 	Object* Construct(Value** args, int numArgs);
-	bool Equals(const Function* f);
+	bool StrictEquals(const Function* f);
 
 	virtual ~Function();
 private:
@@ -123,7 +123,7 @@ public:
 	Value* CallMethod(const char* name, const std::vector<Value*>& args);
 	Value* CallMethod(const char* name, Value** args, int numArgs);
 	bool ContainsKey(const char* key);
-	bool Equals(const Object* object);
+	bool StrictEquals(const Object* object);
 
 	virtual ~Object();
 private:
@@ -141,7 +141,7 @@ public:
 	Value* Get(int index);
 	void Set(int index, Value* value);
 	int Length();
-	bool Equals(const Array* array);
+	bool StrictEquals(const Array* array);
 
 	virtual ~Array();
 private:

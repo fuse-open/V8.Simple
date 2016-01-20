@@ -870,7 +870,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Function_Construct(void * jarg1, void * jar
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Function_Equals(void * jarg1, void * jarg2) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Function_StrictEquals(void * jarg1, void * jarg2) {
   unsigned int jresult ;
   V8Simple::Function *arg1 = (V8Simple::Function *) 0 ;
   V8Simple::Function *arg2 = (V8Simple::Function *) 0 ;
@@ -878,7 +878,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Function_Equals(void * jarg1, void * 
   
   arg1 = (V8Simple::Function *)jarg1; 
   arg2 = (V8Simple::Function *)jarg2; 
-  result = (bool)(arg1)->Equals((V8Simple::Function const *)arg2);
+  result = (bool)(arg1)->StrictEquals((V8Simple::Function const *)arg2);
   jresult = result; 
   return jresult;
 }
@@ -1032,7 +1032,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_ContainsKey(void * jarg1, char
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_Equals(void * jarg1, void * jarg2) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_StrictEquals(void * jarg1, void * jarg2) {
   unsigned int jresult ;
   V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
   V8Simple::Object *arg2 = (V8Simple::Object *) 0 ;
@@ -1040,7 +1040,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_Equals(void * jarg1, void * ja
   
   arg1 = (V8Simple::Object *)jarg1; 
   arg2 = (V8Simple::Object *)jarg2; 
-  result = (bool)(arg1)->Equals((V8Simple::Object const *)arg2);
+  result = (bool)(arg1)->StrictEquals((V8Simple::Object const *)arg2);
   jresult = result; 
   return jresult;
 }
@@ -1104,7 +1104,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Array_Length(void * jarg1) {
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Array_Equals(void * jarg1, void * jarg2) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Array_StrictEquals(void * jarg1, void * jarg2) {
   unsigned int jresult ;
   V8Simple::Array *arg1 = (V8Simple::Array *) 0 ;
   V8Simple::Array *arg2 = (V8Simple::Array *) 0 ;
@@ -1112,7 +1112,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Array_Equals(void * jarg1, void * jar
   
   arg1 = (V8Simple::Array *)jarg1; 
   arg2 = (V8Simple::Array *)jarg2; 
-  result = (bool)(arg1)->Equals((V8Simple::Array const *)arg2);
+  result = (bool)(arg1)->StrictEquals((V8Simple::Array const *)arg2);
   jresult = result; 
   return jresult;
 }

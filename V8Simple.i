@@ -26,6 +26,21 @@
       base.Dispose();
   }
 
+%typemap(cscode) SWIGTYPE %{
+	public override bool Equals(object o) {
+		if (o != null && o is $csclassname)
+		{
+			return Equals(($csclassname)o);
+		}
+		return false;
+	}
+	public bool Equals($csclassname o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+%}
 
 // Make sure we return the correct objects in C#:
 // See: http://johnnado.com/swig-csharp-java-downcast/
