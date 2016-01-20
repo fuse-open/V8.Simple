@@ -71,7 +71,9 @@ public class V8SimpleTests
 				Assert.IsTrue(obj.ContainsKey("c"));
 				Assert.IsFalse(obj.ContainsKey("d"));
 				Assert.IsTrue(obj.Equals(obj));
+				Assert.IsTrue(obj.StrictEquals(obj));
 				Assert.IsFalse(obj.Equals((V8Simple.Object)context.Evaluate("ObjectTests", "({ abc: \"abc\" })")));
+				Assert.IsFalse(obj.StrictEquals((V8Simple.Object)context.Evaluate("ObjectTests", "({ abc: \"abc\" })")));
 				obj.Set("f", context.Evaluate("ObjectTests f", "(function(x, y) { return x + y; })"));
 				var callResult = obj.CallMethod(
 					"f",
@@ -100,7 +102,9 @@ public class V8SimpleTests
 			Assert.AreEqual(arr.GetValueType(), V8Simple.Type.Array);
 			Assert.AreEqual(arr.Length(), 2);
 			Assert.IsTrue(arr.Equals(arr));
+			Assert.IsTrue(arr.StrictEquals(arr));
 			Assert.IsFalse(arr.Equals((V8Simple.Array)context.Evaluate("ArrayTests", "[1, 2, 3]")));
+			Assert.IsFalse(arr.StrictEquals((V8Simple.Array)context.Evaluate("ArrayTests", "[1, 2, 3]")));
 			Assert.AreEqual(((V8Simple.String)arr.Get(0)).GetValue(), "abc");
 			Assert.AreEqual(((V8Simple.Int)arr.Get(1)).GetValue(), 123);
 			arr.Set(1, new V8Simple.String("123"));
@@ -120,9 +124,11 @@ public class V8SimpleTests
 			Assert.IsNotNull(callResult, "Test1.5");
 			Assert.AreEqual(callResult.GetValue(), 132, "Test2");
 			Assert.IsTrue(fun.Equals(fun), "Test3");
+			Assert.IsTrue(fun.StrictEquals(fun), "Test3");
 			var str = (V8Simple.Function)context.Evaluate("FunctionTests construct", "String");
 			Assert.IsNotNull(str, "Test3.5");
 			Assert.IsFalse(fun.Equals(str), "Test4");
+			Assert.IsFalse(fun.StrictEquals(str), "Test4");
 			var obj = str.Construct(new ValueVector { new V8Simple.String("abc 123") });
 			Assert.IsNotNull(obj);
 			Assert.AreEqual(((V8Simple.Int)obj.CallMethod("indexOf", new ValueVector { new V8Simple.String("1") })).GetValue(), 4, "Test5");
