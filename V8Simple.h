@@ -241,6 +241,8 @@ public:
 	~Context();
 	void Delete();
 
+	static const char* GetVersion();
+
 	static void SetDebugMessageHandler(MessageHandler* debugMessageHandler);
 	static void SendDebugCommand(const char* command);
 	static void ProcessDebugMessages();

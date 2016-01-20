@@ -1057,4 +1057,9 @@ void Context::Delete()
 	delete this;
 }
 
+const char* Context::GetVersion()
+{
+	return v8::V8::GetVersion();
+}
+
 } // namespace V8Simple

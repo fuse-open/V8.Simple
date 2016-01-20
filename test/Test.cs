@@ -267,6 +267,12 @@ public class V8SimpleTests
 		V8Simple.Context.ProcessDebugMessages();
 	}
 
+	[Test]
+	public void VersionTests()
+	{
+		Assert.IsNotNull(Context.GetVersion());
+	}
+
 	// Has to be last
 	[Test]
 	public void ZZZContextTests()

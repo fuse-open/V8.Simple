@@ -1519,6 +1519,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Context_Delete(void * jarg1) {
 }
 
 
+SWIGEXPORT char * SWIGSTDCALL CSharp_Context_GetVersion() {
+  char * jresult ;
+  char *result = 0 ;
+  
+  result = (char *)V8Simple::Context::GetVersion();
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_Context_SetDebugMessageHandler(void * jarg1) {
   V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
   
