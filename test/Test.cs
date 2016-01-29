@@ -279,6 +279,17 @@ public class V8SimpleTests
 		Assert.IsNotNull(Context.GetVersion());
 	}
 
+	[Test]
+	public void UnicodeTests()
+	{
+		string str = "ç, é, õ";
+		using (var context = new Context(null, null))
+		{
+			var res = ((V8Simple.String)context.Evaluate("UnicodeTests", "\"" + str + "\"")).GetValue();
+			Assert.AreEqual(str, res);
+		}
+	}
+
 	// Has to be last
 	[Test]
 	public void ZZZContextTests()
