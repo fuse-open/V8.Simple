@@ -406,7 +406,7 @@ UniqueValueVector* Object::Keys()
 
 		auto propArr = FromJust(
 			scope,
-			_object->Get(CurrentIsolate())->GetPropertyNames(context));
+			_object->Get(CurrentIsolate())->GetOwnPropertyNames(context));
 
 		auto length = propArr->Length();
 		result.reserve(length);
