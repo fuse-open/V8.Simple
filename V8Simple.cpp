@@ -7,31 +7,27 @@
 namespace V8Simple
 {
 
-String::String(const char* value)
-	: String(value, value == nullptr ? 0 : static_cast<int>(std::strlen(value)))
+String::String(const byte* buffer, int bufferLength)
+	: _value(new byte[bufferLength + 1])
+	, _length(bufferLength)
 {
-}
-
-String::String(const char* value, int length)
-	: _value(new char[length + 1])
-	, _length(length)
-{
-	if (length > 0 && value != nullptr)
+	if (_length > 0 && buffer != nullptr)
 	{
-		std::memcpy(_value, value, _length);
+		std::memcpy(_value, buffer, _length);
 	}
 	_value[_length] = 0;
 }
-String* String::New(const char* value, int length)
+
+String* String::New(const byte* buffer, int bufferLength)
 {
-	return new String(value, length);
+	return new String(buffer, bufferLength);
 }
 
 String& String::operator=(const String& str)
 {
 	delete[] _value;
 	_length = str._length;
-	_value = new char[_length + 1];
+	_value = new byte[_length + 1];
 	std::memcpy(_value, str._value, _length + 1);
 	return *this;
 }
@@ -42,12 +38,17 @@ String::String(const String& str)
 }
 
 String::String(const v8::String::Utf8Value& v)
-	: String(v.length() > 0 ? *v : nullptr, v.length())
+	: String(v.length() > 0 ? reinterpret_cast<const byte*>(*v) : nullptr, v.length())
 {
 }
 
 Type String::GetValueType() const { return Type::String; }
-const char* String::GetValue() const { return _value; }
+const byte* String::GetValue() const { return _value; }
+int String::GetBufferLength() const { return _length; }
+void String::GetBuffer(byte* outBuffer) const
+{
+	std::memcpy(outBuffer, _value, _length);
+}
 
 String::~String()
 {
@@ -156,9 +157,9 @@ static A FromJust(
 
 static v8::Local<v8::String> ToV8String(
 	const V8Scope& scope,
-	const char* str)
+	const String& str)
 {
-	return FromJust(scope, v8::String::NewFromUtf8(CurrentIsolate(), str, v8::NewStringType::kNormal));
+	return FromJust(scope, v8::String::NewFromUtf8(CurrentIsolate(), reinterpret_cast<const char*>(str.GetValue()), v8::NewStringType::kNormal));
 }
 
 Value* Value::Wrap(
@@ -189,7 +190,7 @@ Value* Value::Wrap(
 		v8::String::Utf8Value str(FromJust(
 			scope,
 			value->ToString(context)));
-		return new String(*str, str.length());
+		return new String(reinterpret_cast<const byte*>(*str), str.length());
 	}
 	if (value->IsArray())
 	{
@@ -252,7 +253,7 @@ v8::Local<v8::Value> Value::Unwrap(
 		case Type::String:
 			return ToV8String(
 				scope,
-				static_cast<String*>(value)->GetValue());
+				*static_cast<String*>(value));
 		case Type::Bool:
 			return v8::Boolean::New(
 				isolate,
@@ -343,7 +344,7 @@ Object::~Object()
 
 Type Object::GetValueType() const { return Type::Object; }
 
-Value* Object::Get(const char* key)
+Value* Object::Get(const String* key)
 {
 	if (key == nullptr)
 	{
@@ -358,7 +359,7 @@ Value* Object::Get(const char* key)
 			scope,
 			_object->Get(CurrentIsolate())->Get(
 				CurrentContext(),
-				ToV8String(scope, key)));
+				ToV8String(scope, *key)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -372,7 +373,7 @@ Value* Object::Get(const char* key)
 	}
 }
 
-void Object::Set(const char* key, Value* value)
+void Object::Set(const String* key, Value* value)
 {
 	if (key == nullptr)
 	{
@@ -385,7 +386,7 @@ void Object::Set(const char* key, Value* value)
 
 		auto ret = _object->Get(CurrentIsolate())->Set(
 			CurrentContext(),
-			ToV8String(scope, key),
+			ToV8String(scope, *key),
 			Unwrap(scope, value));
 		FromJust(scope, ret);
 	}
@@ -467,7 +468,7 @@ static T* DataPointer(std::vector<T>& v)
 }
 
 Value* Object::CallMethod(
-	const char* name,
+	const String* name,
 	const std::vector<Value*>& args)
 {
 	if (name == nullptr)
@@ -486,7 +487,7 @@ Value* Object::CallMethod(
 			scope,
 			localObject->Get(
 				context,
-				ToV8String(scope, name).As<v8::Value>()));
+				ToV8String(scope, *name).As<v8::Value>()));
 
 		if (!prop->IsFunction())
 		{
@@ -514,14 +515,14 @@ Value* Object::CallMethod(
 }
 
 Value* Object::CallMethod(
-	const char* name,
+	const String* name,
 	Value** args,
 	int numArgs)
 {
 	return CallMethod(name, std::vector<Value*>(args, args + numArgs));
 }
 
-bool Object::ContainsKey(const char* key)
+bool Object::ContainsKey(const String* key)
 {
 	if (key == nullptr)
 	{
@@ -536,7 +537,7 @@ bool Object::ContainsKey(const char* key)
 			scope,
 			_object->Get(CurrentIsolate())->Has(
 				CurrentContext(),
-				ToV8String(scope, key)));
+				ToV8String(scope, *key)));
 	}
 	catch (const ScriptException& e)
 	{
@@ -846,7 +847,8 @@ void Context::HandleRuntimeException(const char* e)
 {
 	if (_globalContext != nullptr && _globalContext->_runtimeExceptionHandler != nullptr)
 	{
-		_globalContext->_runtimeExceptionHandler->Handle(e);
+		String str(reinterpret_cast<const byte*>(e), std::strlen(e));
+		_globalContext->_runtimeExceptionHandler->Handle(&str);
 	}
 }
 
@@ -866,14 +868,15 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 		{
 			v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
 			{
-				v8::String::Utf8Value str(message.GetJSON());
-				_globalContext->_debugMessageHandler->Handle(String(*str, str.length()));
+				v8::String::Utf8Value utf8(message.GetJSON());
+				const String str(reinterpret_cast<const byte*>(*utf8), utf8.length());
+				_globalContext->_debugMessageHandler->Handle(&str);
 			});
 		}
 	}
 }
 
-void Context::SendDebugCommand(const char* command)
+void Context::SendDebugCommand(const String* command)
 {
 	if (command == nullptr)
 	{
@@ -886,7 +889,10 @@ void Context::SendDebugCommand(const char* command)
 		v8::Isolate::Scope isolateScope(_globalContext->_conversionIsolate);
 		v8::HandleScope handleScope(_globalContext->_conversionIsolate);
 
-		auto str = v8::String::NewFromUtf8(_globalContext->_conversionIsolate, command, v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_globalContext->_conversionIsolate));
+		auto str = v8::String::NewFromUtf8(
+			_globalContext->_conversionIsolate,
+			reinterpret_cast<const char*>(command->GetValue()),
+			v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_globalContext->_conversionIsolate));
 		auto len = str->Length();
 		auto buffer = new uint16_t[len + 1];
 		str->Write(buffer);
@@ -955,16 +961,21 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 		_context = new v8::Persistent<v8::Context>(_isolate, localContext);
 	}
 	
-	Value* instanceOf = Evaluate(
-		"instanceof",
-		"(function(x, y) { return (x instanceof y); })");
-	if (!instanceOf || instanceOf->GetValueType() != Type::Function)
 	{
-		Context::HandleRuntimeException("V8Simple could not create an instanceof function");
-	}
-	else
-	{
-		_instanceOf = static_cast<Function*>(instanceOf);
+		const char instanceOfStrBuf[] = "instanceof";
+		const char instanceOfCodeBuf[] = "(function(x, y) { return (x instanceof y); })";
+		const String instanceOfString(reinterpret_cast<const byte*>(instanceOfStrBuf), sizeof (instanceOfStrBuf));
+		const String instanceOfCode(reinterpret_cast<const byte*>(instanceOfCodeBuf), sizeof (instanceOfCodeBuf));
+		Value* instanceOf = Evaluate(&instanceOfString, &instanceOfCode);
+		
+		if (!instanceOf || instanceOf->GetValueType() != Type::Function)
+		{
+			Context::HandleRuntimeException("V8Simple could not create an instanceof function");
+		}
+		else
+		{
+			_instanceOf = static_cast<Function*>(instanceOf);
+		}
 	}
 }
 
@@ -1000,7 +1011,7 @@ Context::~Context()
 	// delete _platform;
 }
 
-Value* Context::Evaluate(const char* fileName, const char* code)
+Value* Context::Evaluate(const String* fileName, const String* code)
 {
 	if (fileName == nullptr)
 	{
@@ -1017,12 +1028,12 @@ Value* Context::Evaluate(const char* fileName, const char* code)
 		V8Scope scope;
 		auto context = CurrentContext();
 
-		v8::ScriptOrigin origin(ToV8String(scope, fileName));
+		v8::ScriptOrigin origin(ToV8String(scope, *fileName));
 		auto script = FromJust(
 			scope,
 			v8::Script::Compile(
 				context,
-				ToV8String(scope, code),
+				ToV8String(scope, *code),
 				&origin));
 
 		return Value::Wrap(scope, script->Run(context));

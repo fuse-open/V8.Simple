@@ -103,27 +103,25 @@ public class String : Value {
       base.Dispose();
   }
 
-	public override bool Equals(object o) {
-		if (o != null && o is String)
-		{
-			return Equals((String)o);
-		}
-		return false;
+	public string GetValue()
+	{
+		var buffer = new byte[GetBufferLength()];
+		GetBuffer(buffer);
+		return System.Text.Encoding.UTF8.GetString(buffer);
 	}
-	public bool Equals(String o) {
-		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
-	}
-	public override int GetHashCode() {
-		return swigCPtr.Handle.GetHashCode();
-	}
+	public String(byte[] buffer) : this(buffer, buffer.Length) { }
+	public String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
 
-  public String(string value) : this(v8PINVOKE.new_String__SWIG_0(value), true) {
+  public String(byte[] buffer, int bufferLength) : this(v8PINVOKE.new_String__SWIG_0(buffer, bufferLength), true) {
   }
 
-  public String(string value, int length) : this(v8PINVOKE.new_String__SWIG_1(value, length), true) {
+  public static String New(byte[] buffer, int bufferLength) {
+    global::System.IntPtr cPtr = v8PINVOKE.String_New(buffer, bufferLength);
+    String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, true);
+    return ret;
   }
 
-  public String(String str) : this(v8PINVOKE.new_String__SWIG_2(String.getCPtr(str)), true) {
+  public String(String str) : this(v8PINVOKE.new_String__SWIG_1(String.getCPtr(str)), true) {
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -132,8 +130,12 @@ public class String : Value {
     return ret;
   }
 
-  public string GetValue() {
-    string ret = v8PINVOKE.String_GetValue(swigCPtr);
+  public void GetBuffer(byte[] outBuffer) {
+    v8PINVOKE.String_GetBuffer(swigCPtr, outBuffer);
+  }
+
+  public int GetBufferLength() {
+    int ret = v8PINVOKE.String_GetBufferLength(swigCPtr);
     return ret;
   }
 
@@ -326,14 +328,14 @@ public class Object : Value {
     return ret;
   }
 
-  public Value Get(string key) {
-	global::System.IntPtr cPtr = v8PINVOKE.Object_Get(swigCPtr, key);
+  public Value Get(String key) {
+	global::System.IntPtr cPtr = v8PINVOKE.Object_Get(swigCPtr, String.getCPtr(key));
 	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
 	return ret;
 }
 
-  public void Set(string key, Value value) {
-    v8PINVOKE.Object_Set(swigCPtr, key, Value.getCPtr(value));
+  public void Set(String key, Value value) {
+    v8PINVOKE.Object_Set(swigCPtr, String.getCPtr(key), Value.getCPtr(value));
   }
 
   public UniqueValueVector Keys() {
@@ -347,15 +349,15 @@ public class Object : Value {
     return ret;
   }
 
-  public Value CallMethod(string name, ValueVector args) {
-	global::System.IntPtr cPtr = v8PINVOKE.Object_CallMethod(swigCPtr, name, ValueVector.getCPtr(args));
+  public Value CallMethod(String name, ValueVector args) {
+	global::System.IntPtr cPtr = v8PINVOKE.Object_CallMethod(swigCPtr, String.getCPtr(name), ValueVector.getCPtr(args));
 	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
     if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
 	return ret;
 }
 
-  public bool ContainsKey(string key) {
-    bool ret = v8PINVOKE.Object_ContainsKey(swigCPtr, key);
+  public bool ContainsKey(String key) {
+    bool ret = v8PINVOKE.Object_ContainsKey(swigCPtr, String.getCPtr(key));
     return ret;
   }
 
@@ -693,7 +695,6 @@ public class MessageHandler : global::System.IDisposable {
 
   public virtual void Handle(String message) {
     if (SwigDerivedClassHasMethod("Handle", swigMethodTypes0)) v8PINVOKE.MessageHandler_HandleSwigExplicitMessageHandler(swigCPtr, String.getCPtr(message)); else v8PINVOKE.MessageHandler_Handle(swigCPtr, String.getCPtr(message));
-    if (v8PINVOKE.SWIGPendingException.Pending) throw v8PINVOKE.SWIGPendingException.Retrieve();
   }
 
   public MessageHandler() : this(v8PINVOKE.new_MessageHandler(), true) {
@@ -713,7 +714,7 @@ public class MessageHandler : global::System.IDisposable {
   }
 
   private void SwigDirectorHandle(global::System.IntPtr message) {
-    Handle(new String(message, false));
+    Handle((message == global::System.IntPtr.Zero) ? null : new String(message, false));
   }
 
   public delegate void SwigDelegateMessageHandler_0(global::System.IntPtr message);
@@ -848,8 +849,8 @@ public class Context : global::System.IDisposable {
   public Context(ScriptExceptionHandler scriptExceptionHandler, MessageHandler runtimeExceptionHandler) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler), MessageHandler.getCPtr(runtimeExceptionHandler)), true) {
   }
 
-  public Value Evaluate(string fileName, string code) {
-	global::System.IntPtr cPtr = v8PINVOKE.Context_Evaluate(swigCPtr, fileName, code);
+  public Value Evaluate(String fileName, String code) {
+	global::System.IntPtr cPtr = v8PINVOKE.Context_Evaluate(swigCPtr, String.getCPtr(fileName), String.getCPtr(code));
 	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
 	return ret;
 }
@@ -860,8 +861,8 @@ public class Context : global::System.IDisposable {
     return ret;
   }
 
-  public bool IdleNotificationDeadline(double deadline_in_seconds) {
-    bool ret = v8PINVOKE.Context_IdleNotificationDeadline(swigCPtr, deadline_in_seconds);
+  public bool IdleNotificationDeadline(double deadlineInSeconds) {
+    bool ret = v8PINVOKE.Context_IdleNotificationDeadline(swigCPtr, deadlineInSeconds);
     return ret;
   }
 
@@ -878,8 +879,8 @@ public class Context : global::System.IDisposable {
     v8PINVOKE.Context_SetDebugMessageHandler(MessageHandler.getCPtr(debugMessageHandler));
   }
 
-  public static void SendDebugCommand(string command) {
-    v8PINVOKE.Context_SendDebugCommand(command);
+  public static void SendDebugCommand(String command) {
+    v8PINVOKE.Context_SendDebugCommand(String.getCPtr(command));
   }
 
   public static void ProcessDebugMessages() {
@@ -1889,19 +1890,22 @@ class v8PINVOKE {
   public static extern void delete_Value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_0")]
-  public static extern global::System.IntPtr new_String__SWIG_0(string jarg1);
+  public static extern global::System.IntPtr new_String__SWIG_0([global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_New")]
+  public static extern global::System.IntPtr String_New([global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_1")]
-  public static extern global::System.IntPtr new_String__SWIG_1(string jarg1, int jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_2")]
-  public static extern global::System.IntPtr new_String__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1);
+  public static extern global::System.IntPtr new_String__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_GetValueType")]
   public static extern int String_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_GetValue")]
-  public static extern string String_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_GetBuffer")]
+  public static extern void String_GetBuffer(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.Out, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_GetBufferLength")]
+  public static extern int String_GetBufferLength(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_String")]
   public static extern void delete_String(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1940,10 +1944,10 @@ class v8PINVOKE {
   public static extern int Object_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Get")]
-  public static extern global::System.IntPtr Object_Get(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+  public static extern global::System.IntPtr Object_Get(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Set")]
-  public static extern void Object_Set(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+  public static extern void Object_Set(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_Keys")]
   public static extern global::System.IntPtr Object_Keys(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -1952,10 +1956,10 @@ class v8PINVOKE {
   public static extern bool Object_InstanceOf(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_CallMethod")]
-  public static extern global::System.IntPtr Object_CallMethod(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+  public static extern global::System.IntPtr Object_CallMethod(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_ContainsKey")]
-  public static extern bool Object_ContainsKey(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
+  public static extern bool Object_ContainsKey(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_StrictEquals")]
   public static extern bool Object_StrictEquals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -2075,7 +2079,7 @@ class v8PINVOKE {
   public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_Evaluate")]
-  public static extern global::System.IntPtr Context_Evaluate(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, string jarg3);
+  public static extern global::System.IntPtr Context_Evaluate(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_GlobalObject")]
   public static extern global::System.IntPtr Context_GlobalObject(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -2096,7 +2100,7 @@ class v8PINVOKE {
   public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_SendDebugCommand")]
-  public static extern void Context_SendDebugCommand(string jarg1);
+  public static extern void Context_SendDebugCommand(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_ProcessDebugMessages")]
   public static extern void Context_ProcessDebugMessages();

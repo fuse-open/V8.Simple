@@ -3,6 +3,10 @@
 #include "V8Simple.h"
 %}
 
+%include "arrays_csharp.i"
+%apply unsigned char INPUT[] { const V8Simple::byte* buffer }
+%apply unsigned char OUTPUT[] { V8Simple::byte* outBuffer }
+
 %typemap(csdestruct, methodname="Dispose", methodmodifiers="public") SWIGTYPE {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
@@ -42,6 +46,17 @@
 	}
 %}
 
+%typemap(cscode) V8Simple::String %{
+	public string GetValue()
+	{
+		var buffer = new byte[GetBufferLength()];
+		GetBuffer(buffer);
+		return System.Text.Encoding.UTF8.GetString(buffer);
+	}
+	public String(byte[] buffer) : this(buffer, buffer.Length) { }
+	public String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
+%}
+
 // Make sure we return the correct objects in C#:
 // See: http://johnnado.com/swig-csharp-java-downcast/
 %pragma(csharp) imclasscode=%{
@@ -73,18 +88,19 @@ V8Simple::Value*
 	return ret;
 }
 %include <std_vector.i>
-%newobject V8Simple::Context::Evaluate(const char*, const char*);
+%newobject V8Simple::Context::Evaluate(const String*, const String*);
 %newobject V8Simple::Context::GlobalObject();
-%newobject V8Simple::Object::Get(const char*);
+%newobject V8Simple::Object::Get(const String*);
 %newobject V8Simple::Object::Keys();
-%newobject V8Simple::Object::CallMethod(const char*, const std::vector<Value*>&);
-%ignore V8Simple::Object::CallMethod(const char*, Value** args, int numArgs);
+%newobject V8Simple::Object::CallMethod(const String*, const std::vector<Value*>&);
+%ignore V8Simple::Object::CallMethod(const String*, Value** args, int numArgs);
 %newobject V8Simple::Function::Call(const std::vector<Value*>&);
 %ignore V8Simple::Function::Call(Value** args, int numArgs);
 %newobject V8Simple::Function::Construct(const std::vector<Value*>&);
 %ignore V8Simple::Function::Construct(Value** args, int numArgs);
 %ignore V8Simple::Value::Delete();
-%ignore V8Simple::String::New(const char* value, int length);
+%newobject V8Simple::String::New(const byte* buffer, int bufferLength);
+%ignore V8Simple::String::GetValue() const;
 %ignore V8Simple::Primitive<int>::New(const int& value);
 %ignore V8Simple::Primitive<double>::New(const double& value);
 %ignore V8Simple::Primitive<bool>::New(const bool& value);

@@ -40,7 +40,7 @@ struct SwigDirector_MessageHandler : public V8Simple::MessageHandler, public Swi
 
 public:
     SwigDirector_MessageHandler();
-    virtual void Handle(V8Simple::String const &message);
+    virtual void Handle(V8Simple::String const *message);
     virtual ~SwigDirector_MessageHandler();
 
     typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);

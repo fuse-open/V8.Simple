@@ -17,6 +17,7 @@
 namespace V8Simple
 {
 
+typedef unsigned char byte;
 struct V8Scope;
 class Object;
 
@@ -65,20 +66,22 @@ protected:
 class DllExport String: public Value
 {
 public:
-	String(const char* value);
-	String(const char* value, int length);
-	static String* New(const char* value, int length);
+	String(const byte* buffer, int bufferLength);
+	static String* New(const byte* buffer, int bufferLength);
 	String(const String& str);
 	String& operator=(const String& str);
 	virtual Type GetValueType() const override final;
-	const char* GetValue() const;
+	const byte* GetValue() const;
+	void GetBuffer(byte* outBuffer) const;
+	int GetBufferLength() const;
 	virtual ~String();
 	String* Copy() const;
 private:
 	String(const v8::String::Utf8Value& v);
-	char* _value;
+	byte* _value;
 	int _length;
 	friend class Object;
+	friend class Value;
 	friend struct ScriptException;
 };
 
@@ -117,13 +120,13 @@ class DllExport Object: public Value
 {
 public:
 	virtual Type GetValueType() const override final;
-	Value* Get(const char* key);
-	void Set(const char* key, Value* value);
+	Value* Get(const String* key);
+	void Set(const String* key, Value* value);
 	UniqueValueVector* Keys();
 	bool InstanceOf(Function* type);
-	Value* CallMethod(const char* name, const std::vector<Value*>& args);
-	Value* CallMethod(const char* name, Value** args, int numArgs);
-	bool ContainsKey(const char* key);
+	Value* CallMethod(const String* name, const std::vector<Value*>& args);
+	Value* CallMethod(const String* name, Value** args, int numArgs);
+	bool ContainsKey(const String* key);
 	bool StrictEquals(const Object* object);
 
 	virtual ~Object();
@@ -220,7 +223,7 @@ private:
 
 struct DllExport MessageHandler
 {
-	virtual void Handle(const String& message) { }
+	virtual void Handle(const String* message) { }
 	virtual ~MessageHandler() { }
 };
 
@@ -235,16 +238,16 @@ class DllExport Context
 public:
 	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
 	static Context* New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
-	Value* Evaluate(const char* fileName, const char* code);
+	Value* Evaluate(const String* fileName, const String* code);
 	Object* GlobalObject();
-	bool IdleNotificationDeadline(double deadline_in_seconds);
+	bool IdleNotificationDeadline(double deadlineInSeconds);
 	~Context();
 	void Delete();
 
 	static const char* GetVersion();
 
 	static void SetDebugMessageHandler(MessageHandler* debugMessageHandler);
-	static void SendDebugCommand(const char* command);
+	static void SendDebugCommand(const String* command);
 	static void ProcessDebugMessages();
 private:
 	static Context* _globalContext;
@@ -261,7 +264,7 @@ private:
 	static void HandleScriptException(
 		const ScriptException& e);
 	static void HandleRuntimeException(
-		const char* e);
+		const char* messageBuffer);
 
 	friend v8::Isolate* CurrentIsolate();
 	friend v8::Local<v8::Context> CurrentContext();

@@ -7,28 +7,33 @@ using NUnit.Framework;
 [TestFixture]
 public class V8SimpleTests
 {
+	V8Simple.String Str(string str)
+	{
+		return new V8Simple.String(str);
+	}
+
 	[Test]
 	public void PrimitiveTests()
 	{
 		using (var context = new Context(null, null))
 		{
 			{
-				var result = context.Evaluate("ValueTests", "12 + 13");
+				var result = context.Evaluate(Str("ValueTests"), Str("12 + 13"));
 				Assert.AreEqual(result.GetValueType(), V8Simple.Type.Int);
 				Assert.AreEqual(((V8Simple.Int)result).GetValue(), 25);
 			}
 			{
-				var result = context.Evaluate("ValueTests", "1.2 + 1.3");
+				var result = context.Evaluate(Str("ValueTests"), Str("1.2 + 1.3"));
 				Assert.AreEqual(result.GetValueType(), V8Simple.Type.Double);
 				Assert.AreEqual(((V8Simple.Double)result).GetValue(), 2.5);
 			}
 			{
-				var result = context.Evaluate("ValueTests", "\"abc 123\"");
+				var result = context.Evaluate(Str("ValueTests"), Str("\"abc 123\""));
 				Assert.AreEqual(result.GetValueType(), V8Simple.Type.String);
 				Assert.AreEqual(((V8Simple.String)result).GetValue(), "abc 123");
 			}
 			{
-				var result = context.Evaluate("ValueTests", "true || false");
+				var result = context.Evaluate(Str("ValueTests"), Str("true || false"));
 				Assert.AreEqual(result.GetValueType(), V8Simple.Type.Bool);
 				Assert.AreEqual(((V8Simple.Bool)result).GetValue(), true);
 			}
@@ -41,17 +46,17 @@ public class V8SimpleTests
 		using (var context = new Context(null, null))
 		{
 			{
-				var obj = (V8Simple.Object)context.Evaluate("ObjectTests", "({ a: \"abc\", b: 123 })");
+				var obj = (V8Simple.Object)context.Evaluate(Str("ObjectTests"), Str("({ a: \"abc\", b: 123 })"));
 				Assert.IsNotNull(obj);
 				Assert.AreEqual(obj.GetValueType(), V8Simple.Type.Object);
-				Assert.AreEqual(obj.Get("a").GetValueType(), V8Simple.Type.String);
-				Assert.AreEqual(((V8Simple.String)obj.Get("a")).GetValue(), "abc");
-				Assert.AreEqual(obj.Get("b").GetValueType(), V8Simple.Type.Int);
-				Assert.AreEqual(((V8Simple.Int)obj.Get("b")).GetValue(), 123);
-				obj.Set("a", new V8Simple.String("xyz"));
-				Assert.AreEqual(((V8Simple.String)obj.Get("a")).GetValue(), "xyz");
-				obj.Set("c", new V8Simple.Double(123.4));
-				Assert.AreEqual(((V8Simple.Double)obj.Get("c")).GetValue(), 123.4);
+				Assert.AreEqual(obj.Get(Str("a")).GetValueType(), V8Simple.Type.String);
+				Assert.AreEqual(((V8Simple.String)obj.Get(Str("a"))).GetValue(), "abc");
+				Assert.AreEqual(obj.Get(Str("b")).GetValueType(), V8Simple.Type.Int);
+				Assert.AreEqual(((V8Simple.Int)obj.Get(Str("b"))).GetValue(), 123);
+				obj.Set(Str("a"), new V8Simple.String(Str("xyz")));
+				Assert.AreEqual(((V8Simple.String)obj.Get(Str("a"))).GetValue(), "xyz");
+				obj.Set(Str("c"), new V8Simple.Double(123.4));
+				Assert.AreEqual(((V8Simple.Double)obj.Get(Str("c"))).GetValue(), 123.4);
 				var keys1 = obj.Keys();
 				List<Value> keys1l = new List<Value>();
 				for (int i = 0; i < keys1.Length(); ++i)
@@ -66,17 +71,17 @@ public class V8SimpleTests
 				}
 				Assert.AreEqual(keys1l.Count, 3);
 				Assert.AreEqual(keys2l.Count, 3);
-				Assert.IsTrue(obj.ContainsKey("a"));
-				Assert.IsTrue(obj.ContainsKey("b"));
-				Assert.IsTrue(obj.ContainsKey("c"));
-				Assert.IsFalse(obj.ContainsKey("d"));
+				Assert.IsTrue(obj.ContainsKey(Str("a")));
+				Assert.IsTrue(obj.ContainsKey(Str("b")));
+				Assert.IsTrue(obj.ContainsKey(Str("c")));
+				Assert.IsFalse(obj.ContainsKey(Str("d")));
 				Assert.IsTrue(obj.Equals(obj));
 				Assert.IsTrue(obj.StrictEquals(obj));
-				Assert.IsFalse(obj.Equals((V8Simple.Object)context.Evaluate("ObjectTests", "({ abc: \"abc\" })")));
-				Assert.IsFalse(obj.StrictEquals((V8Simple.Object)context.Evaluate("ObjectTests", "({ abc: \"abc\" })")));
-				obj.Set("f", context.Evaluate("ObjectTests f", "(function(x, y) { return x + y; })"));
+				Assert.IsFalse(obj.Equals((V8Simple.Object)context.Evaluate(Str("ObjectTests"), Str("({ abc: \"abc\" })"))));
+				Assert.IsFalse(obj.StrictEquals((V8Simple.Object)context.Evaluate(Str("ObjectTests"), Str("({ abc: \"abc\" })"))));
+				obj.Set(Str("f"), context.Evaluate(Str("ObjectTests f"), Str("(function(x, y) { return x + y; })")));
 				var callResult = obj.CallMethod(
-					"f",
+					Str("f"),
 					new ValueVector { new V8Simple.Int(12), new V8Simple.Int(13) });
 				Assert.IsNotNull(callResult);
 				Assert.AreEqual(callResult.GetValueType(), V8Simple.Type.Int);
@@ -84,11 +89,11 @@ public class V8SimpleTests
 					((V8Simple.Int)callResult).GetValue(),
 					25);
 				Assert.IsTrue(
-					((V8Simple.Object)(context.Evaluate("ObjectTests instanceof", "new Map()")))
-					.InstanceOf((V8Simple.Function)context.Evaluate("ObjectTests instanceof 2", "Map")));
+					((V8Simple.Object)(context.Evaluate(Str("ObjectTests instanceof"), Str("new Map()"))))
+					.InstanceOf((V8Simple.Function)context.Evaluate(Str("ObjectTests instanceof 2"), Str("Map"))));
 				Assert.IsFalse(
 					obj
-					.InstanceOf((V8Simple.Function)context.Evaluate("ObjectTests instanceof 2", "Map")));
+					.InstanceOf((V8Simple.Function)context.Evaluate(Str("ObjectTests instanceof 2"), Str("Map"))));
 			}
 		}
 	}
@@ -98,16 +103,16 @@ public class V8SimpleTests
 	{
 		using (var context = new Context(null, null))
 		{
-			var arr = (V8Simple.Array)context.Evaluate("ArrayTests", "[\"abc\", 123]");
+			var arr = (V8Simple.Array)context.Evaluate(Str("ArrayTests"), Str("[\"abc\", 123]"));
 			Assert.AreEqual(arr.GetValueType(), V8Simple.Type.Array);
 			Assert.AreEqual(arr.Length(), 2);
 			Assert.IsTrue(arr.Equals(arr));
 			Assert.IsTrue(arr.StrictEquals(arr));
-			Assert.IsFalse(arr.Equals((V8Simple.Array)context.Evaluate("ArrayTests", "[1, 2, 3]")));
-			Assert.IsFalse(arr.StrictEquals((V8Simple.Array)context.Evaluate("ArrayTests", "[1, 2, 3]")));
+			Assert.IsFalse(arr.Equals((V8Simple.Array)context.Evaluate(Str("ArrayTests"), Str("[1, 2, 3]"))));
+			Assert.IsFalse(arr.StrictEquals((V8Simple.Array)context.Evaluate(Str("ArrayTests"), Str("[1, 2, 3]"))));
 			Assert.AreEqual(((V8Simple.String)arr.Get(0)).GetValue(), "abc");
 			Assert.AreEqual(((V8Simple.Int)arr.Get(1)).GetValue(), 123);
-			arr.Set(1, new V8Simple.String("123"));
+			arr.Set(1, new V8Simple.String(Str("123")));
 			Assert.AreEqual(((V8Simple.String)arr.Get(1)).GetValue(), "123");
 		}
 	}
@@ -117,7 +122,7 @@ public class V8SimpleTests
 	{
 		using (var context = new Context(null, null))
 		{
-			var fun = (V8Simple.Function)context.Evaluate("FunctionTests", "(function(x, y) { return x * y; })");
+			var fun = (V8Simple.Function)context.Evaluate(Str("FunctionTests"), Str("(function(x, y) { return x * y; })"));
 			Assert.IsNotNull(fun, "Test0");
 			Assert.AreEqual(fun.GetValueType(), V8Simple.Type.Function, "Test1");
 			var callResult = (V8Simple.Int)fun.Call(new ValueVector { new V8Simple.Int(11), new V8Simple.Int(12) });
@@ -125,13 +130,13 @@ public class V8SimpleTests
 			Assert.AreEqual(callResult.GetValue(), 132, "Test2");
 			Assert.IsTrue(fun.Equals(fun), "Test3");
 			Assert.IsTrue(fun.StrictEquals(fun), "Test3");
-			var str = (V8Simple.Function)context.Evaluate("FunctionTests construct", "String");
+			var str = (V8Simple.Function)context.Evaluate(Str("FunctionTests construct"), Str("String"));
 			Assert.IsNotNull(str, "Test3.5");
 			Assert.IsFalse(fun.Equals(str), "Test4");
 			Assert.IsFalse(fun.StrictEquals(str), "Test4");
-			var obj = str.Construct(new ValueVector { new V8Simple.String("abc 123") });
+			var obj = str.Construct(new ValueVector { new V8Simple.String(Str("abc 123")) });
 			Assert.IsNotNull(obj);
-			Assert.AreEqual(((V8Simple.Int)obj.CallMethod("indexOf", new ValueVector { new V8Simple.String("1") })).GetValue(), 4, "Test5");
+			Assert.AreEqual(((V8Simple.Int)obj.CallMethod(Str("indexOf"), new ValueVector { new V8Simple.String(Str("1")) })).GetValue(), 4, "Test5");
 		}
 	}
 
@@ -164,8 +169,8 @@ public class V8SimpleTests
 		using (var context = new Context(null, null))
 		{
 			var f = (V8Simple.Function)context.Evaluate(
-				"CallbackTests",
-				"(function(f) { return f(12, 13) + f(10, 20); })");
+				Str("CallbackTests"),
+				Str("(function(f) { return f(12, 13) + f(10, 20); })"));
 			Assert.AreEqual(
 				((V8Simple.Int)f.Call(new ValueVector { new MyCallback() })).GetValue(),
 				12 + 13 + 1000 + 10 + 20 + 1000);
@@ -199,18 +204,18 @@ public class V8SimpleTests
 			runtimeExceptionHandler))
 		{
 			handled = false;
-			context.Evaluate("ErrorTests", "new ....");
+			context.Evaluate(Str("ErrorTests"), Str("new ...."));
 			Assert.IsTrue(handled, "Test1");
 
 			handled = false;
-			context.Evaluate("ErrorTests", "obj.someMethod()");
+			context.Evaluate(Str("ErrorTests"), Str("obj.someMethod()"));
 			Assert.IsTrue(handled, "Test2");
 
 			handled = false;
-			context.Evaluate("ErrorTests", "throw \"Hello\";");
+			context.Evaluate(Str("ErrorTests"), Str("throw \"Hello\";"));
 			Assert.IsTrue(handled, "Test3");
 
-			var obj = (V8Simple.Object)context.Evaluate("ErrorTests", "({})");
+			var obj = (V8Simple.Object)context.Evaluate(Str("ErrorTests"), Str("({})"));
 
 			runtimeHandled = false;
 			obj.ContainsKey(null);
@@ -233,11 +238,11 @@ public class V8SimpleTests
 			Assert.IsTrue(runtimeHandled, "Test8");
 
 			runtimeHandled = false;
-			context.Evaluate(null, "({})");
+			context.Evaluate(null, Str("({})"));
 			Assert.IsTrue(runtimeHandled, "Test9");
 
 			runtimeHandled = false;
-			context.Evaluate("ErrorTests", null);
+			context.Evaluate(Str("ErrorTests"), null);
 			Assert.IsTrue(runtimeHandled, "Test10");
 		}
 	}
@@ -266,7 +271,7 @@ public class V8SimpleTests
 		{
 			var messageHandler = new DelegateMessageHandler(x => { return; });
 			V8Simple.Context.SetDebugMessageHandler(messageHandler);
-			V8Simple.Context.SendDebugCommand("{}");
+			V8Simple.Context.SendDebugCommand(Str("{}"));
 			V8Simple.Context.ProcessDebugMessages();
 		}
 		V8Simple.Context.SetDebugMessageHandler(null);
@@ -285,7 +290,7 @@ public class V8SimpleTests
 		string str = "ç, é, õ";
 		using (var context = new Context(null, null))
 		{
-			var res = ((V8Simple.String)context.Evaluate("UnicodeTests", "\"" + str + "\"")).GetValue();
+			var res = ((V8Simple.String)context.Evaluate(Str("UnicodeTests"), Str("\"" + str + "\""))).GetValue();
 			Assert.AreEqual(str, res);
 		}
 	}
@@ -299,7 +304,7 @@ public class V8SimpleTests
 		var runtimeExceptionHandler = new DelegateMessageHandler(x => { handled = true; });
 		var context = new Context(scriptExceptionHandler, runtimeExceptionHandler);
 		Assert.AreEqual(
-			((V8Simple.Int)context.Evaluate("ContextTests", "1 + 2")).GetValue(),
+			((V8Simple.Int)context.Evaluate(Str("ContextTests"), Str("1 + 2"))).GetValue(),
 			3);
 	}
 }
