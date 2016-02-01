@@ -847,7 +847,7 @@ void Context::HandleRuntimeException(const char* e)
 {
 	if (_globalContext != nullptr && _globalContext->_runtimeExceptionHandler != nullptr)
 	{
-		String str(reinterpret_cast<const byte*>(e), std::strlen(e));
+		String str(reinterpret_cast<const byte*>(e), static_cast<int>(std::strlen(e)));
 		_globalContext->_runtimeExceptionHandler->Handle(&str);
 	}
 }
