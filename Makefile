@@ -20,7 +20,7 @@ $(LIB_DIR)/$(LIB_FILE): $(OBJ_DIR)/$(FILE).o $(OBJ_DIR)/$(FILE)_wrap.o
 	@mkdir -p $(LIB_DIR)
 	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
-$(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o
+$(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o $(OBJ_DIR)/$(FILE)_wrap.o
 	@mkdir -p $(LIB_DIR)
 	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 

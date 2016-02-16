@@ -66,8 +66,8 @@ protected:
 class DllExport String: public Value
 {
 public:
-	String(const byte* buffer, int bufferLength);
 	static String* New(const byte* buffer, int bufferLength);
+	String(const byte* buffer, int bufferLength);
 	String(const String& str);
 	String& operator=(const String& str);
 	virtual Type GetValueType() const override final;
@@ -83,6 +83,7 @@ private:
 	friend class Object;
 	friend class Value;
 	friend struct ScriptException;
+	friend class Context;
 };
 
 class DllExport Function: public Value

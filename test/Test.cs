@@ -9,7 +9,7 @@ public class V8SimpleTests
 {
 	V8Simple.String Str(string str)
 	{
-		return new V8Simple.String(str);
+		return V8Simple.String.New(str);
 	}
 
 	[Test]

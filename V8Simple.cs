@@ -109,16 +109,20 @@ public class String : Value {
 		GetBuffer(buffer);
 		return System.Text.Encoding.UTF8.GetString(buffer);
 	}
-	public String(byte[] buffer) : this(buffer, buffer.Length) { }
-	public String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
-
-  public String(byte[] buffer, int bufferLength) : this(v8PINVOKE.new_String__SWIG_0(buffer, bufferLength), true) {
-  }
+	private String(byte[] buffer) : this(buffer, buffer.Length) { }
+	private String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
+	public static String New(string str)
+	{
+		return str == null ? null : new String(str);
+	}
 
   public static String New(byte[] buffer, int bufferLength) {
     global::System.IntPtr cPtr = v8PINVOKE.String_New(buffer, bufferLength);
     String ret = (cPtr == global::System.IntPtr.Zero) ? null : new String(cPtr, true);
     return ret;
+  }
+
+  public String(byte[] buffer, int bufferLength) : this(v8PINVOKE.new_String__SWIG_0(buffer, bufferLength), true) {
   }
 
   public String(String str) : this(v8PINVOKE.new_String__SWIG_1(String.getCPtr(str)), true) {
@@ -1889,11 +1893,11 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_Value")]
   public static extern void delete_Value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_0")]
-  public static extern global::System.IntPtr new_String__SWIG_0([global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg1, int jarg2);
-
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_String_New")]
   public static extern global::System.IntPtr String_New([global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_0")]
+  public static extern global::System.IntPtr new_String__SWIG_0([global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_String__SWIG_1")]
   public static extern global::System.IntPtr new_String__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);

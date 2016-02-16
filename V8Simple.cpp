@@ -20,7 +20,7 @@ String::String(const byte* buffer, int bufferLength)
 
 String* String::New(const byte* buffer, int bufferLength)
 {
-	return new String(buffer, bufferLength);
+	return buffer == nullptr ? nullptr : new String(buffer, bufferLength);
 }
 
 String& String::operator=(const String& str)

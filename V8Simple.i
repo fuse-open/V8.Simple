@@ -53,8 +53,12 @@
 		GetBuffer(buffer);
 		return System.Text.Encoding.UTF8.GetString(buffer);
 	}
-	public String(byte[] buffer) : this(buffer, buffer.Length) { }
-	public String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
+	private String(byte[] buffer) : this(buffer, buffer.Length) { }
+	private String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
+	public static String New(string str)
+	{
+		return str == null ? null : new String(str);
+	}
 %}
 
 // Make sure we return the correct objects in C#:
