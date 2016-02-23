@@ -49,16 +49,16 @@ public:
 	virtual void Delete();
 protected:
 	static Value* Wrap(
-		const V8Scope& scope,
 		v8::Local<v8::Value> value);
 	static Value* Wrap(
-		const V8Scope& scope,
-		v8::MaybeLocal<v8::Value> mvalue);
+		const v8::TryCatch& tryCatch,
+		v8::Local<v8::Value> value);
+	static Value* Wrap(
+		const v8::TryCatch& tryCatch,
+		v8::MaybeLocal<v8::Value> value);
 	static v8::Local<v8::Value> Unwrap(
-		const V8Scope& scope,
 		Value* value);
 	std::vector<v8::Local<v8::Value>> UnwrapVector(
-		const V8Scope& scope,
 		const std::vector<Value*>& values);
 	friend class Context;
 };
@@ -219,7 +219,8 @@ private:
 		int lineNumber,
 		const ::v8::String::Utf8Value& stackTrace,
 		const ::v8::String::Utf8Value& sourceLine);
-	friend void Throw(const V8Scope& scope);
+	friend void Throw(const v8::TryCatch& tryCatch);
+	friend class Value;
 };
 
 struct DllExport MessageHandler
@@ -246,6 +247,7 @@ public:
 	void Delete();
 
 	static const char* GetVersion();
+	static Value* ThrowException(Value* exception);
 
 	static void SetDebugMessageHandler(MessageHandler* debugMessageHandler);
 	static void SendDebugCommand(const String* command);

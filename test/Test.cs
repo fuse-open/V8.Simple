@@ -163,6 +163,28 @@ public class V8SimpleTests
 		}
 	}
 
+	class DelegateCallback: Callback
+	{
+		Func<UniqueValueVector, Value> _f;
+		public DelegateCallback(Func<UniqueValueVector, Value> f)
+		{
+			_f = f;
+		}
+		static List<object> _retained = new List<object>();
+		public override void Retain()
+		{
+			_retained.Add(this);
+		}
+		public override void Release()
+		{
+			_retained.Remove(this);
+		}
+		public override Value Call(UniqueValueVector args)
+		{
+			return _f(args);
+		}
+	}
+
 	[Test]
 	public void CallbackTests()
 	{
@@ -292,6 +314,22 @@ public class V8SimpleTests
 		{
 			var res = ((V8Simple.String)context.Evaluate(Str("UnicodeTests"), Str("\"" + str + "\""))).GetValue();
 			Assert.AreEqual(str, res);
+		}
+	}
+
+	[Test]
+	public void CallbackExceptionTests()
+	{
+		bool handled;
+		var scriptExceptionHandler = new DelegateScriptExceptionHandler(x => { handled = true; });
+		using (var context = new Context(
+			scriptExceptionHandler,
+			null))
+		{
+			var f = context.Evaluate(Str("CallbackExceptionTests"), Str("(function(f) { f(); })")) as V8Simple.Function;
+			handled = false;
+			f.Call(new ValueVector {new DelegateCallback(x => Context.ThrowException(Str("My Exception")))});
+			Assert.IsTrue(handled, "Test1");
 		}
 	}
 

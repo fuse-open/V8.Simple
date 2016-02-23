@@ -1539,6 +1539,18 @@ SWIGEXPORT char * SWIGSTDCALL CSharp_Context_GetVersion() {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_Context_ThrowException(void * jarg1) {
+  void * jresult ;
+  V8Simple::Value *arg1 = (V8Simple::Value *) 0 ;
+  V8Simple::Value *result = 0 ;
+  
+  arg1 = (V8Simple::Value *)jarg1; 
+  result = (V8Simple::Value *)V8Simple::Context::ThrowException(arg1);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_Context_SetDebugMessageHandler(void * jarg1) {
   V8Simple::MessageHandler *arg1 = (V8Simple::MessageHandler *) 0 ;
   

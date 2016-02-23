@@ -879,6 +879,12 @@ public class Context : global::System.IDisposable {
     return ret;
   }
 
+  public static Value ThrowException(Value exception) {
+	global::System.IntPtr cPtr = v8PINVOKE.Context_ThrowException(Value.getCPtr(exception));
+	Value ret = (Value) v8PINVOKE.InstantiateConcreteValue(cPtr, true);
+	return ret;
+}
+
   public static void SetDebugMessageHandler(MessageHandler debugMessageHandler) {
     v8PINVOKE.Context_SetDebugMessageHandler(MessageHandler.getCPtr(debugMessageHandler));
   }
@@ -2099,6 +2105,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_GetVersion")]
   public static extern string Context_GetVersion();
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_ThrowException")]
+  public static extern global::System.IntPtr Context_ThrowException(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_SetDebugMessageHandler")]
   public static extern void Context_SetDebugMessageHandler(global::System.Runtime.InteropServices.HandleRef jarg1);
