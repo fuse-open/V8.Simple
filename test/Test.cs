@@ -3,6 +3,7 @@ using V8Simple = Fuse.Scripting.V8.Simple;
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using System.Runtime.InteropServices;
 
 [TestFixture]
 public class V8SimpleTests
@@ -165,12 +166,12 @@ public class V8SimpleTests
 
 	class DelegateCallback: Callback
 	{
+		static List<object> _retained = new List<object>();
 		Func<UniqueValueVector, Value> _f;
 		public DelegateCallback(Func<UniqueValueVector, Value> f)
 		{
 			_f = f;
 		}
-		static List<object> _retained = new List<object>();
 		public override void Retain()
 		{
 			_retained.Add(this);
@@ -193,9 +194,36 @@ public class V8SimpleTests
 			var f = (V8Simple.Function)context.Evaluate(
 				Str("CallbackTests"),
 				Str("(function(f) { return f(12, 13) + f(10, 20); })"));
+			context.IdleNotificationDeadline(1);
+			System.GC.Collect();
+			System.GC.WaitForPendingFinalizers();
 			Assert.AreEqual(
 				((V8Simple.Int)f.Call(new ValueVector { new MyCallback() })).GetValue(),
 				12 + 13 + 1000 + 10 + 20 + 1000);
+			context.IdleNotificationDeadline(1);
+			System.GC.Collect();
+			System.GC.WaitForPendingFinalizers();
+		}
+	}
+
+	[Test]
+	public void CallbackTests2()
+	{
+		using (var context = new Context(null, null))
+		{
+			for (int i = 0; i < 10; ++i)
+			{
+				var f = (V8Simple.Function)context.Evaluate(
+					Str("CallbackTests2"),
+					Str("(function(f) { return (function() { return f(12, 13) + f(10, 20); }); })"));
+				var g = (V8Simple.Function)f.Call(new ValueVector { new MyCallback() });
+				context.IdleNotificationDeadline(1);
+				System.GC.Collect();
+				System.GC.WaitForPendingFinalizers();
+				Assert.AreEqual(
+					((V8Simple.Int)g.Call(new ValueVector { })).GetValue(),
+					12 + 13 + 1000 + 10 + 20 + 1000);
+			}
 		}
 	}
 

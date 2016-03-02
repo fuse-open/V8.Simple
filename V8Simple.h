@@ -20,9 +20,9 @@ namespace V8Simple
 typedef unsigned char byte;
 struct V8Scope;
 class Object;
+class Context;
+class String;
 
-v8::Isolate* CurrentIsolate();
-v8::Local<v8::Context> CurrentContext();
 void Throw(const V8Scope& scope);
 
 enum class DllExport Type
@@ -56,10 +56,10 @@ protected:
 	static Value* Wrap(
 		const v8::TryCatch& tryCatch,
 		v8::MaybeLocal<v8::Value> value);
-	static v8::Local<v8::Value> Unwrap(
-		Value* value);
-	std::vector<v8::Local<v8::Value>> UnwrapVector(
-		const std::vector<Value*>& values);
+	static v8::Local<v8::Value> Unwrap(Value* value);
+	std::vector<v8::Local<v8::Value>> UnwrapVector(const std::vector<Value*>& values);
+	static v8::Local<v8::String> ToV8String(const v8::TryCatch& tryCatch, const String& str);
+	static v8::Local<v8::String> ToV8String(const String& str);
 	friend class Context;
 };
 
@@ -99,7 +99,7 @@ public:
 	virtual ~Function();
 private:
 	Function(v8::Local<v8::Function> function);
-	v8::Persistent<v8::Function>* _function;
+	v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>>* _function;
 	friend class Value;
 };
 
@@ -133,7 +133,7 @@ public:
 	virtual ~Object();
 private:
 	Object(v8::Local<v8::Object> object);
-	v8::Persistent<v8::Object>* _object;
+	v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>>* _object;
 	friend class Context;
 	friend class Value;
 	friend class Function;
@@ -151,7 +151,7 @@ public:
 	virtual ~Array();
 private:
 	Array(v8::Local<v8::Array> array);
-	v8::Persistent<v8::Array>* _array;
+	v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array>>* _array;
 	friend class Value;
 };
 
@@ -253,29 +253,30 @@ public:
 	static void SendDebugCommand(const String* command);
 	static void ProcessDebugMessages();
 private:
-	static Context* _globalContext;
 	static v8::Platform* _platform;
+	static v8::Isolate* _isolate;
+	static v8::Isolate* _conversionIsolate;
+	static Context* _globalContext;
 
-	MessageHandler* _debugMessageHandler;
-	v8::Isolate* _isolate;
-	v8::Isolate* _conversionIsolate;
-	v8::Persistent<v8::Context>* _context;
+	static MessageHandler* _debugMessageHandler;
+	v8::Persistent<v8::Context, v8::CopyablePersistentTraits<v8::Context> >* _context;
 	Function* _instanceOf;
 	ScriptExceptionHandler* _scriptExceptionHandler;
 	MessageHandler* _runtimeExceptionHandler;
 
-	static void HandleScriptException(
-		const ScriptException& e);
-	static void HandleRuntimeException(
-		const char* messageBuffer);
+	void HandleScriptException(const ScriptException& e) const;
+	void HandleRuntimeException(const char* messageBuffer) const;
 
-	friend v8::Isolate* CurrentIsolate();
-	friend v8::Local<v8::Context> CurrentContext();
+	v8::Local<v8::Context> V8Context() const;
+
+	static Context* Global();
+	static v8::Isolate* Isolate();
 	friend struct V8Scope;
 	friend class Value;
 	friend class Array;
 	friend class Function;
 	friend class Object;
+	friend void Throw(const v8::TryCatch& tryCatch);
 };
 
 } // namespace V8Simple

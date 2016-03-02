@@ -126,8 +126,6 @@ V8Simple::Value*
   SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, $1.what());
   return $null;
 }
-%ignore V8Simple::CurrentContext();
-%ignore V8Simple::CurrentIsolate();
 %ignore V8Simple::Throw(const V8Scope& scope);
 %include "V8Simple.h"
 %template(Int) V8Simple::Primitive<int>;
