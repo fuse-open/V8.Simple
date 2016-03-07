@@ -7,6 +7,10 @@
 %apply unsigned char INPUT[] { const V8Simple::byte* buffer }
 %apply unsigned char OUTPUT[] { V8Simple::byte* outBuffer }
 
+// void* to IntPtr
+%typemap(csdirectorin) void *VOID_INT_PTR "$1"
+%apply void *VOID_INT_PTR { void * }
+
 %typemap(csdestruct, methodname="Dispose", methodmodifiers="public") SWIGTYPE {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
@@ -80,6 +84,7 @@
 			case Type.Object: return new Object(cPtr, owner);
 			case Type.Function: return new Function(cPtr, owner);
 			case Type.Array: return new Array(cPtr, owner);
+			case Type.External: return new External(cPtr, owner);
 		}
 		throw new global::System.Exception("V8Simple: Unhandled value type");
 	}
@@ -91,6 +96,7 @@ V8Simple::Value*
 	$csclassname ret = ($csclassname) $modulePINVOKE.InstantiateConcreteValue(cPtr, $owner);$excode
 	return ret;
 }
+
 %include <std_vector.i>
 %newobject V8Simple::Context::Evaluate(const String*, const String*);
 %newobject V8Simple::Context::GlobalObject();
@@ -109,6 +115,7 @@ V8Simple::Value*
 %ignore V8Simple::Primitive<int>::New(const int& value);
 %ignore V8Simple::Primitive<double>::New(const double& value);
 %ignore V8Simple::Primitive<bool>::New(const bool& value);
+%ignore V8Simple::External::New(void* value);
 %ignore V8Simple::Context::New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
 %newobject V8Simple::Array::Get(int);
 %newobject V8Simple::ScriptException::GetName();
@@ -121,6 +128,7 @@ V8Simple::Value*
 %newobject V8Simple::ScriptException::Copy();
 %feature("director") V8Simple::MessageHandler;
 %feature("director") V8Simple::ScriptExceptionHandler;
+%feature("director") V8Simple::ExternalFreer;
 %feature("director") V8Simple::Callback;
 %typemap(throws, canthrow=1) std::runtime_error {
   SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, $1.what());

@@ -18,7 +18,8 @@ public enum Type {
   Object,
   Array,
   Function,
-  Callback
+  Callback,
+  External
 }
 
 }
@@ -563,6 +564,65 @@ public class Callback : Value {
 }
 namespace Fuse.Scripting.V8.Simple {
 
+public class External : Value {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+
+  internal External(global::System.IntPtr cPtr, bool cMemoryOwn) : base(v8PINVOKE.External_SWIGUpcast(cPtr), cMemoryOwn) {
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(External obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~External() {
+    Dispose();
+  }
+
+  public override void Dispose() {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_External(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+      base.Dispose();
+  }
+
+	public override bool Equals(object o) {
+		if (o != null && o is External)
+		{
+			return Equals((External)o);
+		}
+		return false;
+	}
+	public bool Equals(External o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
+  public External(global::System.IntPtr value) : this(v8PINVOKE.new_External(value), true) {
+  }
+
+  public override Type GetValueType() {
+    Type ret = (Type)v8PINVOKE.External_GetValueType(swigCPtr);
+    return ret;
+  }
+
+  public global::System.IntPtr GetValue() {
+    global::System.IntPtr ret = v8PINVOKE.External_GetValue(swigCPtr);
+    return ret;
+  }
+
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
 public class ScriptException : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
@@ -808,6 +868,82 @@ public class ScriptExceptionHandler : global::System.IDisposable {
 }
 namespace Fuse.Scripting.V8.Simple {
 
+public class ExternalFreer : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal ExternalFreer(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ExternalFreer obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~ExternalFreer() {
+    Dispose();
+  }
+
+  public virtual void Dispose() {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          v8PINVOKE.delete_ExternalFreer(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+  }
+
+	public override bool Equals(object o) {
+		if (o != null && o is ExternalFreer)
+		{
+			return Equals((ExternalFreer)o);
+		}
+		return false;
+	}
+	public bool Equals(ExternalFreer o) {
+		return o.swigCPtr.Handle.Equals(this.swigCPtr.Handle);
+	}
+	public override int GetHashCode() {
+		return swigCPtr.Handle.GetHashCode();
+	}
+
+  public virtual void Free(global::System.IntPtr external) {
+    if (SwigDerivedClassHasMethod("Free", swigMethodTypes0)) v8PINVOKE.ExternalFreer_FreeSwigExplicitExternalFreer(swigCPtr, external); else v8PINVOKE.ExternalFreer_Free(swigCPtr, external);
+  }
+
+  public ExternalFreer() : this(v8PINVOKE.new_ExternalFreer(), true) {
+    SwigDirectorConnect();
+  }
+
+  private void SwigDirectorConnect() {
+    if (SwigDerivedClassHasMethod("Free", swigMethodTypes0))
+      swigDelegate0 = new SwigDelegateExternalFreer_0(SwigDirectorFree);
+    v8PINVOKE.ExternalFreer_director_connect(swigCPtr, swigDelegate0);
+  }
+
+  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
+    global::System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(methodName, global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, methodTypes, null);
+    bool hasDerivedMethod = methodInfo.DeclaringType.IsSubclassOf(typeof(ExternalFreer));
+    return hasDerivedMethod;
+  }
+
+  private void SwigDirectorFree(global::System.IntPtr external) {
+    Free(external);
+  }
+
+  public delegate void SwigDelegateExternalFreer_0(global::System.IntPtr external);
+
+  private SwigDelegateExternalFreer_0 swigDelegate0;
+
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(global::System.IntPtr) };
+}
+
+}
+namespace Fuse.Scripting.V8.Simple {
+
 public class Context : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
@@ -850,7 +986,13 @@ public class Context : global::System.IDisposable {
 		return swigCPtr.Handle.GetHashCode();
 	}
 
-  public Context(ScriptExceptionHandler scriptExceptionHandler, MessageHandler runtimeExceptionHandler) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler), MessageHandler.getCPtr(runtimeExceptionHandler)), true) {
+  public Context(ScriptExceptionHandler scriptExceptionHandler, MessageHandler runtimeExceptionHandler, ExternalFreer externalFreer) : this(v8PINVOKE.new_Context(ScriptExceptionHandler.getCPtr(scriptExceptionHandler), MessageHandler.getCPtr(runtimeExceptionHandler), ExternalFreer.getCPtr(externalFreer)), true) {
+  }
+
+  public static Context New(ScriptExceptionHandler scriptExceptionHandler, MessageHandler runtimeExceptionHandler, ExternalFreer externalFreer) {
+    global::System.IntPtr cPtr = v8PINVOKE.Context_New(ScriptExceptionHandler.getCPtr(scriptExceptionHandler), MessageHandler.getCPtr(runtimeExceptionHandler), ExternalFreer.getCPtr(externalFreer));
+    Context ret = (cPtr == global::System.IntPtr.Zero) ? null : new Context(cPtr, false);
+    return ret;
   }
 
   public Value Evaluate(String fileName, String code) {
@@ -1888,6 +2030,7 @@ class v8PINVOKE {
 			case Type.Object: return new Object(cPtr, owner);
 			case Type.Function: return new Function(cPtr, owner);
 			case Type.Array: return new Array(cPtr, owner);
+			case Type.External: return new External(cPtr, owner);
 		}
 		throw new global::System.Exception("V8Simple: Unhandled value type");
 	}
@@ -2028,6 +2171,18 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_director_connect")]
   public static extern void Callback_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, Callback.SwigDelegateCallback_0 delegate0, Callback.SwigDelegateCallback_1 delegate1, Callback.SwigDelegateCallback_2 delegate2, Callback.SwigDelegateCallback_3 delegate3);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_External")]
+  public static extern global::System.IntPtr new_External(global::System.IntPtr jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_External_GetValueType")]
+  public static extern int External_GetValueType(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_External_GetValue")]
+  public static extern global::System.IntPtr External_GetValue(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_External")]
+  public static extern void delete_External(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptException_GetName")]
   public static extern global::System.IntPtr ScriptException_GetName(global::System.Runtime.InteropServices.HandleRef jarg1);
 
@@ -2085,8 +2240,26 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ScriptExceptionHandler_director_connect")]
   public static extern void ScriptExceptionHandler_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ScriptExceptionHandler.SwigDelegateScriptExceptionHandler_0 delegate0);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ExternalFreer_Free")]
+  public static extern void ExternalFreer_Free(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.IntPtr jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ExternalFreer_FreeSwigExplicitExternalFreer")]
+  public static extern void ExternalFreer_FreeSwigExplicitExternalFreer(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.IntPtr jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_delete_ExternalFreer")]
+  public static extern void delete_ExternalFreer(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_ExternalFreer")]
+  public static extern global::System.IntPtr new_ExternalFreer();
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_ExternalFreer_director_connect")]
+  public static extern void ExternalFreer_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, ExternalFreer.SwigDelegateExternalFreer_0 delegate0);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_new_Context")]
-  public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+  public static extern global::System.IntPtr new_Context(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_New")]
+  public static extern global::System.IntPtr Context_New(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_Evaluate")]
   public static extern global::System.IntPtr Context_Evaluate(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
@@ -2312,6 +2485,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Callback_SWIGUpcast")]
   public static extern global::System.IntPtr Callback_SWIGUpcast(global::System.IntPtr jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_External_SWIGUpcast")]
+  public static extern global::System.IntPtr External_SWIGUpcast(global::System.IntPtr jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Int_SWIGUpcast")]
   public static extern global::System.IntPtr Int_SWIGUpcast(global::System.IntPtr jarg1);

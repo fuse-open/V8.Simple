@@ -66,5 +66,20 @@ private:
     void swig_init_callbacks();
 };
 
+struct SwigDirector_ExternalFreer : public V8Simple::ExternalFreer, public Swig::Director {
+
+public:
+    SwigDirector_ExternalFreer();
+    virtual void Free(void *external);
+    virtual ~SwigDirector_ExternalFreer();
+
+    typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);
+    void swig_connect_director(SWIG_Callback0_t callbackFree);
+
+private:
+    SWIG_Callback0_t swig_callbackFree;
+    void swig_init_callbacks();
+};
+
 
 #endif

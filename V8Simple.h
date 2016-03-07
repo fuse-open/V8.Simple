@@ -35,6 +35,7 @@ enum class DllExport Type
 	Array,
 	Function,
 	Callback,
+	External,
 };
 
 template<class T> struct TypeTag { };
@@ -133,7 +134,7 @@ public:
 	virtual ~Object();
 private:
 	Object(v8::Local<v8::Object> object);
-	v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>>* _object;
+	v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object> >* _object;
 	friend class Context;
 	friend class Value;
 	friend class Function;
@@ -151,7 +152,7 @@ public:
 	virtual ~Array();
 private:
 	Array(v8::Local<v8::Array> array);
-	v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array>>* _array;
+	v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array> >* _array;
 	friend class Value;
 };
 
@@ -165,6 +166,21 @@ public:
 	virtual void Release() { }
 };
 
+class DllExport External: public Value
+{
+public:
+	External(void* value);
+	static External* New(void* value);
+	virtual Type GetValueType() const override;
+	void* GetValue();
+
+	virtual ~External();
+private:
+	External(v8::Local<v8::External> external);
+	v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >* _external;
+	friend class Value;
+};
+
 template<class T>
 class DllExport Primitive: public Value
 {
@@ -176,10 +192,6 @@ public:
 	}
 	virtual Type GetValueType() const override final { return TypeTag<Primitive<T>>::Tag; }
 	T GetValue() const { return _value; }
-	virtual void Delete() override
-	{
-		delete this;
-	}
 private:
 	const T _value;
 };
@@ -192,6 +204,7 @@ template<> struct TypeTag<Object> { static const Type Tag = Type::Object; };
 template<> struct TypeTag<Array> { static const Type Tag = Type::Array; };
 template<> struct TypeTag<Function> { static const Type Tag = Type::Function; };
 template<> struct TypeTag<Callback> { static const Type Tag = Type::Callback; };
+template<> struct TypeTag<External> { static const Type Tag = Type::External; };
 template<> struct TypeTag<Int> { static const Type Tag = Type::Int; };
 template<> struct TypeTag<Double> { static const Type Tag = Type::Double; };
 template<> struct TypeTag<String> { static const Type Tag = Type::String; };
@@ -235,11 +248,17 @@ struct DllExport ScriptExceptionHandler
 	virtual ~ScriptExceptionHandler() { }
 };
 
+struct DllExport ExternalFreer
+{
+	virtual void Free(void* external) { }
+	virtual ~ExternalFreer() { }
+};
+
 class DllExport Context
 {
 public:
-	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
-	static Context* New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
+	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler, ExternalFreer* externalFreer);
+	static Context* New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler, ExternalFreer* externalFreer);
 	Value* Evaluate(const String* fileName, const String* code);
 	Object* GlobalObject();
 	bool IdleNotificationDeadline(double deadlineInSeconds);
@@ -263,6 +282,7 @@ private:
 	Function* _instanceOf;
 	ScriptExceptionHandler* _scriptExceptionHandler;
 	MessageHandler* _runtimeExceptionHandler;
+	ExternalFreer* _externalFreer;
 
 	void HandleScriptException(const ScriptException& e) const;
 	void HandleRuntimeException(const char* messageBuffer) const;
@@ -276,6 +296,7 @@ private:
 	friend class Array;
 	friend class Function;
 	friend class Object;
+	friend class External;
 	friend void Throw(const v8::TryCatch& tryCatch);
 };
 

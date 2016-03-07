@@ -16,7 +16,7 @@ public class V8SimpleTests
 	[Test]
 	public void PrimitiveTests()
 	{
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			{
 				var result = context.Evaluate(Str("ValueTests"), Str("12 + 13"));
@@ -44,7 +44,7 @@ public class V8SimpleTests
 	[Test]
 	public void ObjectTests()
 	{
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			{
 				var obj = (V8Simple.Object)context.Evaluate(Str("ObjectTests"), Str("({ a: \"abc\", b: 123 })"));
@@ -102,7 +102,7 @@ public class V8SimpleTests
 	[Test]
 	public void ArrayTests()
 	{
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			var arr = (V8Simple.Array)context.Evaluate(Str("ArrayTests"), Str("[\"abc\", 123]"));
 			Assert.AreEqual(arr.GetValueType(), V8Simple.Type.Array);
@@ -121,7 +121,7 @@ public class V8SimpleTests
 	[Test]
 	public void FunctionTests()
 	{
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			var fun = (V8Simple.Function)context.Evaluate(Str("FunctionTests"), Str("(function(x, y) { return x * y; })"));
 			Assert.IsNotNull(fun, "Test0");
@@ -189,7 +189,7 @@ public class V8SimpleTests
 	[Test]
 	public void CallbackTests()
 	{
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			var f = (V8Simple.Function)context.Evaluate(
 				Str("CallbackTests"),
@@ -209,7 +209,7 @@ public class V8SimpleTests
 	[Test]
 	public void CallbackTests2()
 	{
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			for (int i = 0; i < 10; ++i)
 			{
@@ -251,7 +251,8 @@ public class V8SimpleTests
 		var runtimeExceptionHandler = new DelegateMessageHandler(x => { runtimeHandled = true; });
 		using (var context = new Context(
 			scriptExceptionHandler,
-			runtimeExceptionHandler))
+			runtimeExceptionHandler,
+			null))
 		{
 			handled = false;
 			context.Evaluate(Str("ErrorTests"), Str("new ...."));
@@ -317,7 +318,7 @@ public class V8SimpleTests
 	{
 		V8Simple.Context.SetDebugMessageHandler(null);
 		V8Simple.Context.ProcessDebugMessages();
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			var messageHandler = new DelegateMessageHandler(x => { return; });
 			V8Simple.Context.SetDebugMessageHandler(messageHandler);
@@ -338,7 +339,7 @@ public class V8SimpleTests
 	public void UnicodeTests()
 	{
 		string str = "ç, é, õ";
-		using (var context = new Context(null, null))
+		using (var context = new Context(null, null, null))
 		{
 			var res = ((V8Simple.String)context.Evaluate(Str("UnicodeTests"), Str("\"" + str + "\""))).GetValue();
 			Assert.AreEqual(str, res);
@@ -352,12 +353,73 @@ public class V8SimpleTests
 		var scriptExceptionHandler = new DelegateScriptExceptionHandler(x => { handled = true; });
 		using (var context = new Context(
 			scriptExceptionHandler,
+			null,
 			null))
 		{
 			var f = context.Evaluate(Str("CallbackExceptionTests"), Str("(function(f) { f(); })")) as V8Simple.Function;
 			handled = false;
 			f.Call(new ValueVector {new DelegateCallback(x => Context.ThrowException(Str("My Exception")))});
 			Assert.IsTrue(handled, "Test1");
+		}
+	}
+
+	class SomeObject
+	{
+		public string SomeField;
+		public SomeObject(string someField)
+		{
+			SomeField = someField;
+		}
+	}
+
+	class MyExternalFreer: ExternalFreer
+	{
+		public static IntPtr GetIntPtr(object o)
+		{
+			return GCHandle.ToIntPtr(GCHandle.Alloc(o));
+		}
+		public static object GetObject(IntPtr ptr)
+		{
+			return GCHandle.FromIntPtr(ptr).Target;
+		}
+		public override void Free(IntPtr ptr)
+		{
+			GCHandle.FromIntPtr(ptr).Free();
+		}
+	}
+
+	[Test]
+	public void ExternalTests()
+	{
+		using (var context = new Context(null, null, new MyExternalFreer()))
+		{
+			SomeObject someObject = new SomeObject("theField");
+			var f = context.Evaluate(Str("ExternalTests"), Str("(function(x) { return x; })")) as V8Simple.Function;
+			var res = f.Call(new ValueVector { new External(MyExternalFreer.GetIntPtr(someObject)) });
+			Assert.AreEqual(res.GetValueType(), V8Simple.Type.External);
+			var ext = res as V8Simple.External;
+			Assert.IsNotNull(ext);
+			var o1 = ext.GetValue();
+			Assert.IsNotNull(o1);
+			var o2 = MyExternalFreer.GetObject(o1);
+			Assert.IsNotNull(o2);
+			var o3 = o2 as SomeObject;
+			Assert.IsNotNull(o3);
+			Assert.AreEqual(o3.SomeField, "theField");
+			context.IdleNotificationDeadline(1);
+			System.GC.Collect();
+			System.GC.WaitForPendingFinalizers();
+
+			var res2 = f.Call(new ValueVector { ext });
+			Assert.AreEqual(res2.GetValueType(), V8Simple.Type.External);
+			var ext2 = res2 as V8Simple.External;
+			var o12 = ext2.GetValue();
+			Assert.IsNotNull(o12);
+			var o22 = MyExternalFreer.GetObject(o12);
+			Assert.IsNotNull(o22);
+			var o32 = o22 as SomeObject;
+			Assert.IsNotNull(o32);
+			Assert.AreEqual(o32.SomeField, "theField");
 		}
 	}
 
@@ -368,7 +430,7 @@ public class V8SimpleTests
 		bool handled;
 		var scriptExceptionHandler = new DelegateScriptExceptionHandler(x => { handled = true; });
 		var runtimeExceptionHandler = new DelegateMessageHandler(x => { handled = true; });
-		var context = new Context(scriptExceptionHandler, runtimeExceptionHandler);
+		var context = new Context(scriptExceptionHandler, runtimeExceptionHandler, null);
 		Assert.AreEqual(
 			((V8Simple.Int)context.Evaluate(Str("ContextTests"), Str("1 + 2"))).GetValue(),
 			3);

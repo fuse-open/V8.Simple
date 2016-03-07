@@ -204,6 +204,10 @@ Value* Value::Wrap(const v8::TryCatch& tryCatch, v8::Local<v8::Value> value)
 			tryCatch,
 			value->ToObject(context)).As<v8::Function>());
 	}
+	if (value->IsExternal())
+	{
+		return new External(value.As<v8::External>()->Value());
+	}
 	if (value->IsObject())
 	{
 		return new Object(FromJust(
@@ -268,7 +272,11 @@ v8::Local<v8::Value> Value::Unwrap(Value* value)
 		case Type::Function:
 			return static_cast<Function*>(value)
 				->_function->Get(isolate);
+		case Type::External:
+			return static_cast<External*>(value)
+				->_external->Get(isolate);
 		case Type::Callback:
+		{
 			Callback* callback = static_cast<Callback*>(value);
 			callback->Retain();
 			auto localCallback = v8::External::New(isolate, callback);
@@ -340,6 +348,7 @@ v8::Local<v8::Value> Value::Unwrap(Value* value)
 				},
 				localCallback.As<v8::Value>()));
 		}
+	}
 	return v8::Null(isolate).As<v8::Value>();
 }
 
@@ -797,6 +806,68 @@ Value* Callback::Call(UniqueValueVector* args)
 
 Type Callback::GetValueType() const { return Type::Callback; }
 
+External::External(void* value)
+{
+	V8Scope scope;
+
+	auto isolate = Context::Isolate();
+	auto localExternal = v8::External::New(isolate, value);
+	_external = new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(Context::Isolate(), localExternal);
+
+	auto finalizer
+		= new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(isolate, localExternal);
+
+	struct Closure
+	{
+		v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >* persistent;
+		void* value;
+	};
+
+	auto closure = new Closure{finalizer, value};
+
+	finalizer->SetWeak(
+		closure,
+		[] (const v8::WeakCallbackInfo<Closure>& data)
+		{
+			auto closure = data.GetParameter();
+			auto pext = closure->persistent;
+			auto value = closure->value;
+			if (Context::Global()->_externalFreer != nullptr)
+			{
+				Context::Global()->_externalFreer->Free(value);
+			}
+			pext->ClearWeak();
+			delete pext;
+			delete closure;
+		},
+		v8::WeakCallbackType::kParameter);
+}
+
+External* External::New(void* value)
+{
+	return new External(value);
+}
+
+External::External(v8::Local<v8::External> external)
+	: _external(new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(Context::Isolate(), external))
+{ }
+
+Type External::GetValueType() const { return Type::External; }
+
+void* External::GetValue()
+{
+	V8Scope scope;
+	auto isolate = Context::Isolate();
+	return _external->Get(isolate)->Value();
+}
+
+External::~External()
+{
+	v8::Locker locker(Context::Isolate());
+	v8::Isolate::Scope isolateScope(Context::Isolate());
+	delete _external;
+}
+
 struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 {
 	virtual void* Allocate(size_t length)
@@ -922,10 +993,11 @@ v8::Isolate* Context::_conversionIsolate = nullptr;
 MessageHandler* Context::_debugMessageHandler = nullptr;
 Context* Context::_globalContext = nullptr;
 
-Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler)
+Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler, ExternalFreer* externalFreer)
+	: _scriptExceptionHandler(scriptExceptionHandler)
+	, _runtimeExceptionHandler(runtimeExceptionHandler)
+	, _externalFreer(externalFreer)
 {
-	_scriptExceptionHandler = scriptExceptionHandler;
-	_runtimeExceptionHandler = runtimeExceptionHandler;
 
 	if (_globalContext != nullptr)
 	{
@@ -988,9 +1060,12 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	}
 }
 
-Context* Context::New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler)
+Context* Context::New(
+	ScriptExceptionHandler* scriptExceptionHandler,
+	MessageHandler* runtimeExceptionHandler,
+	ExternalFreer* externalFreer)
 {
-	return new Context(scriptExceptionHandler, runtimeExceptionHandler);
+	return new Context(scriptExceptionHandler, runtimeExceptionHandler, externalFreer);
 }
 
 Context::~Context()

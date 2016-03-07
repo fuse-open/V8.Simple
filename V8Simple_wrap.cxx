@@ -711,6 +711,35 @@ void SwigDirector_ScriptExceptionHandler::swig_init_callbacks() {
   swig_callbackHandle = 0;
 }
 
+SwigDirector_ExternalFreer::SwigDirector_ExternalFreer() : V8Simple::ExternalFreer(), Swig::Director() {
+  swig_init_callbacks();
+}
+
+void SwigDirector_ExternalFreer::Free(void *external) {
+  void * jexternal = 0 ;
+  
+  if (!swig_callbackFree) {
+    V8Simple::ExternalFreer::Free(external);
+    return;
+  } else {
+    jexternal = (void *) external; 
+    swig_callbackFree(jexternal);
+  }
+}
+
+SwigDirector_ExternalFreer::~SwigDirector_ExternalFreer() {
+  
+}
+
+
+void SwigDirector_ExternalFreer::swig_connect_director(SWIG_Callback0_t callbackFree) {
+  swig_callbackFree = callbackFree;
+}
+
+void SwigDirector_ExternalFreer::swig_init_callbacks() {
+  swig_callbackFree = 0;
+}
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -1255,6 +1284,50 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Callback_director_connect(void *objarg, SwigD
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_External(void * jarg1) {
+  void * jresult ;
+  void *arg1 = (void *) 0 ;
+  V8Simple::External *result = 0 ;
+  
+  arg1 = (void *)jarg1; 
+  result = (V8Simple::External *)new V8Simple::External(arg1);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_External_GetValueType(void * jarg1) {
+  int jresult ;
+  V8Simple::External *arg1 = (V8Simple::External *) 0 ;
+  V8Simple::Type result;
+  
+  arg1 = (V8Simple::External *)jarg1; 
+  result = (V8Simple::Type)((V8Simple::External const *)arg1)->GetValueType();
+  jresult = (int)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_External_GetValue(void * jarg1) {
+  void * jresult ;
+  V8Simple::External *arg1 = (V8Simple::External *) 0 ;
+  void *result = 0 ;
+  
+  arg1 = (V8Simple::External *)jarg1; 
+  result = (void *)(arg1)->GetValue();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_External(void * jarg1) {
+  V8Simple::External *arg1 = (V8Simple::External *) 0 ;
+  
+  arg1 = (V8Simple::External *)jarg1; 
+  delete arg1;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_ScriptException_GetName(void * jarg1) {
   void * jresult ;
   V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
@@ -1457,15 +1530,80 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_director_connect(void 
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_Context(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ExternalFreer_Free(void * jarg1, void * jarg2) {
+  V8Simple::ExternalFreer *arg1 = (V8Simple::ExternalFreer *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  arg1 = (V8Simple::ExternalFreer *)jarg1; 
+  arg2 = (void *)jarg2; 
+  (arg1)->Free(arg2);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ExternalFreer_FreeSwigExplicitExternalFreer(void * jarg1, void * jarg2) {
+  V8Simple::ExternalFreer *arg1 = (V8Simple::ExternalFreer *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  arg1 = (V8Simple::ExternalFreer *)jarg1; 
+  arg2 = (void *)jarg2; 
+  (arg1)->V8Simple::ExternalFreer::Free(arg2);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_ExternalFreer(void * jarg1) {
+  V8Simple::ExternalFreer *arg1 = (V8Simple::ExternalFreer *) 0 ;
+  
+  arg1 = (V8Simple::ExternalFreer *)jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ExternalFreer() {
+  void * jresult ;
+  V8Simple::ExternalFreer *result = 0 ;
+  
+  result = (V8Simple::ExternalFreer *)new SwigDirector_ExternalFreer();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ExternalFreer_director_connect(void *objarg, SwigDirector_ExternalFreer::SWIG_Callback0_t callback0) {
+  V8Simple::ExternalFreer *obj = (V8Simple::ExternalFreer *)objarg;
+  SwigDirector_ExternalFreer *director = dynamic_cast<SwigDirector_ExternalFreer *>(obj);
+  if (director) {
+    director->swig_connect_director(callback0);
+  }
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Context(void * jarg1, void * jarg2, void * jarg3) {
   void * jresult ;
   V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
   V8Simple::MessageHandler *arg2 = (V8Simple::MessageHandler *) 0 ;
+  V8Simple::ExternalFreer *arg3 = (V8Simple::ExternalFreer *) 0 ;
   V8Simple::Context *result = 0 ;
   
   arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
   arg2 = (V8Simple::MessageHandler *)jarg2; 
-  result = (V8Simple::Context *)new V8Simple::Context(arg1,arg2);
+  arg3 = (V8Simple::ExternalFreer *)jarg3; 
+  result = (V8Simple::Context *)new V8Simple::Context(arg1,arg2,arg3);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Context_New(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
+  V8Simple::ScriptExceptionHandler *arg1 = (V8Simple::ScriptExceptionHandler *) 0 ;
+  V8Simple::MessageHandler *arg2 = (V8Simple::MessageHandler *) 0 ;
+  V8Simple::ExternalFreer *arg3 = (V8Simple::ExternalFreer *) 0 ;
+  V8Simple::Context *result = 0 ;
+  
+  arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
+  arg2 = (V8Simple::MessageHandler *)jarg2; 
+  arg3 = (V8Simple::ExternalFreer *)jarg3; 
+  result = (V8Simple::Context *)V8Simple::Context::New(arg1,arg2,arg3);
   jresult = (void *)result; 
   return jresult;
 }
@@ -2543,6 +2681,10 @@ SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Array_SWIGUpcast(V8Simple::Array
 }
 
 SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_Callback_SWIGUpcast(V8Simple::Callback *jarg1) {
+    return (V8Simple::Value *)jarg1;
+}
+
+SWIGEXPORT V8Simple::Value * SWIGSTDCALL CSharp_External_SWIGUpcast(V8Simple::External *jarg1) {
     return (V8Simple::Value *)jarg1;
 }
 
