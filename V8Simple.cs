@@ -366,6 +366,11 @@ public class Object : Value {
     return ret;
   }
 
+  public global::System.IntPtr GetArrayBufferData() {
+    global::System.IntPtr ret = v8PINVOKE.Object_GetArrayBufferData(swigCPtr);
+    return ret;
+  }
+
   public bool StrictEquals(Object arg0) {
     bool ret = v8PINVOKE.Object_StrictEquals(swigCPtr, Object.getCPtr(arg0));
     return ret;
@@ -1014,6 +1019,12 @@ public class Context : global::System.IDisposable {
 
   public void Delete() {
     v8PINVOKE.Context_Delete(swigCPtr);
+  }
+
+  public static Object NewExternalArrayBuffer(global::System.IntPtr data, int byteLength) {
+    global::System.IntPtr cPtr = v8PINVOKE.Context_NewExternalArrayBuffer(data, byteLength);
+    Object ret = (cPtr == global::System.IntPtr.Zero) ? null : new Object(cPtr, true);
+    return ret;
   }
 
   public static string GetVersion() {
@@ -2114,6 +2125,9 @@ class v8PINVOKE {
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_ContainsKey")]
   public static extern bool Object_ContainsKey(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_GetArrayBufferData")]
+  public static extern global::System.IntPtr Object_GetArrayBufferData(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Object_StrictEquals")]
   public static extern bool Object_StrictEquals(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
@@ -2275,6 +2289,9 @@ class v8PINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_Delete")]
   public static extern void Context_Delete(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_NewExternalArrayBuffer")]
+  public static extern global::System.IntPtr Context_NewExternalArrayBuffer(global::System.IntPtr jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("V8Simple.dll", EntryPoint="CSharp_Context_GetVersion")]
   public static extern string Context_GetVersion();

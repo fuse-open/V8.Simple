@@ -423,6 +423,89 @@ public class V8SimpleTests
 		}
 	}
 
+	class ArrayMarshaller
+	{
+		readonly byte[] _array;
+		readonly GCHandle _handle;
+
+		public ArrayMarshaller(byte[] array)
+		{
+			_array = array;
+			_handle = GCHandle.Alloc(array, GCHandleType.Pinned);
+		}
+
+		~ArrayMarshaller()
+		{
+			_handle.Free();
+		}
+
+		public IntPtr GetIntPtr()
+		{
+			return Marshal.UnsafeAddrOfPinnedArrayElement(_array, 0);
+		}
+	}
+
+	[Test]
+	public void ArrayBufferTests()
+	{
+		using (var context = new Context(null, null, new MyExternalFreer()))
+		{
+			var len = 100;
+			var buf = new byte[len];
+			var sum = 0;
+			for (byte i = 0; i < len; ++i)
+			{
+				buf[i] = i;
+				sum += i;
+			}
+			var marshaller = new ArrayMarshaller(buf);
+			var arrayBuffer = Context.NewExternalArrayBuffer(marshaller.GetIntPtr(), len);
+			{
+				var arrayBufferType = context.GlobalObject().Get(Str("ArrayBuffer")) as V8Simple.Function;
+				Assert.IsTrue(arrayBuffer.InstanceOf(arrayBufferType));
+			}
+			{
+				var f = context.Evaluate(
+					Str("ArrayBufferTests"),
+					Str("(function (buf) { return new Uint8Array(buf).reduce(function(acc, x) { return acc + x; }); })")) as Function;
+				var res = f.Call(new ValueVector { arrayBuffer }) as V8Simple.Int;
+				Assert.AreEqual(sum, res.GetValue());
+			}
+			{
+				var f = context.Evaluate(
+					Str("ArrayBufferTests"),
+					Str("(function (buf) { return buf; })")) as V8Simple.Function;
+				var arrayBuffer2 = f.Call(new ValueVector{ arrayBuffer }) as V8Simple.Object;
+				var ptr = arrayBuffer2.GetArrayBufferData();
+				var buf2 = new byte[len];
+				Marshal.Copy(ptr, buf2, 0, len);
+				for (int i = 0; i < len; ++i)
+				{
+					Assert.AreEqual(buf[i], buf2[i]);
+				}
+			}
+			{
+				var f = context.Evaluate(
+					Str("ArrayBufferTests"),
+					Str("(function (len) { var buf = new ArrayBuffer(len); var x = new Uint8Array(buf); for (var i = 0; i < len; ++i) x[i] = i; return buf; })")) as V8Simple.Function;
+				var arrayBuffer2 = f.Call(new ValueVector{ new V8Simple.Int(len) }) as V8Simple.Object;
+				var ptr = arrayBuffer2.GetArrayBufferData();
+				var buf2 = new byte[len];
+				Marshal.Copy(ptr, buf2, 0, len);
+				for (int i = 0; i < len; ++i)
+				{
+					Assert.AreEqual(buf[i], buf2[i]);
+				}
+			}
+			{
+				var o = context.Evaluate(
+					Str("ArrayBufferTests"),
+					Str("({})")) as V8Simple.Object;
+				Assert.AreEqual(IntPtr.Zero, o.GetArrayBufferData());
+			}
+		}
+	}
+
 	// Has to be last
 	[Test]
 	public void ZZZContextTests()

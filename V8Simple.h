@@ -129,6 +129,7 @@ public:
 	Value* CallMethod(const String* name, const std::vector<Value*>& args);
 	Value* CallMethod(const String* name, Value** args, int numArgs);
 	bool ContainsKey(const String* key);
+	void* GetArrayBufferData();
 	bool StrictEquals(const Object* object);
 
 	virtual ~Object();
@@ -264,6 +265,8 @@ public:
 	bool IdleNotificationDeadline(double deadlineInSeconds);
 	~Context();
 	void Delete();
+
+	static Object* NewExternalArrayBuffer(void* data, int byteLength);
 
 	static const char* GetVersion();
 	static Value* ThrowException(Value* exception);

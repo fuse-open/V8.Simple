@@ -580,6 +580,19 @@ bool Object::ContainsKey(const String* key)
 	}
 }
 
+void* Object::GetArrayBufferData()
+{
+	V8Scope scope;
+
+	auto localObject = _object->Get(Context::Isolate());
+	if (!localObject->IsArrayBuffer())
+	{
+		return nullptr;
+	}
+	auto arrayBuffer = localObject.As<v8::ArrayBuffer>();
+	return arrayBuffer->GetContents().Data();
+}
+
 bool Object::StrictEquals(const Object* object)
 {
 	if (object == nullptr)
@@ -1141,6 +1154,13 @@ Object* Context::GlobalObject()
 	V8Scope scope;
 
 	return new Object(V8Context()->Global());
+}
+
+Object* Context::NewExternalArrayBuffer(void* data, int byteLength)
+{
+	V8Scope scope;
+
+	return new Object(v8::ArrayBuffer::New(Context::Isolate(), data, (size_t)byteLength));
 }
 
 bool Context::IdleNotificationDeadline(double deadline_in_seconds)

@@ -100,6 +100,7 @@ V8Simple::Value*
 %include <std_vector.i>
 %newobject V8Simple::Context::Evaluate(const String*, const String*);
 %newobject V8Simple::Context::GlobalObject();
+%newobject V8Simple::Context::NewExternalArrayBuffer(void* data, int byteLength);
 %newobject V8Simple::Context::ThrowException(Value* exception);
 %newobject V8Simple::Object::Get(const String*);
 %newobject V8Simple::Object::Keys();

@@ -1079,6 +1079,18 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_ContainsKey(void * jarg1, void
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_Object_GetArrayBufferData(void * jarg1) {
+  void * jresult ;
+  V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
+  void *result = 0 ;
+  
+  arg1 = (V8Simple::Object *)jarg1; 
+  result = (void *)(arg1)->GetArrayBufferData();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Object_StrictEquals(void * jarg1, void * jarg2) {
   unsigned int jresult ;
   V8Simple::Object *arg1 = (V8Simple::Object *) 0 ;
@@ -1664,6 +1676,20 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Context_Delete(void * jarg1) {
   
   arg1 = (V8Simple::Context *)jarg1; 
   (arg1)->Delete();
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Context_NewExternalArrayBuffer(void * jarg1, int jarg2) {
+  void * jresult ;
+  void *arg1 = (void *) 0 ;
+  int arg2 ;
+  V8Simple::Object *result = 0 ;
+  
+  arg1 = (void *)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (V8Simple::Object *)V8Simple::Context::NewExternalArrayBuffer(arg1,arg2);
+  jresult = (void *)result; 
+  return jresult;
 }
 
 
