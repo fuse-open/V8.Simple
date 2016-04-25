@@ -138,6 +138,7 @@ public class V8SimpleTests
 			var obj = str.Construct(new ValueVector { new V8Simple.String(Str("abc 123")) });
 			Assert.IsNotNull(obj);
 			Assert.AreEqual(((V8Simple.Int)obj.CallMethod(Str("indexOf"), new ValueVector { new V8Simple.String(Str("1")) })).GetValue(), 4, "Test5");
+
 		}
 	}
 
@@ -266,35 +267,41 @@ public class V8SimpleTests
 			context.Evaluate(Str("ErrorTests"), Str("throw \"Hello\";"));
 			Assert.IsTrue(handled, "Test3");
 
+			handled = false;
+			var throwingFun = (V8Simple.Function)context.Evaluate(Str("FunctionTests"), Str("(function() { throw \"Error\"; })"));
+			throwingFun.Call(new ValueVector { });
+			Assert.IsTrue(handled, "Test4");
+
 			var obj = (V8Simple.Object)context.Evaluate(Str("ErrorTests"), Str("({})"));
 
 			runtimeHandled = false;
 			obj.ContainsKey(null);
-			Assert.IsTrue(runtimeHandled, "Test4");
-
-			runtimeHandled = false;
-			obj.Get(null);
 			Assert.IsTrue(runtimeHandled, "Test5");
 
 			runtimeHandled = false;
-			obj.Set(null, null);
+			obj.Get(null);
 			Assert.IsTrue(runtimeHandled, "Test6");
 
 			runtimeHandled = false;
-			obj.CallMethod(null, new ValueVector { });
+			obj.Set(null, null);
 			Assert.IsTrue(runtimeHandled, "Test7");
 
 			runtimeHandled = false;
-			V8Simple.Context.SendDebugCommand(null);
+			obj.CallMethod(null, new ValueVector { });
 			Assert.IsTrue(runtimeHandled, "Test8");
 
 			runtimeHandled = false;
-			context.Evaluate(null, Str("({})"));
+			V8Simple.Context.SendDebugCommand(null);
 			Assert.IsTrue(runtimeHandled, "Test9");
 
 			runtimeHandled = false;
-			context.Evaluate(Str("ErrorTests"), null);
+			context.Evaluate(null, Str("({})"));
 			Assert.IsTrue(runtimeHandled, "Test10");
+
+			runtimeHandled = false;
+			context.Evaluate(Str("ErrorTests"), null);
+			Assert.IsTrue(runtimeHandled, "Test11");
+
 		}
 	}
 
