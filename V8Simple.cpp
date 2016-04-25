@@ -532,6 +532,7 @@ Value* Object::CallMethod(
 		return Wrap(
 			tryCatch,
 			fun->Call(
+				Context::Global()->V8Context(),
 				localObject,
 				static_cast<int>(unwrappedArgs.size()),
 				DataPointer(unwrappedArgs)));
