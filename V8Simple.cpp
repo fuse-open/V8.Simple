@@ -206,7 +206,7 @@ Value* Value::Wrap(const v8::TryCatch& tryCatch, v8::Local<v8::Value> value)
 	}
 	if (value->IsExternal())
 	{
-		return new External(value.As<v8::External>()->Value());
+		return new External(value.As<v8::External>());
 	}
 	if (value->IsObject())
 	{
