@@ -54,7 +54,7 @@ protected:
 	static Value* Wrap(
 		const v8::TryCatch& tryCatch,
 		v8::Local<v8::Value> value);
-	static Value* Wrap(
+	static Value* WrapMaybe(
 		const v8::TryCatch& tryCatch,
 		v8::MaybeLocal<v8::Value> value);
 	static v8::Local<v8::Value> Unwrap(Value* value);

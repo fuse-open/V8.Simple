@@ -221,7 +221,7 @@ Value* Value::Wrap(const v8::TryCatch& tryCatch, v8::Local<v8::Value> value)
 	throw std::runtime_error("Unhandled type in V8Simple");
 }
 
-Value* Value::Wrap(const v8::TryCatch& tryCatch, v8::MaybeLocal<v8::Value> value)
+Value* Value::WrapMaybe(const v8::TryCatch& tryCatch, v8::MaybeLocal<v8::Value> value)
 {
 	return Wrap(tryCatch, FromJust(tryCatch, value));
 }
@@ -388,7 +388,7 @@ Value* Object::Get(const String* key)
 		V8Scope scope;
 		v8::TryCatch tryCatch;
 
-		return Wrap(
+		return WrapMaybe(
 			tryCatch,
 			_object->Get(Context::Isolate())->Get(
 				Context::Global()->V8Context(),
@@ -529,7 +529,7 @@ Value* Object::CallMethod(
 		auto fun = prop.As<v8::Function>();
 
 		auto unwrappedArgs = UnwrapVector(args);
-		return Wrap(
+		return WrapMaybe(
 			tryCatch,
 			fun->Call(
 				Context::Global()->V8Context(),
@@ -629,7 +629,7 @@ Value* Function::Call(const std::vector<Value*>& args)
 		auto context = Context::Global()->V8Context();
 
 		auto unwrappedArgs = UnwrapVector(args);
-		return Wrap(
+		return WrapMaybe(
 			tryCatch,
 			_function->Get(Context::Isolate())->Call(
 				context,
@@ -719,7 +719,7 @@ Value* Array::Get(int index)
 		V8Scope scope;
 		v8::TryCatch tryCatch;
 
-		return Wrap(
+		return WrapMaybe(
 			tryCatch,
 			_array->Get(Context::Isolate())->Get(
 				Context::Global()->V8Context(),
@@ -1136,7 +1136,7 @@ Value* Context::Evaluate(const String* fileName, const String* code)
 				Value::ToV8String(tryCatch, *code),
 				&origin));
 
-		return Value::Wrap(tryCatch, script->Run(context));
+		return Value::WrapMaybe(tryCatch, script->Run(context));
 	}
 	catch (const ScriptException& e)
 	{
