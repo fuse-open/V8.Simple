@@ -690,7 +690,7 @@ SwigDirector_ScriptExceptionHandler::SwigDirector_ScriptExceptionHandler() : V8S
   swig_init_callbacks();
 }
 
-void SwigDirector_ScriptExceptionHandler::Handle(V8Simple::ScriptException const &e) {
+void SwigDirector_ScriptExceptionHandler::Handle(V8Simple::ScriptException &e) {
   void * je = 0 ;
   
   if (!swig_callbackHandle) {
@@ -1344,13 +1344,13 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_External(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ScriptException_GetName(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ScriptException_GetException(void * jarg1) {
   void * jresult ;
   V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
-  V8Simple::String *result = 0 ;
+  V8Simple::Value *result = 0 ;
   
   arg1 = (V8Simple::ScriptException *)jarg1; 
-  result = (V8Simple::String *)(arg1)->GetName();
+  result = (V8Simple::Value *)(arg1)->GetException();
   jresult = (void *)result; 
   return jresult;
 }
@@ -1422,17 +1422,9 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ScriptException_Copy(void * jarg1) {
   V8Simple::ScriptException *result = 0 ;
   
   arg1 = (V8Simple::ScriptException *)jarg1; 
-  result = (V8Simple::ScriptException *)((V8Simple::ScriptException const *)arg1)->Copy();
+  result = (V8Simple::ScriptException *)(arg1)->Copy();
   jresult = (void *)result; 
   return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_ScriptException_Delete(void * jarg1) {
-  V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
-  
-  arg1 = (V8Simple::ScriptException *)jarg1; 
-  (arg1)->Delete();
 }
 
 
@@ -1441,6 +1433,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ScriptException(void * jarg1) {
   
   arg1 = (V8Simple::ScriptException *)jarg1; 
   delete arg1;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ScriptException_Delete(void * jarg1) {
+  V8Simple::ScriptException *arg1 = (V8Simple::ScriptException *) 0 ;
+  
+  arg1 = (V8Simple::ScriptException *)jarg1; 
+  (arg1)->Delete();
 }
 
 
@@ -1498,10 +1498,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_Handle(void * jarg1, v
   arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
   arg2 = (V8Simple::ScriptException *)jarg2;
   if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::ScriptException const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::ScriptException & type is null", 0);
     return ;
   } 
-  (arg1)->Handle((V8Simple::ScriptException const &)*arg2);
+  (arg1)->Handle(*arg2);
 }
 
 
@@ -1512,10 +1512,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ScriptExceptionHandler_HandleSwigExplicitScri
   arg1 = (V8Simple::ScriptExceptionHandler *)jarg1; 
   arg2 = (V8Simple::ScriptException *)jarg2;
   if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::ScriptException const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "V8Simple::ScriptException & type is null", 0);
     return ;
   } 
-  (arg1)->V8Simple::ScriptExceptionHandler::Handle((V8Simple::ScriptException const &)*arg2);
+  (arg1)->V8Simple::ScriptExceptionHandler::Handle(*arg2);
 }
 
 

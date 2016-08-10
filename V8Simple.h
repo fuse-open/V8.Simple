@@ -62,6 +62,7 @@ protected:
 	static v8::Local<v8::String> ToV8String(const v8::TryCatch& tryCatch, const String& str);
 	static v8::Local<v8::String> ToV8String(const String& str);
 	friend class Context;
+	friend void Throw(const v8::TryCatch& tryCatch);
 };
 
 class DllExport String: public Value
@@ -213,21 +214,22 @@ template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
 
 struct DllExport ScriptException
 {
-	String* GetName() { return Name.Copy(); }
-	String* GetErrorMessage() { return ErrorMessage.Copy(); }
-	String* GetFileName() { return FileName.Copy(); }
-	int GetLineNumber() { return LineNumber; }
-	String* GetStackTrace() { return StackTrace.Copy(); }
-	String* GetSourceLine() { return SourceLine.Copy(); }
-	ScriptException* Copy() const;
+	Value* GetException() { auto result = _exception; _exception = nullptr; return result; }
+	String* GetErrorMessage() { return _errorMessage.Copy(); }
+	String* GetFileName() { return _fileName.Copy(); }
+	int GetLineNumber() { return _lineNumber; }
+	String* GetStackTrace() { return _stackTrace.Copy(); }
+	String* GetSourceLine() { return _sourceLine.Copy(); }
+	ScriptException* Copy();
+	~ScriptException();
 	void Delete();
-
 private:
-	const String Name, ErrorMessage, FileName, StackTrace, SourceLine;
-	int LineNumber;
+	Value* _exception;
+	const String _errorMessage, _fileName, _stackTrace, _sourceLine;
+	int _lineNumber;
 
 	ScriptException(
-		const ::v8::String::Utf8Value& name,
+		Value* exception,
 		const ::v8::String::Utf8Value& errorMessage,
 		const ::v8::String::Utf8Value& fileName,
 		int lineNumber,
@@ -245,7 +247,7 @@ struct DllExport MessageHandler
 
 struct DllExport ScriptExceptionHandler
 {
-	virtual void Handle(const ScriptException& e) { }
+	virtual void Handle(ScriptException& e) { }
 	virtual ~ScriptExceptionHandler() { }
 };
 
@@ -287,7 +289,7 @@ private:
 	MessageHandler* _runtimeExceptionHandler;
 	ExternalFreer* _externalFreer;
 
-	void HandleScriptException(const ScriptException& e) const;
+	void HandleScriptException(ScriptException& e) const;
 	void HandleRuntimeException(const char* messageBuffer) const;
 
 	v8::Local<v8::Context> V8Context() const;

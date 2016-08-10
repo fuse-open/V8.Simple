@@ -119,7 +119,7 @@ V8Simple::Value*
 %ignore V8Simple::External::New(void* value);
 %ignore V8Simple::Context::New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler);
 %newobject V8Simple::Array::Get(int);
-%newobject V8Simple::ScriptException::GetName();
+%newobject V8Simple::ScriptException::GetException();
 %newobject V8Simple::ScriptException::GetErrorMessage();
 %newobject V8Simple::ScriptException::GetFileName();
 %newobject V8Simple::ScriptException::GetStackTrace();

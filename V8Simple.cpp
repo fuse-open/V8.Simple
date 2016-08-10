@@ -111,9 +111,12 @@ void Throw(const v8::TryCatch& tryCatch)
 		lineNumber = message->GetLineNumber(context).FromMaybe(-1);
 	}
 
-	v8::Local<v8::Value> exception = tryCatch.Exception().IsEmpty()
-		? emptyString
-		: tryCatch.Exception();
+	Value* exception = nullptr;
+	if (!tryCatch.Exception().IsEmpty())
+	{
+		v8::TryCatch innerTryCatch;
+		exception = Value::Wrap(innerTryCatch, tryCatch.Exception());
+	}
 
 	auto stackTrace(
 		tryCatch
@@ -121,7 +124,7 @@ void Throw(const v8::TryCatch& tryCatch)
 		.FromMaybe(emptyString.As<v8::Value>()));
 
 	throw ScriptException(
-		v8::String::Utf8Value(exception),
+		exception,
 		v8::String::Utf8Value(messageStr),
 		v8::String::Utf8Value(fileName),
 		lineNumber,
@@ -336,14 +339,9 @@ v8::Local<v8::Value> Value::Unwrap(Value* value)
 								v8::NewStringType::kNormal)
 							.FromMaybe(v8::String::Empty(info.GetIsolate())));
 					}
-					catch (const ScriptException& e)
+					catch (ScriptException& e)
 					{
-						info.GetIsolate()->ThrowException(
-							v8::String::NewFromUtf8(
-								info.GetIsolate(),
-								reinterpret_cast<const char*>(e.ErrorMessage.GetValue()),
-								v8::NewStringType::kNormal)
-							.FromMaybe(v8::String::Empty(info.GetIsolate())));
+						Context::Global()->HandleScriptException(e);
 					}
 				},
 				localCallback.As<v8::Value>()));
@@ -394,7 +392,7 @@ Value* Object::Get(const String* key)
 				Context::Global()->V8Context(),
 				ToV8String(tryCatch, *key)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 		return nullptr;
@@ -423,7 +421,7 @@ void Object::Set(const String* key, Value* value)
 			ToV8String(tryCatch, *key),
 			Unwrap(value)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -451,7 +449,7 @@ UniqueValueVector* Object::Keys()
 				propArr->Get(context, static_cast<uint32_t>(i))))));
 		}
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -478,7 +476,7 @@ bool Object::InstanceOf(Function* type)
 		delete callResult;
 		return result;
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -537,7 +535,7 @@ Value* Object::CallMethod(
 				static_cast<int>(unwrappedArgs.size()),
 				DataPointer(unwrappedArgs)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -574,7 +572,7 @@ bool Object::ContainsKey(const String* key)
 				Context::Global()->V8Context(),
 				ToV8String(tryCatch, *key)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 		return false;
@@ -637,7 +635,7 @@ Value* Function::Call(const std::vector<Value*>& args)
 				static_cast<int>(unwrappedArgs.size()),
 				DataPointer(unwrappedArgs)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -672,7 +670,7 @@ Object* Function::Construct(const std::vector<Value*>& args)
 					static_cast<int>(unwrappedArgs.size()),
 					DataPointer(unwrappedArgs))));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -725,7 +723,7 @@ Value* Array::Get(int index)
 				Context::Global()->V8Context(),
 				static_cast<uint32_t>(index)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 		return nullptr;
@@ -751,7 +749,7 @@ void Array::Set(int index, Value* value)
 				static_cast<uint32_t>(index),
 				Unwrap(value)));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		Context::Global()->HandleScriptException(e);
 	}
@@ -901,24 +899,26 @@ struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 };
 
 ScriptException::ScriptException(
-	const ::v8::String::Utf8Value& name,
+	Value* exception,
 	const ::v8::String::Utf8Value& errorMessage,
 	const ::v8::String::Utf8Value& fileName,
 	int lineNumber,
 	const ::v8::String::Utf8Value& stackTrace,
 	const ::v8::String::Utf8Value& sourceLine)
-	: Name(name)
-	, ErrorMessage(errorMessage)
-	, FileName(fileName)
-	, StackTrace(stackTrace)
-	, SourceLine(sourceLine)
-	, LineNumber(lineNumber)
+	: _exception(exception)
+	, _errorMessage(errorMessage)
+	, _fileName(fileName)
+	, _stackTrace(stackTrace)
+	, _sourceLine(sourceLine)
+	, _lineNumber(lineNumber)
 {
 }
 
-ScriptException* ScriptException::Copy() const
+ScriptException* ScriptException::Copy()
 {
-	return new ScriptException(*this);
+	auto result = new ScriptException(*this);
+	_exception = nullptr;
+	return result;
 }
 
 void ScriptException::Delete()
@@ -926,7 +926,12 @@ void ScriptException::Delete()
 	delete this;
 }
 
-void Context::HandleScriptException(const ScriptException& e) const
+ScriptException::~ScriptException()
+{
+	delete _exception;
+}
+
+void Context::HandleScriptException(ScriptException& e) const
 {
 	if (_scriptExceptionHandler != nullptr)
 	{
@@ -1138,7 +1143,7 @@ Value* Context::Evaluate(const String* fileName, const String* code)
 
 		return Value::WrapMaybe(tryCatch, script->Run(context));
 	}
-	catch (const ScriptException& e)
+	catch (ScriptException& e)
 	{
 		HandleScriptException(e);
 		return nullptr;

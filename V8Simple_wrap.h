@@ -55,7 +55,7 @@ struct SwigDirector_ScriptExceptionHandler : public V8Simple::ScriptExceptionHan
 
 public:
     SwigDirector_ScriptExceptionHandler();
-    virtual void Handle(V8Simple::ScriptException const &e);
+    virtual void Handle(V8Simple::ScriptException &e);
     virtual ~SwigDirector_ScriptExceptionHandler();
 
     typedef void (SWIGSTDCALL* SWIG_Callback0_t)(void *);
