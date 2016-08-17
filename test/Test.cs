@@ -320,6 +320,11 @@ public class V8SimpleTests
 		}
 	}
 
+	MessageHandler _debugMessageHandler = new DelegateMessageHandler(x =>
+	{
+		return;
+	});
+
 	[Test]
 	public void DebuggerTests()
 	{
@@ -327,8 +332,7 @@ public class V8SimpleTests
 		V8Simple.Context.ProcessDebugMessages();
 		using (var context = new Context(null, null, null))
 		{
-			var messageHandler = new DelegateMessageHandler(x => { return; });
-			V8Simple.Context.SetDebugMessageHandler(messageHandler);
+			V8Simple.Context.SetDebugMessageHandler(_debugMessageHandler);
 			V8Simple.Context.SendDebugCommand(Str("{}"));
 			V8Simple.Context.ProcessDebugMessages();
 		}
@@ -340,6 +344,19 @@ public class V8SimpleTests
 	public void VersionTests()
 	{
 		Assert.IsNotNull(Context.GetVersion());
+	}
+
+	[Test]
+	public void StringTest()
+	{
+		string str1 = "abc";
+		Assert.AreEqual(str1, Str(str1).GetValue());
+		string str2 = "ç, é, õ";
+		Assert.AreEqual(str2, Str(str2).GetValue());
+		string str3 = "eeeeææææææææææaaaaaaaaa";
+		Assert.AreEqual(str3, Str(str3).GetValue());
+		string str4 = "æææææææææææææææææææææææ";
+		Assert.AreEqual(str4, Str(str4).GetValue());
 	}
 
 	[Test]

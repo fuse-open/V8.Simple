@@ -4,8 +4,9 @@
 %}
 
 %include "arrays_csharp.i"
-%apply unsigned char INPUT[] { const V8Simple::byte* buffer }
-%apply unsigned char OUTPUT[] { V8Simple::byte* outBuffer }
+CSHARP_ARRAYS(uint16_t, byte)
+%apply uint16_t INPUT[] { const uint16_t* buffer }
+%apply uint16_t OUTPUT[] { uint16_t* outBuffer }
 
 // void* to IntPtr
 %typemap(csdirectorin) void *VOID_INT_PTR "$1"
@@ -53,12 +54,14 @@
 %typemap(cscode) V8Simple::String %{
 	public string GetValue()
 	{
-		var buffer = new byte[GetBufferLength()];
+		var buffer = new byte[GetBufferLength() * sizeof(char)];
 		GetBuffer(buffer);
-		return System.Text.Encoding.UTF8.GetString(buffer);
+		return System.Text.Encoding.Unicode.GetString(buffer);
 	}
-	private String(byte[] buffer) : this(buffer, buffer.Length) { }
-	private String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
+	private String(byte[] buffer) : this(buffer, buffer.Length / sizeof(char))
+	{
+	}
+	private String(string str) : this(System.Text.Encoding.Unicode.GetBytes(str)) { }
 	public static String New(string str)
 	{
 		return str == null ? null : new String(str);
@@ -111,7 +114,7 @@ V8Simple::Value*
 %newobject V8Simple::Function::Construct(const std::vector<Value*>&);
 %ignore V8Simple::Function::Construct(Value** args, int numArgs);
 %ignore V8Simple::Value::Delete();
-%newobject V8Simple::String::New(const byte* buffer, int bufferLength);
+%newobject V8Simple::String::New(const uint16_t* buffer, int bufferLength);
 %ignore V8Simple::String::GetValue() const;
 %ignore V8Simple::Primitive<int>::New(const int& value);
 %ignore V8Simple::Primitive<double>::New(const double& value);

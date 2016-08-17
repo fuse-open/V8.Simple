@@ -17,7 +17,6 @@
 namespace V8Simple
 {
 
-typedef unsigned char byte;
 struct V8Scope;
 class Object;
 class Context;
@@ -68,19 +67,19 @@ protected:
 class DllExport String: public Value
 {
 public:
-	static String* New(const byte* buffer, int bufferLength);
-	String(const byte* buffer, int bufferLength);
+	static String* New(const uint16_t* buffer, int bufferLength);
+	String(const uint16_t* buffer, int bufferLength);
 	String(const String& str);
 	String& operator=(const String& str);
 	virtual Type GetValueType() const override final;
-	const byte* GetValue() const;
-	void GetBuffer(byte* outBuffer) const;
+	const uint16_t* GetValue() const;
+	void GetBuffer(uint16_t* outBuffer) const;
 	int GetBufferLength() const;
 	virtual ~String();
 	String* Copy() const;
 private:
-	String(const v8::String::Utf8Value& v);
-	byte* _value;
+	String(const v8::Local<v8::String>& v);
+	uint16_t* _value;
 	int _length;
 	friend class Object;
 	friend class Value;
@@ -230,11 +229,11 @@ private:
 
 	ScriptException(
 		Value* exception,
-		const ::v8::String::Utf8Value& errorMessage,
-		const ::v8::String::Utf8Value& fileName,
+		const v8::Local<v8::String>& errorMessage,
+		const v8::Local<v8::String>& fileName,
 		int lineNumber,
-		const ::v8::String::Utf8Value& stackTrace,
-		const ::v8::String::Utf8Value& sourceLine);
+		const v8::Local<v8::String>& stackTrace,
+		const v8::Local<v8::String>& sourceLine);
 	friend void Throw(const v8::TryCatch& tryCatch);
 	friend class Value;
 };
@@ -288,6 +287,8 @@ private:
 	ScriptExceptionHandler* _scriptExceptionHandler;
 	MessageHandler* _runtimeExceptionHandler;
 	ExternalFreer* _externalFreer;
+
+	String* NewStringFromUtf8(const char* str) const;
 
 	void HandleScriptException(ScriptException& e) const;
 	void HandleRuntimeException(const char* messageBuffer) const;

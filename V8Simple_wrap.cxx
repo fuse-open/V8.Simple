@@ -769,15 +769,15 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Value(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_String_New(unsigned char* jarg1, int jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_String_New(uint16_t* jarg1, int jarg2) {
   void * jresult ;
-  V8Simple::byte *arg1 = (V8Simple::byte *) 0 ;
+  uint16_t *arg1 = (uint16_t *) 0 ;
   int arg2 ;
   V8Simple::String *result = 0 ;
   
   arg1 = jarg1;
   arg2 = (int)jarg2; 
-  result = (V8Simple::String *)V8Simple::String::New((unsigned char const *)arg1,arg2);
+  result = (V8Simple::String *)V8Simple::String::New((uint16_t const *)arg1,arg2);
   jresult = (void *)result; 
   
   
@@ -785,15 +785,15 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_String_New(unsigned char* jarg1, int jarg2)
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_String__SWIG_0(unsigned char* jarg1, int jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_String__SWIG_0(uint16_t* jarg1, int jarg2) {
   void * jresult ;
-  V8Simple::byte *arg1 = (V8Simple::byte *) 0 ;
+  uint16_t *arg1 = (uint16_t *) 0 ;
   int arg2 ;
   V8Simple::String *result = 0 ;
   
   arg1 = jarg1;
   arg2 = (int)jarg2; 
-  result = (V8Simple::String *)new V8Simple::String((V8Simple::byte const *)arg1,arg2);
+  result = (V8Simple::String *)new V8Simple::String((uint16_t const *)arg1,arg2);
   jresult = (void *)result; 
   
   
@@ -829,9 +829,9 @@ SWIGEXPORT int SWIGSTDCALL CSharp_String_GetValueType(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_String_GetBuffer(void * jarg1, unsigned char* jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_String_GetBuffer(void * jarg1, uint16_t* jarg2) {
   V8Simple::String *arg1 = (V8Simple::String *) 0 ;
-  V8Simple::byte *arg2 = (V8Simple::byte *) 0 ;
+  uint16_t *arg2 = (uint16_t *) 0 ;
   
   arg1 = (V8Simple::String *)jarg1; 
   arg2 = jarg2;

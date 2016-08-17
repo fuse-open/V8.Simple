@@ -106,12 +106,14 @@ public class String : Value {
 
 	public string GetValue()
 	{
-		var buffer = new byte[GetBufferLength()];
+		var buffer = new byte[GetBufferLength() * sizeof(char)];
 		GetBuffer(buffer);
-		return System.Text.Encoding.UTF8.GetString(buffer);
+		return System.Text.Encoding.Unicode.GetString(buffer);
 	}
-	private String(byte[] buffer) : this(buffer, buffer.Length) { }
-	private String(string str) : this(System.Text.Encoding.UTF8.GetBytes(str)) { }
+	private String(byte[] buffer) : this(buffer, buffer.Length / sizeof(char))
+	{
+	}
+	private String(string str) : this(System.Text.Encoding.Unicode.GetBytes(str)) { }
 	public static String New(string str)
 	{
 		return str == null ? null : new String(str);

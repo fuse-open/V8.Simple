@@ -3,22 +3,22 @@
 #include <include/libplatform/libplatform.h>
 #include <stdlib.h>
 #include <string>
+#include <iostream>
 
 namespace V8Simple
 {
 
-String::String(const byte* buffer, int bufferLength)
-	: _value(new byte[bufferLength + 1])
+String::String(const uint16_t* buffer, int bufferLength)
+	: _value(new uint16_t[bufferLength])
 	, _length(bufferLength)
 {
 	if (_length > 0 && buffer != nullptr)
 	{
-		std::memcpy(_value, buffer, _length);
+		std::memcpy(_value, buffer, _length * sizeof(uint16_t));
 	}
-	_value[_length] = 0;
 }
 
-String* String::New(const byte* buffer, int bufferLength)
+String* String::New(const uint16_t* buffer, int bufferLength)
 {
 	return buffer == nullptr ? nullptr : new String(buffer, bufferLength);
 }
@@ -27,8 +27,8 @@ String& String::operator=(const String& str)
 {
 	delete[] _value;
 	_length = str._length;
-	_value = new byte[_length + 1];
-	std::memcpy(_value, str._value, _length + 1);
+	_value = new uint16_t[_length];
+	std::memcpy(_value, str._value, _length * sizeof(uint16_t));
 	return *this;
 }
 
@@ -37,17 +37,19 @@ String::String(const String& str)
 {
 }
 
-String::String(const v8::String::Utf8Value& v)
-	: String(v.length() > 0 ? reinterpret_cast<const byte*>(*v) : nullptr, v.length())
+String::String(const v8::Local<v8::String>& str)
+	: _value(new uint16_t[str->Length()])
+	, _length(str->Length())
 {
+	str->Write(_value, 0, str->Length(), v8::String::NO_NULL_TERMINATION);
 }
 
 Type String::GetValueType() const { return Type::String; }
-const byte* String::GetValue() const { return _value; }
+const uint16_t* String::GetValue() const { return _value; }
 int String::GetBufferLength() const { return _length; }
-void String::GetBuffer(byte* outBuffer) const
+void String::GetBuffer(uint16_t* outBuffer) const
 {
-	std::memcpy(outBuffer, _value, _length);
+	std::memcpy(outBuffer, _value, _length * sizeof(uint16_t));
 }
 
 String::~String()
@@ -92,12 +94,12 @@ struct V8Scope
 void Throw(const v8::TryCatch& tryCatch)
 {
 	auto context = Context::Global()->V8Context();
-	v8::Local<v8::Value> emptyString = v8::String::Empty(Context::Isolate());
+	v8::Local<v8::String> emptyString = v8::String::Empty(Context::Isolate());
 
-	auto message = tryCatch.Message();
-	auto sourceLine(emptyString);
-	auto messageStr(emptyString);
-	auto fileName(emptyString);
+	v8::Local<v8::Message> message = tryCatch.Message();
+	v8::Local<v8::String> sourceLine(emptyString);
+	v8::Local<v8::String> messageStr(emptyString);
+	v8::Local<v8::String> fileName(emptyString);
 	int lineNumber = -1;
 	if (!message.IsEmpty())
 	{
@@ -107,7 +109,7 @@ void Throw(const v8::TryCatch& tryCatch)
 		{
 			messageStr = messageStrLocal;
 		}
-		fileName = message->GetScriptResourceName();
+		fileName = message->GetScriptResourceName()->ToString(context).FromMaybe(emptyString);
 		lineNumber = message->GetLineNumber(context).FromMaybe(-1);
 	}
 
@@ -118,18 +120,20 @@ void Throw(const v8::TryCatch& tryCatch)
 		exception = Value::Wrap(innerTryCatch, tryCatch.Exception());
 	}
 
-	auto stackTrace(
+	v8::Local<v8::String> stackTrace(
 		tryCatch
 		.StackTrace(context)
-		.FromMaybe(emptyString.As<v8::Value>()));
+		.FromMaybe(emptyString.As<v8::Value>())
+		->ToString(context)
+		.FromMaybe(emptyString));
 
 	throw ScriptException(
 		exception,
-		v8::String::Utf8Value(messageStr),
-		v8::String::Utf8Value(fileName),
+		messageStr,
+		fileName,
 		lineNumber,
-		v8::String::Utf8Value(stackTrace),
-		v8::String::Utf8Value(sourceLine));
+		stackTrace,
+		sourceLine);
 }
 
 template<class A>
@@ -158,7 +162,7 @@ static A FromJust(
 
 v8::Local<v8::String> Value::ToV8String(const v8::TryCatch& tryCatch, const String& str)
 {
-	return FromJust(tryCatch, v8::String::NewFromUtf8(Context::Isolate(), reinterpret_cast<const char*>(str.GetValue()), v8::NewStringType::kNormal));
+	return FromJust(tryCatch, v8::String::NewFromTwoByte(Context::Isolate(), str.GetValue(), v8::NewStringType::kNormal, str.GetBufferLength()));
 }
 
 v8::Local<v8::String> Value::ToV8String(const String& str)
@@ -190,10 +194,9 @@ Value* Value::Wrap(const v8::TryCatch& tryCatch, v8::Local<v8::Value> value)
 	}
 	if (value->IsString() || value->IsStringObject())
 	{
-		v8::String::Utf8Value str(FromJust(
+		return new String(FromJust(
 			tryCatch,
 			value->ToString(context)));
-		return new String(reinterpret_cast<const byte*>(*str), str.length());
 	}
 	if (value->IsArray())
 	{
@@ -444,9 +447,9 @@ UniqueValueVector* Object::Keys()
 		result.reserve(length);
 		for (int i = 0; i < static_cast<int>(length); ++i)
 		{
-			result.push_back(new String(v8::String::Utf8Value(FromJust(
+			result.push_back(new String(FromJust(
 				tryCatch,
-				propArr->Get(context, static_cast<uint32_t>(i))))));
+				FromJust(tryCatch, propArr->Get(context, static_cast<uint32_t>(i)))->ToString(context))));
 		}
 	}
 	catch (ScriptException& e)
@@ -900,11 +903,11 @@ struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 
 ScriptException::ScriptException(
 	Value* exception,
-	const ::v8::String::Utf8Value& errorMessage,
-	const ::v8::String::Utf8Value& fileName,
+	const v8::Local<v8::String>& errorMessage,
+	const v8::Local<v8::String>& fileName,
 	int lineNumber,
-	const ::v8::String::Utf8Value& stackTrace,
-	const ::v8::String::Utf8Value& sourceLine)
+	const v8::Local<v8::String>& stackTrace,
+	const v8::Local<v8::String>& sourceLine)
 	: _exception(exception)
 	, _errorMessage(errorMessage)
 	, _fileName(fileName)
@@ -931,6 +934,20 @@ ScriptException::~ScriptException()
 	delete _exception;
 }
 
+String* Context::NewStringFromUtf8(const char *str) const
+{
+	v8::Locker locker(_conversionIsolate);
+	v8::Isolate::Scope isolateScope(_conversionIsolate);
+	v8::HandleScope handleScope(_conversionIsolate);
+
+	auto v8Str = v8::String::NewFromUtf8(
+		_conversionIsolate,
+		str,
+		v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_conversionIsolate));
+
+	return new String(v8Str);
+}
+
 void Context::HandleScriptException(ScriptException& e) const
 {
 	if (_scriptExceptionHandler != nullptr)
@@ -943,8 +960,9 @@ void Context::HandleRuntimeException(const char* e) const
 {
 	if (_runtimeExceptionHandler != nullptr)
 	{
-		String str(reinterpret_cast<const byte*>(e), static_cast<int>(std::strlen(e)));
-		_runtimeExceptionHandler->Handle(&str);
+		auto str = NewStringFromUtf8(e);
+		_runtimeExceptionHandler->Handle(str);
+		delete str;
 	}
 }
 
@@ -964,8 +982,7 @@ void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
 		{
 			v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
 			{
-				v8::String::Utf8Value utf8(message.GetJSON());
-				const String str(reinterpret_cast<const byte*>(*utf8), utf8.length());
+				const String str(message.GetJSON());
 				_debugMessageHandler->Handle(&str);
 			});
 		}
@@ -981,19 +998,7 @@ void Context::SendDebugCommand(const String* command)
 			Context::Global()->HandleRuntimeException("V8Simple::Context::SendDebugCommand is not defined for nullptr argument");
 			return;
 		}
-		v8::Locker locker(_conversionIsolate);
-		v8::Isolate::Scope isolateScope(_conversionIsolate);
-		v8::HandleScope handleScope(_conversionIsolate);
-
-		auto str = v8::String::NewFromUtf8(
-			_conversionIsolate,
-			reinterpret_cast<const char*>(command->GetValue()),
-			v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_conversionIsolate));
-		auto len = str->Length();
-		auto buffer = new uint16_t[len + 1];
-		str->Write(buffer);
-		v8::Debug::SendCommand(_isolate, buffer, len);
-		delete[] buffer;
+		v8::Debug::SendCommand(_isolate, command->GetValue(), command->GetBufferLength());
 	}
 }
 
@@ -1064,9 +1069,11 @@ Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler*
 	{
 		const char instanceOfStrBuf[] = "instanceof";
 		const char instanceOfCodeBuf[] = "(function(x, y) { return (x instanceof y); })";
-		const String instanceOfString(reinterpret_cast<const byte*>(instanceOfStrBuf), sizeof (instanceOfStrBuf));
-		const String instanceOfCode(reinterpret_cast<const byte*>(instanceOfCodeBuf), sizeof (instanceOfCodeBuf));
-		Value* instanceOf = Evaluate(&instanceOfString, &instanceOfCode);
+		String* instanceOfString = NewStringFromUtf8(instanceOfStrBuf);
+		String* instanceOfCode = NewStringFromUtf8(instanceOfCodeBuf);
+		Value* instanceOf = Evaluate(instanceOfString, instanceOfCode);
+		delete instanceOfCode;
+		delete instanceOfString;
 		
 		if (!instanceOf || instanceOf->GetValueType() != Type::Function)
 		{
