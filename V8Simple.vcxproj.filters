@@ -18,15 +18,9 @@
     <ClInclude Include="V8Simple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="V8Simple_wrap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="V8Simple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="V8Simple_wrap.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

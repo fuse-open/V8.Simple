@@ -1,889 +1,32 @@
 #include "V8Simple.h"
+#include <include/v8.h>
 #include <include/v8-debug.h>
 #include <include/libplatform/libplatform.h>
-#include <stdlib.h>
-#include <string>
-#include <iostream>
+#include <vector>
+#include <cstdlib>
 
-namespace V8Simple
+struct RefCounted
 {
+	int _refCount = 1;
 
-String::String(const uint16_t* buffer, int bufferLength)
-	: _value(new uint16_t[bufferLength])
-	, _length(bufferLength)
-{
-	if (_length > 0 && buffer != nullptr)
+	void Retain()
 	{
-		std::memcpy(_value, buffer, _length * sizeof(uint16_t));
+		++_refCount;
 	}
-}
 
-String* String::New(const uint16_t* buffer, int bufferLength)
-{
-	return buffer == nullptr ? nullptr : new String(buffer, bufferLength);
-}
-
-String& String::operator=(const String& str)
-{
-	delete[] _value;
-	_length = str._length;
-	_value = new uint16_t[_length];
-	std::memcpy(_value, str._value, _length * sizeof(uint16_t));
-	return *this;
-}
-
-String::String(const String& str)
-	: String(str._value, str._length)
-{
-}
-
-String::String(const v8::Local<v8::String>& str)
-	: _value(new uint16_t[str->Length()])
-	, _length(str->Length())
-{
-	str->Write(_value, 0, str->Length(), v8::String::NO_NULL_TERMINATION);
-}
-
-Type String::GetValueType() const { return Type::String; }
-const uint16_t* String::GetValue() const { return _value; }
-int String::GetBufferLength() const { return _length; }
-void String::GetBuffer(uint16_t* outBuffer) const
-{
-	std::memcpy(outBuffer, _value, _length * sizeof(uint16_t));
-}
-
-String::~String()
-{
-	delete[] _value;
-}
-
-String* String::Copy() const
-{
-	return new String(*this);
-}
-
-v8::Isolate* Context::Isolate()
-{
-	return Context::_isolate;
-}
-
-Context* Context::Global()
-{
-	return Context::_globalContext;
-}
-
-struct V8Scope
-{
-	V8Scope(v8::Isolate* isolate)
-		: Locker(isolate)
-		, IsolateScope(isolate)
-		, HandleScope(isolate)
-		, ContextScope(Context::Global()->V8Context())
+	void Release()
 	{
+		--_refCount;
+		if (_refCount == 0)
+		{
+			delete this;
+		}
 	}
-	V8Scope()
-		: V8Scope(Context::Isolate())
-	{
-	}
-	v8::Locker Locker;
-	v8::Isolate::Scope IsolateScope;
-	v8::HandleScope HandleScope;
-	v8::Context::Scope ContextScope;
+
+	virtual ~RefCounted() { }
 };
 
-void Throw(const v8::TryCatch& tryCatch)
-{
-	auto context = Context::Global()->V8Context();
-	v8::Local<v8::String> emptyString = v8::String::Empty(Context::Isolate());
-
-	v8::Local<v8::Message> message = tryCatch.Message();
-	v8::Local<v8::String> sourceLine(emptyString);
-	v8::Local<v8::String> messageStr(emptyString);
-	v8::Local<v8::String> fileName(emptyString);
-	int lineNumber = -1;
-	if (!message.IsEmpty())
-	{
-		sourceLine = message->GetSourceLine(context).FromMaybe(emptyString);
-		auto messageStrLocal = message->Get();
-		if (!messageStrLocal.IsEmpty())
-		{
-			messageStr = messageStrLocal;
-		}
-		fileName = message->GetScriptResourceName()->ToString(context).FromMaybe(emptyString);
-		lineNumber = message->GetLineNumber(context).FromMaybe(-1);
-	}
-
-	Value* exception = nullptr;
-	if (!tryCatch.Exception().IsEmpty())
-	{
-		v8::TryCatch innerTryCatch;
-		exception = Value::Wrap(innerTryCatch, tryCatch.Exception());
-	}
-
-	v8::Local<v8::String> stackTrace(
-		tryCatch
-		.StackTrace(context)
-		.FromMaybe(emptyString.As<v8::Value>())
-		->ToString(context)
-		.FromMaybe(emptyString));
-
-	throw ScriptException(
-		exception,
-		messageStr,
-		fileName,
-		lineNumber,
-		stackTrace,
-		sourceLine);
-}
-
-template<class A>
-static v8::Local<A> FromJust(
-	const v8::TryCatch& tryCatch,
-	v8::MaybeLocal<A> a)
-{
-	if (tryCatch.HasCaught() || a.IsEmpty())
-	{
-		Throw(tryCatch);
-	}
-	return a.ToLocalChecked();
-}
-
-template<class A>
-static A FromJust(
-	const v8::TryCatch& tryCatch,
-	v8::Maybe<A> a)
-{
-	if (tryCatch.HasCaught() || a.IsNothing())
-	{
-		Throw(tryCatch);
-	}
-	return a.FromJust();
-}
-
-v8::Local<v8::String> Value::ToV8String(const v8::TryCatch& tryCatch, const String& str)
-{
-	return FromJust(tryCatch, v8::String::NewFromTwoByte(Context::Isolate(), str.GetValue(), v8::NewStringType::kNormal, str.GetBufferLength()));
-}
-
-v8::Local<v8::String> Value::ToV8String(const String& str)
-{
-	v8::TryCatch tryCatch;
-	return ToV8String(tryCatch, str);
-}
-
-Value* Value::Wrap(const v8::TryCatch& tryCatch, v8::Local<v8::Value> value)
-{
-	auto context = Context::Global()->V8Context();
-	if (value->IsInt32())
-	{
-		return new Int(FromJust(
-			tryCatch,
-			value->Int32Value(context)));
-	}
-	if (value->IsNumber() || value->IsNumberObject())
-	{
-		return new Double(FromJust(
-			tryCatch,
-			value->NumberValue(context)));
-	}
-	if (value->IsBoolean() || value->IsBooleanObject())
-	{
-		return new Bool(FromJust(
-			tryCatch,
-			value->BooleanValue(context)));
-	}
-	if (value->IsString() || value->IsStringObject())
-	{
-		return new String(FromJust(
-			tryCatch,
-			value->ToString(context)));
-	}
-	if (value->IsArray())
-	{
-		return new Array(FromJust(
-			tryCatch,
-			value->ToObject(context)).As<v8::Array>());
-	}
-	if (value->IsFunction())
-	{
-		return new Function(FromJust(
-			tryCatch,
-			value->ToObject(context)).As<v8::Function>());
-	}
-	if (value->IsExternal())
-	{
-		return new External(value.As<v8::External>());
-	}
-	if (value->IsObject())
-	{
-		return new Object(FromJust(
-			tryCatch,
-			value->ToObject(context)));
-	}
-	if (value->IsUndefined() || value->IsNull())
-	{
-		return nullptr;
-	}
-	throw std::runtime_error("Unhandled type in V8Simple");
-}
-
-Value* Value::WrapMaybe(const v8::TryCatch& tryCatch, v8::MaybeLocal<v8::Value> value)
-{
-	return Wrap(tryCatch, FromJust(tryCatch, value));
-}
-
-Value* Value::Wrap(v8::Local<v8::Value> value)
-{
-	v8::TryCatch tryCatch;
-	return Wrap(tryCatch, value);
-
-}
-
-void Value::Delete()
-{
-	delete this;
-}
-
-v8::Local<v8::Value> Value::Unwrap(Value* value)
-{
-	auto isolate = Context::Isolate();
-
-	if (value == nullptr)
-	{
-		return v8::Null(isolate).As<v8::Value>();
-	}
-
-	switch (value->GetValueType())
-	{
-		case Type::Int:
-			return v8::Int32::New(
-				isolate,
-				static_cast<Int*>(value)->GetValue());
-		case Type::Double:
-			return v8::Number::New(
-				isolate,
-				static_cast<Double*>(value)->GetValue());
-		case Type::String:
-			return ToV8String(*static_cast<String*>(value));
-		case Type::Bool:
-			return v8::Boolean::New(
-				isolate,
-				static_cast<Bool*>(value)->GetValue());
-		case Type::Object:
-			return static_cast<Object*>(value)
-				->_object->Get(isolate);
-		case Type::Array:
-			return static_cast<Array*>(value)
-				->_array->Get(isolate);
-		case Type::Function:
-			return static_cast<Function*>(value)
-				->_function->Get(isolate);
-		case Type::External:
-			return static_cast<External*>(value)
-				->_external->Get(isolate);
-		case Type::Callback:
-		{
-			Callback* callback = static_cast<Callback*>(value);
-			callback->Retain();
-			auto localCallback = v8::External::New(isolate, callback);
-			auto persistentCallback = new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(isolate, localCallback);
-			struct Closure
-			{
-				v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >* persistent;
-				Callback* callback;
-			};
-
-			auto closure = new Closure{persistentCallback, callback};
-
-			persistentCallback->SetWeak(
-				closure,
-				[] (const v8::WeakCallbackInfo<Closure>& data)
-				{
-					auto closure = data.GetParameter();
-					auto pcb = closure->persistent;
-					auto cb = closure->callback;
-					cb->Release();
-					pcb->ClearWeak();
-					delete pcb;
-					delete closure;
-				},
-				v8::WeakCallbackType::kParameter);
-
-			v8::TryCatch tryCatch;
-			return FromJust(tryCatch, v8::Function::New(
-				Context::Global()->V8Context(),
-				[] (const v8::FunctionCallbackInfo<v8::Value>& info)
-				{
-					v8::HandleScope handleScope(info.GetIsolate());
-					try
-					{
-						std::vector<Value*> wrappedArgs;
-						wrappedArgs.reserve(info.Length());
-						for (int i = 0; i < info.Length(); ++i)
-						{
-							wrappedArgs.push_back(Wrap(info[i]));
-						}
-
-						Callback* callback =
-							static_cast<Callback*>(info.Data()
-								.As<v8::External>()
-								->Value());
-						UniqueValueVector args((const std::vector<Value*>&&)wrappedArgs);
-						Value* result = callback->Call(&args);
-
-						info.GetReturnValue().Set(Unwrap(result));
-					}
-					catch (const std::runtime_error& e)
-					{
-						info.GetIsolate()->ThrowException(
-							v8::String::NewFromUtf8(
-								info.GetIsolate(),
-								e.what(),
-								v8::NewStringType::kNormal)
-							.FromMaybe(v8::String::Empty(info.GetIsolate())));
-					}
-					catch (ScriptException& e)
-					{
-						Context::Global()->HandleScriptException(e);
-					}
-				},
-				localCallback.As<v8::Value>()));
-		}
-	}
-	return v8::Null(isolate).As<v8::Value>();
-}
-
-std::vector<v8::Local<v8::Value>> Value::UnwrapVector(const std::vector<Value*>& values)
-{
-	std::vector<v8::Local<v8::Value>> result;
-	result.reserve(values.size());
-	for (Value* value: values)
-	{
-		result.push_back(Unwrap(value));
-	}
-	return result;
-}
-
-Object::Object(v8::Local<v8::Object> object)
-	: _object(new v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object> >(Context::Isolate(), object))
-{ }
-
-Object::~Object()
-{
-	v8::Locker locker(Context::Isolate());
-	v8::Isolate::Scope isolateScope(Context::Isolate());
-	delete _object;
-}
-
-Type Object::GetValueType() const { return Type::Object; }
-
-Value* Object::Get(const String* key)
-{
-	if (key == nullptr)
-	{
-		Context::Global()->HandleRuntimeException("V8Simple::Object::Get is not defined for nullptr argument");
-		return nullptr;
-	}
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		return WrapMaybe(
-			tryCatch,
-			_object->Get(Context::Isolate())->Get(
-				Context::Global()->V8Context(),
-				ToV8String(tryCatch, *key)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-		return nullptr;
-	}
-	catch (const std::runtime_error& e)
-	{
-		Context::Global()->HandleRuntimeException(e.what());
-		return nullptr;
-	}
-}
-
-void Object::Set(const String* key, Value* value)
-{
-	if (key == nullptr)
-	{
-		Context::Global()->HandleRuntimeException("V8Simple::Object::Set is not defined for nullptr `key` argument");
-		return;
-	}
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		FromJust(tryCatch, _object->Get(Context::Isolate())->Set(
-			Context::Global()->V8Context(),
-			ToV8String(tryCatch, *key),
-			Unwrap(value)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-}
-
-UniqueValueVector* Object::Keys()
-{
-	std::vector<Value*> result;
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-		auto context = Context::Global()->V8Context();
-
-		auto propArr = FromJust(
-			tryCatch,
-			_object->Get(Context::Isolate())->GetOwnPropertyNames(context));
-
-		auto length = propArr->Length();
-		result.reserve(length);
-		for (int i = 0; i < static_cast<int>(length); ++i)
-		{
-			result.push_back(new String(FromJust(
-				tryCatch,
-				FromJust(tryCatch, propArr->Get(context, static_cast<uint32_t>(i)))->ToString(context))));
-		}
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-	return new UniqueValueVector((const std::vector<Value*>&&)result);
-}
-
-bool Object::InstanceOf(Function* type)
-{
-	if (type == nullptr)
-	{
-		return false;
-	}
-	Value* callResult = nullptr;
-	try
-	{
-		std::vector<Value*> args;
-		args.reserve(2);
-		args.push_back(this);
-		args.push_back(type);
-		callResult = Context::Global()->_instanceOf->Call(args);
-		bool result = (callResult == nullptr || callResult->GetValueType() != Type::Bool)
-			? false
-			: static_cast<Bool*>(callResult)->GetValue();
-		delete callResult;
-		return result;
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-	catch (const std::runtime_error& e)
-	{
-		Context::Global()->HandleRuntimeException(e.what());
-	}
-	delete callResult;
-	return false;
-}
-
-// Workaround for pre-C++11
-template<class T>
-static T* DataPointer(std::vector<T>& v)
-{
-	if (v.size() == 0)
-	{
-		return nullptr;
-	}
-	return &v[0];
-}
-
-Value* Object::CallMethod(
-	const String* name,
-	const std::vector<Value*>& args)
-{
-	if (name == nullptr)
-	{
-		Context::Global()->HandleRuntimeException("V8Simple::Object::CallMethod is not defined for nullptr `name` argument");
-		return nullptr;
-	}
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		auto localObject = _object->Get(Context::Isolate());
-		auto prop = FromJust(
-			tryCatch,
-			localObject->Get(
-				Context::Global()->V8Context(),
-				ToV8String(tryCatch, *name).As<v8::Value>()));
-
-		if (!prop->IsFunction())
-		{
-			Throw(tryCatch);
-		}
-		auto fun = prop.As<v8::Function>();
-
-		auto unwrappedArgs = UnwrapVector(args);
-		return WrapMaybe(
-			tryCatch,
-			fun->Call(
-				Context::Global()->V8Context(),
-				localObject,
-				static_cast<int>(unwrappedArgs.size()),
-				DataPointer(unwrappedArgs)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-	catch (const std::runtime_error& e)
-	{
-		Context::Global()->HandleRuntimeException(e.what());
-	}
-	return nullptr;
-}
-
-Value* Object::CallMethod(
-	const String* name,
-	Value** args,
-	int numArgs)
-{
-	return CallMethod(name, std::vector<Value*>(args, args + numArgs));
-}
-
-bool Object::ContainsKey(const String* key)
-{
-	if (key == nullptr)
-	{
-		Context::Global()->HandleRuntimeException("V8Simple::Object::ContainsKey is not defined for nullptr");
-		return false;
-	}
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		return FromJust(
-			tryCatch,
-			_object->Get(Context::Isolate())->Has(
-				Context::Global()->V8Context(),
-				ToV8String(tryCatch, *key)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-		return false;
-	}
-}
-
-void* Object::GetArrayBufferData()
-{
-	V8Scope scope;
-
-	auto localObject = _object->Get(Context::Isolate());
-	if (!localObject->IsArrayBuffer())
-	{
-		return nullptr;
-	}
-	auto arrayBuffer = localObject.As<v8::ArrayBuffer>();
-	return arrayBuffer->GetContents().Data();
-}
-
-bool Object::StrictEquals(const Object* object)
-{
-	if (object == nullptr)
-	{
-		return false;
-	}
-	V8Scope scope;
-	auto isolate = Context::Isolate();
-
-	return _object->Get(isolate)->StrictEquals(
-		object->_object->Get(isolate));
-}
-
-Function::Function(v8::Local<v8::Function> function)
-	: _function(new v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>>(Context::Isolate(), function))
-{ }
-
-Function::~Function()
-{
-	v8::Locker locker(Context::Isolate());
-	v8::Isolate::Scope isolateScope(Context::Isolate());
-	delete _function;
-}
-
-Type Function::GetValueType() const { return Type::Function; }
-
-Value* Function::Call(const std::vector<Value*>& args)
-{
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-		auto context = Context::Global()->V8Context();
-
-		auto unwrappedArgs = UnwrapVector(args);
-		return WrapMaybe(
-			tryCatch,
-			_function->Get(Context::Isolate())->Call(
-				context,
-				context->Global(),
-				static_cast<int>(unwrappedArgs.size()),
-				DataPointer(unwrappedArgs)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-	catch (const std::runtime_error& e)
-	{
-		Context::Global()->HandleRuntimeException(e.what());
-	}
-	return nullptr;
-}
-
-Value* Function::Call(
-	Value** args,
-	int numArgs)
-{
-	return Call(std::vector<Value*>(args, args + numArgs));
-}
-
-Object* Function::Construct(const std::vector<Value*>& args)
-{
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		auto unwrappedArgs = UnwrapVector(args);
-
-		return new Object(
-			FromJust(
-				tryCatch,
-				_function->Get(Context::Isolate())->NewInstance(
-					Context::Global()->V8Context(),
-					static_cast<int>(unwrappedArgs.size()),
-					DataPointer(unwrappedArgs))));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-	return nullptr;
-}
-
-Object* Function::Construct(
-	Value** args,
-	int numArgs)
-{
-	return Construct(std::vector<Value*>(args, args + numArgs));
-}
-
-bool Function::StrictEquals(const Function* function)
-{
-	if (function == nullptr)
-	{
-		return false;
-	}
-	V8Scope scope;
-	auto isolate = Context::Isolate();
-
-	return _function->Get(isolate)->StrictEquals(
-		function->_function->Get(isolate));
-}
-
-Array::Array(v8::Local<v8::Array> array)
-	: _array(new v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array> >(Context::Isolate(), array))
-{ }
-
-Array::~Array()
-{
-	v8::Locker locker(Context::Isolate());
-	v8::Isolate::Scope isolateScope(Context::Isolate());
-	delete _array;
-}
-
-Type Array::GetValueType() const { return Type::Array; }
-
-Value* Array::Get(int index)
-{
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		return WrapMaybe(
-			tryCatch,
-			_array->Get(Context::Isolate())->Get(
-				Context::Global()->V8Context(),
-				static_cast<uint32_t>(index)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-		return nullptr;
-	}
-	catch (const std::runtime_error& e)
-	{
-		Context::Global()->HandleRuntimeException(e.what());
-		return nullptr;
-	}
-}
-
-void Array::Set(int index, Value* value)
-{
-	try
-	{
-		V8Scope scope;
-		v8::TryCatch tryCatch;
-
-		FromJust(
-			tryCatch,
-			_array->Get(Context::Isolate())->Set(
-				Context::Global()->V8Context(),
-				static_cast<uint32_t>(index),
-				Unwrap(value)));
-	}
-	catch (ScriptException& e)
-	{
-		Context::Global()->HandleScriptException(e);
-	}
-}
-
-int Array::Length()
-{
-	V8Scope scope;
-
-	return static_cast<int>(_array->Get(Context::Isolate())->Length());
-}
-
-bool Array::StrictEquals(const Array* array)
-{
-	if (array == nullptr)
-	{
-		return false;
-	}
-	V8Scope scope;
-	auto isolate = Context::Isolate();
-
-	return _array->Get(isolate)->StrictEquals(
-		array->_array->Get(isolate));
-
-}
-
-UniqueValueVector::UniqueValueVector(const std::vector<Value*>&& values)
-	: _values(new std::vector<Value*>(values))
-{
-}
-
-int UniqueValueVector::Length()
-{
-	return static_cast<int>(_values->size());
-}
-
-Value* UniqueValueVector::Get(int index)
-{
-	Value* result = nullptr;
-	std::swap(_values->at(index), result);
-	return result;
-}
-
-UniqueValueVector::~UniqueValueVector()
-{
-	for (Value* v: *_values)
-	{
-		delete v;
-	}
-	delete _values;
-}
-
-void UniqueValueVector::Delete()
-{
-	delete this;
-}
-
-Callback::Callback()
-{
-}
-
-Value* Callback::Call(UniqueValueVector* args)
-{
-	return nullptr;
-}
-
-Type Callback::GetValueType() const { return Type::Callback; }
-
-External::External(void* value)
-{
-	V8Scope scope;
-
-	auto isolate = Context::Isolate();
-	auto localExternal = v8::External::New(isolate, value);
-	_external = new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(Context::Isolate(), localExternal);
-
-	auto finalizer
-		= new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(isolate, localExternal);
-
-	struct Closure
-	{
-		v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >* persistent;
-		void* value;
-	};
-
-	auto closure = new Closure{finalizer, value};
-
-	finalizer->SetWeak(
-		closure,
-		[] (const v8::WeakCallbackInfo<Closure>& data)
-		{
-			auto closure = data.GetParameter();
-			auto pext = closure->persistent;
-			auto value = closure->value;
-			if (Context::Global()->_externalFreer != nullptr)
-			{
-				Context::Global()->_externalFreer->Free(value);
-			}
-			pext->ClearWeak();
-			delete pext;
-			delete closure;
-		},
-		v8::WeakCallbackType::kParameter);
-}
-
-External* External::New(void* value)
-{
-	return new External(value);
-}
-
-External::External(v8::Local<v8::External> external)
-	: _external(new v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >(Context::Isolate(), external))
-{ }
-
-Type External::GetValueType() const { return Type::External; }
-
-void* External::GetValue()
-{
-	V8Scope scope;
-	auto isolate = Context::Isolate();
-	return _external->Get(isolate)->Value();
-}
-
-External::~External()
-{
-	v8::Locker locker(Context::Isolate());
-	v8::Isolate::Scope isolateScope(Context::Isolate());
-	delete _external;
-}
-
-struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
+struct ArrayBufferAllocator: v8::ArrayBuffer::Allocator
 {
 	virtual void* Allocate(size_t length)
 	{
@@ -901,311 +44,899 @@ struct ArrayBufferAllocator: ::v8::ArrayBuffer::Allocator
 	}
 };
 
-ScriptException::ScriptException(
-	Value* exception,
-	const v8::Local<v8::String>& errorMessage,
-	const v8::Local<v8::String>& fileName,
-	int lineNumber,
-	const v8::Local<v8::String>& stackTrace,
-	const v8::Local<v8::String>& sourceLine)
-	: _exception(exception)
-	, _errorMessage(errorMessage)
-	, _fileName(fileName)
-	, _stackTrace(stackTrace)
-	, _sourceLine(sourceLine)
-	, _lineNumber(lineNumber)
+v8::Platform* _platform = nullptr;
+
+struct JSContext : RefCounted
 {
-}
-
-ScriptException* ScriptException::Copy()
-{
-	auto result = new ScriptException(*this);
-	_exception = nullptr;
-	return result;
-}
-
-void ScriptException::Delete()
-{
-	delete this;
-}
-
-ScriptException::~ScriptException()
-{
-	delete _exception;
-}
-
-String* Context::NewStringFromUtf8(const char *str) const
-{
-	v8::Locker locker(_conversionIsolate);
-	v8::Isolate::Scope isolateScope(_conversionIsolate);
-	v8::HandleScope handleScope(_conversionIsolate);
-
-	auto v8Str = v8::String::NewFromUtf8(
-		_conversionIsolate,
-		str,
-		v8::NewStringType::kNormal).FromMaybe(v8::String::Empty(_conversionIsolate));
-
-	return new String(v8Str);
-}
-
-void Context::HandleScriptException(ScriptException& e) const
-{
-	if (_scriptExceptionHandler != nullptr)
+	const JSCallbackFinalizer CallbackFinalizer;
+	const JSExternalFinalizer ExternalFinalizer;
+	v8::Isolate* Isolate;
+	v8::Persistent<v8::Context> Handle;
+	JSContext(
+		JSCallbackFinalizer callbackFinalizer,
+		JSExternalFinalizer externalFinalizer)
+		: CallbackFinalizer(callbackFinalizer)
+		, ExternalFinalizer(externalFinalizer)
 	{
-		_scriptExceptionHandler->Handle(e);
-	}
-}
-
-void Context::HandleRuntimeException(const char* e) const
-{
-	if (_runtimeExceptionHandler != nullptr)
-	{
-		auto str = NewStringFromUtf8(e);
-		_runtimeExceptionHandler->Handle(str);
-		delete str;
-	}
-}
-
-void Context::SetDebugMessageHandler(MessageHandler* debugMessageHandler)
-{
-	if (Context::Global() != nullptr)
-	{
-		V8Scope scope;
-
-		_debugMessageHandler = debugMessageHandler;
-
-		if (debugMessageHandler == nullptr)
+		if (_platform == nullptr)
 		{
-			v8::Debug::SetMessageHandler(nullptr);
+			v8::V8::InitializeICU();
+			_platform = v8::platform::CreateDefaultPlatform();
+			v8::V8::InitializePlatform(_platform);
+			v8::V8::Initialize();
 		}
-		else
-		{
-			v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
-			{
-				const String str(message.GetJSON());
-				_debugMessageHandler->Handle(&str);
-			});
-		}
-	}
-}
 
-void Context::SendDebugCommand(const String* command)
-{
-	if (Context::Global() != nullptr)
-	{
-		if (command == nullptr)
-		{
-			Context::Global()->HandleRuntimeException("V8Simple::Context::SendDebugCommand is not defined for nullptr argument");
-			return;
-		}
-		v8::Debug::SendCommand(_isolate, command->GetValue(), command->GetBufferLength());
-	}
-}
-
-void Context::ProcessDebugMessages()
-{
-	if (Context::Global() != nullptr)
-	{
-		V8Scope scope;
-		v8::Debug::ProcessDebugMessages();
-	}
-}
-
-v8::Platform* Context::_platform = nullptr;
-v8::Isolate* Context::_isolate = nullptr;
-v8::Isolate* Context::_conversionIsolate = nullptr;
-MessageHandler* Context::_debugMessageHandler = nullptr;
-Context* Context::_globalContext = nullptr;
-
-Context::Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler, ExternalFreer* externalFreer)
-	: _scriptExceptionHandler(scriptExceptionHandler)
-	, _runtimeExceptionHandler(runtimeExceptionHandler)
-	, _externalFreer(externalFreer)
-{
-
-	if (_globalContext != nullptr)
-	{
-		HandleRuntimeException("V8Simple::Context is not re-entrant");
-		return;
-	}
-
-	_globalContext = this;
-
-	// v8::V8::SetFlagsFromString("--expose-gc", 11);
-	{
-		// For compatibility with node.js
-		const char flags[] = "--expose_debug_as=v8debug";
-		v8::V8::SetFlagsFromString(flags, sizeof(flags));
-	}
-
-	if (_platform == nullptr)
-	{
-		v8::V8::InitializeICU();
-		_platform = v8::platform::CreateDefaultPlatform();
-		v8::V8::InitializePlatform(_platform);
-		v8::V8::Initialize();
-	}
-
-	if (_isolate == nullptr)
-	{
-		v8::Isolate::CreateParams createParams;
 		static ArrayBufferAllocator arrayBufferAllocator;
+		v8::Isolate::CreateParams createParams;
 		createParams.array_buffer_allocator = &arrayBufferAllocator;
-		_isolate = v8::Isolate::New(createParams);
-		_conversionIsolate = v8::Isolate::New(createParams);
-	}
+		Isolate = v8::Isolate::New(createParams);
 
-	{
-		v8::Locker locker(_isolate);
-		v8::Isolate::Scope isolateScope(_isolate);
-		v8::HandleScope handleScope(_isolate);
+		v8::Locker locker(Isolate);
+		v8::Isolate::Scope isolateScope(Isolate);
+		v8::HandleScope handleScope(Isolate);
 
-		auto localContext = v8::Context::New(_isolate);
+		auto localContext = v8::Context::New(Isolate);
 		v8::Context::Scope contextScope(localContext);
 
-		_context = new v8::Persistent<v8::Context, v8::CopyablePersistentTraits<v8::Context> >(_isolate, localContext);
+		Handle.Reset(Isolate, localContext);
 	}
-	
-	{
-		const char instanceOfStrBuf[] = "instanceof";
-		const char instanceOfCodeBuf[] = "(function(x, y) { return (x instanceof y); })";
-		String* instanceOfString = NewStringFromUtf8(instanceOfStrBuf);
-		String* instanceOfCode = NewStringFromUtf8(instanceOfCodeBuf);
-		Value* instanceOf = Evaluate(instanceOfString, instanceOfCode);
-		delete instanceOfCode;
-		delete instanceOfString;
-		
-		if (!instanceOf || instanceOf->GetValueType() != Type::Function)
-		{
-			Context::HandleRuntimeException("V8Simple could not create an instanceof function");
-		}
-		else
-		{
-			_instanceOf = static_cast<Function*>(instanceOf);
-		}
-	}
-}
 
-Context* Context::New(
-	ScriptExceptionHandler* scriptExceptionHandler,
-	MessageHandler* runtimeExceptionHandler,
-	ExternalFreer* externalFreer)
+	virtual ~JSContext() override
+	{
+		Isolate->Dispose();
+		Isolate = nullptr;
+	}
+
+	inline v8::Local<v8::Context> LocalHandle() { return Handle.Get(Isolate); }
+};
+
+struct V8Scope
 {
-	return new Context(scriptExceptionHandler, runtimeExceptionHandler, externalFreer);
-}
+	V8Scope(v8::Isolate* isolate, const v8::Persistent<v8::Context>& context)
+		: Locker(isolate)
+		, IsolateScope(isolate)
+		, HandleScope(isolate)
+		, ContextScope(context.Get(isolate))
+	{
+	}
+	V8Scope(JSContext* context)
+		: V8Scope(context->Isolate, context->Handle)
+	{
+	}
+	v8::Locker Locker;
+	v8::Isolate::Scope IsolateScope;
+	v8::HandleScope HandleScope;
+	v8::Context::Scope ContextScope;
+};
 
-Context::~Context()
+struct JSValue : RefCounted
 {
-	SetDebugMessageHandler(nullptr);
-	_globalContext = nullptr;
+	virtual JSType Type() const = 0;
+};
 
-	{
-		v8::Locker locker(_isolate);
-		v8::Isolate::Scope isolateScope(_isolate);
-		v8::HandleScope handleScope(_isolate);
-
-		{
-			v8::Context::Scope contextScope(_context->Get(_isolate));
-			delete _instanceOf;
-		}
-
-		delete _context;
-	}
-
-	// _conversionIsolate->Dispose();
-	// _isolate->Dispose();
-
-	// If we do this we can't create a new context afterwards.
-	//
-	// v8::V8::Dispose();
-	// v8::V8::ShutdownPlatform();
-	// delete _platform;
-}
-
-Value* Context::Evaluate(const String* fileName, const String* code)
+struct JSInt : JSValue
 {
-	if (fileName == nullptr)
+	virtual JSType Type() const override { return JSType::Int; }
+	const int Value;
+	JSInt(int value) : Value(value) { }
+};
+
+struct JSDouble : JSValue
+{
+	virtual JSType Type() const override { return JSType::Double; }
+	const double Value;
+	JSDouble(double value) : Value(value) { }
+};
+
+struct JSString : JSValue
+{
+	virtual JSType Type() const override { return JSType::String; }
+	const v8::Persistent<v8::String> Handle;
+	JSString(v8::Isolate* isolate, const v8::Local<v8::String>& handle)
+		: Handle(isolate, handle)
 	{
-		Context::HandleRuntimeException("V8Simple::Context::Evaluate is not defined for nullptr `fileName` argument");
-		return nullptr;
 	}
-	if (code == nullptr)
+	inline v8::Local<v8::String> LocalHandle(v8::Isolate* isolate) { return Handle.Get(isolate); }
+	inline v8::Local<v8::String> LocalHandle(JSContext* context) { return Handle.Get(context->Isolate); }
+};
+
+struct JSBool : JSValue
+{
+	virtual JSType Type() const override { return JSType::Bool; }
+	const bool Value;
+	JSBool(bool value) : Value(value) { }
+};
+
+struct JSObject : JSValue
+{
+	virtual JSType Type() const override { return JSType::Object; }
+	const v8::Persistent<v8::Object> Handle;
+	JSObject(v8::Isolate* isolate, const v8::Local<v8::Object>& handle)
+		: Handle(isolate, handle)
 	{
-		Context::HandleRuntimeException("V8Simple::Context::Evaluate is not defined for nullptr `code` argument");
-		return nullptr;
 	}
+	inline v8::Local<v8::Object> LocalHandle(v8::Isolate* isolate) { return Handle.Get(isolate); }
+	inline v8::Local<v8::Object> LocalHandle(JSContext* context) { return Handle.Get(context->Isolate); }
+};
+
+struct JSArray : JSValue
+{
+	virtual JSType Type() const override { return JSType::Array; }
+	v8::Persistent<v8::Array> Handle;
+	JSArray(v8::Isolate* isolate, const v8::Local<v8::Array>& handle)
+		: Handle(isolate, handle)
+	{
+	}
+	inline v8::Local<v8::Array> LocalHandle(v8::Isolate* isolate) { return Handle.Get(isolate); }
+	inline v8::Local<v8::Array> LocalHandle(JSContext* context) { return Handle.Get(context->Isolate); }
+};
+
+struct JSFunction : JSValue
+{
+	virtual JSType Type() const override { return JSType::Function; }
+	v8::Persistent<v8::Function> Handle;
+	JSFunction(v8::Isolate* isolate, const v8::Local<v8::Function>& handle)
+		: Handle(isolate, handle)
+	{
+	}
+	inline v8::Local<v8::Function> LocalHandle(v8::Isolate* isolate) { return Handle.Get(isolate); }
+	inline v8::Local<v8::Function> LocalHandle(JSContext* context) { return Handle.Get(context->Isolate); }
+};
+
+struct JSExternal : JSValue
+{
+	virtual JSType Type() const override { return JSType::External; }
+	v8::Persistent<v8::External> Handle;
+	JSExternal(v8::Isolate* isolate, const v8::Local<v8::External>& handle)
+		: Handle(isolate, handle)
+	{
+	}
+	inline v8::Local<v8::External> LocalHandle(v8::Isolate* isolate) { return Handle.Get(isolate); }
+	inline v8::Local<v8::External> LocalHandle(JSContext* context) { return Handle.Get(context->Isolate); }
+};
+
+struct JSScriptException : RefCounted
+{
+	JSValue* Exception;
+	JSString* ErrorMessage;
+	JSString* FileName;
+	int LineNumber;
+	JSString* StackTrace;
+	JSString* SourceLine;
+
+	// Note: Assumes that all arguments are retained
+	JSScriptException(
+		JSValue* exception,
+		JSString* errorMessage,
+		JSString* fileName,
+		int lineNumber,
+		JSString* stackTrace,
+		JSString* sourceLine)
+		: Exception(exception)
+		, ErrorMessage(errorMessage)
+		, FileName(fileName)
+		, LineNumber(lineNumber)
+		, StackTrace(stackTrace)
+		, SourceLine(sourceLine)
+	{
+	}
+
+	~JSScriptException()
+	{
+		if (Exception != nullptr) Exception->Release();
+		if (ErrorMessage != nullptr) ErrorMessage->Release();
+		if (FileName != nullptr) FileName->Release();
+		if (StackTrace != nullptr) StackTrace->Release();
+		if (SourceLine != nullptr) SourceLine->Release();
+	}
+};
+
+template<typename T>
+inline static auto TryCatch(
+	JSScriptException** outError,
+	const V8Scope& scope,
+	T inner) -> decltype(inner((v8::TryCatch&)*(v8::TryCatch*)nullptr))
+{
+	*outError = nullptr;
 	try
 	{
-		V8Scope scope;
 		v8::TryCatch tryCatch;
-		auto context = V8Context();
+		return inner(tryCatch);
+	}
+	catch (JSScriptException* exception)
+	{
+		*outError = exception;
+		return decltype(inner((v8::TryCatch&)*(v8::TryCatch*)nullptr))();
+	}
+}
 
-		v8::ScriptOrigin origin(Value::ToV8String(tryCatch, *fileName));
+template<typename T>
+inline static auto TryCatch(
+	JSScriptException** outError,
+	JSContext* context,
+	T inner) -> decltype(inner((v8::TryCatch&)*(v8::TryCatch*)nullptr))
+{
+	V8Scope scope(context);
+	return TryCatch(outError, scope, inner);
+}
+
+static JSValue* Wrap(JSContext* context, const v8::TryCatch& tryCatch, v8::Local<v8::Value> value);
+
+static void Throw(JSContext* context, const v8::TryCatch& tryCatch)
+{
+	v8::Local<v8::String> emptyString = v8::String::Empty(context->Isolate);
+
+	v8::Local<v8::Message> message = tryCatch.Message();
+	v8::Local<v8::String> sourceLine(emptyString);
+	v8::Local<v8::String> messageStr(emptyString);
+	v8::Local<v8::String> fileName(emptyString);
+	int lineNumber = -1;
+	auto localContext = context->LocalHandle();
+	if (!message.IsEmpty())
+	{
+		sourceLine = message->GetSourceLine(localContext).FromMaybe(emptyString);
+		auto messageStrLocal = message->Get();
+		if (!messageStrLocal.IsEmpty())
+		{
+			messageStr = messageStrLocal;
+		}
+		fileName = message->GetScriptResourceName()->ToString(localContext).FromMaybe(emptyString);
+		lineNumber = message->GetLineNumber(localContext).FromMaybe(-1);
+	}
+
+	JSValue* exception = nullptr;
+	if (!tryCatch.Exception().IsEmpty())
+	{
+		v8::TryCatch innerTryCatch;
+		exception = Wrap(context, innerTryCatch, tryCatch.Exception());
+	}
+
+	v8::Local<v8::String> stackTrace(
+		tryCatch
+		.StackTrace(localContext)
+		.FromMaybe(emptyString.As<v8::Value>())
+		->ToString(localContext)
+		.FromMaybe(emptyString));
+
+	throw new JSScriptException(
+		exception,
+		new JSString(context->Isolate, messageStr),
+		new JSString(context->Isolate, fileName),
+		lineNumber,
+		new JSString(context->Isolate, stackTrace),
+		new JSString(context->Isolate, sourceLine));
+}
+
+template<class A>
+inline static v8::Local<A> FromJust(
+	JSContext* context,
+	const v8::TryCatch& tryCatch,
+	v8::MaybeLocal<A> a)
+{
+	if (tryCatch.HasCaught() || a.IsEmpty())
+	{
+		Throw(context, tryCatch);
+	}
+	return a.ToLocalChecked();
+}
+
+template<class A>
+inline static A FromJust(
+	JSContext* context,
+	const v8::TryCatch& tryCatch,
+	v8::Maybe<A> a)
+{
+	if (tryCatch.HasCaught() || a.IsNothing())
+	{
+		Throw(context, tryCatch);
+	}
+	return a.FromJust();
+}
+
+static JSValue* Wrap(JSContext* context, const v8::TryCatch& tryCatch, v8::Local<v8::Value> value)
+{
+	if (value->IsUndefined() || value->IsNull())
+		return nullptr;
+	if (value->IsInt32())
+		return new JSInt(FromJust(context, tryCatch, value->Int32Value(context->LocalHandle())));
+	if (value->IsNumber() || value->IsNumberObject())
+		return new JSDouble(FromJust(context, tryCatch, value->NumberValue(context->LocalHandle())));
+	if (value->IsBoolean() || value->IsBooleanObject())
+		return new JSBool(FromJust(context, tryCatch, value->BooleanValue(context->LocalHandle())));
+	if (value->IsString() || value->IsStringObject())
+		return new JSString(context->Isolate, FromJust(context, tryCatch, value->ToString(context->LocalHandle())));
+	if (value->IsArray())
+		return new JSArray(context->Isolate, FromJust(context, tryCatch, value->ToObject(context->LocalHandle())).As<v8::Array>());
+	if (value->IsFunction())
+		return new JSFunction(context->Isolate, FromJust(context, tryCatch, value->ToObject(context->LocalHandle())).As<v8::Function>());
+	if (value->IsExternal())
+		return new JSExternal(context->Isolate, value.As<v8::External>());
+	if (value->IsObject())
+		return new JSObject(context->Isolate, FromJust(context, tryCatch, value->ToObject(context->LocalHandle())));
+	return nullptr; // TODO do something good here
+}
+
+static v8::Local<v8::Value> Unwrap(v8::Isolate* isolate, JSValue* value)
+{
+	switch (GetJSValueType(value))
+	{
+		case JSType::Null:
+			return v8::Null(isolate).As<v8::Value>();
+		case JSType::Int:
+			return v8::Int32::New(isolate, static_cast<JSInt*>(value)->Value);
+		case JSType::Double:
+			return v8::Number::New(isolate, static_cast<JSDouble*>(value)->Value);
+		case JSType::Bool:
+			return v8::Boolean::New(isolate, static_cast<JSBool*>(value)->Value);
+		case JSType::String:
+			return static_cast<JSString*>(value)->LocalHandle(isolate);
+		case JSType::Array:
+			return static_cast<JSArray*>(value)->LocalHandle(isolate);
+		case JSType::Function:
+			return static_cast<JSFunction*>(value)->LocalHandle(isolate);
+		case JSType::External:
+			return static_cast<JSExternal*>(value)->LocalHandle(isolate);
+		case JSType::Object:
+			return static_cast<JSObject*>(value)->LocalHandle(isolate);
+		default: break;
+	}
+	return v8::Null(isolate).As<v8::Value>(); // TODO do something good here
+}
+
+static inline JSValue* WrapMaybe(JSContext* context, const v8::TryCatch& tryCatch, v8::MaybeLocal<v8::Value> value)
+{
+	return Wrap(context, tryCatch, FromJust(context, tryCatch, value));
+}
+
+template<typename T>
+inline static T const* data_ptr(const std::vector<T>& v)
+{
+	return v.size() > 0
+		? &*v.begin()
+		: nullptr;
+}
+
+// -------------------------------------------------------------------------
+// Context
+DllPublic void CDecl RetainJSContext(JSContext* context)
+{
+	if (context != nullptr)
+	{
+		v8::Locker(context->Isolate);
+		context->Retain();
+	}
+}
+
+DllPublic void CDecl ReleaseJSContext(JSContext* context)
+{
+	if (context != nullptr)
+	{
+		v8::Locker(context->Isolate);
+		context->Release();
+	}
+}
+
+DllPublic JSContext* CDecl CreateJSContext(
+	JSCallbackFinalizer callbackFinalizer,
+	JSExternalFinalizer externalFinalizer)
+{
+	return new JSContext(callbackFinalizer, externalFinalizer);
+}
+
+DllPublic JSValue* CDecl JSContextEvaluateCreate(JSContext* context, JSString* fileName, JSString* code, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		v8::ScriptOrigin origin(fileName->LocalHandle(context));
 		auto script = FromJust(
+			context,
 			tryCatch,
 			v8::Script::Compile(
-				context,
-				Value::ToV8String(tryCatch, *code),
+				context->LocalHandle(),
+				code->LocalHandle(context),
 				&origin));
 
-		return Value::WrapMaybe(tryCatch, script->Run(context));
-	}
-	catch (ScriptException& e)
+		return WrapMaybe(context, tryCatch, script->Run(context->LocalHandle()));
+	});
+}
+
+DllPublic JSObject* CDecl JSContextCopyGlobalObject(JSContext* context)
+{
+	V8Scope scope(context);
+	return new JSObject(context->Isolate, context->LocalHandle()->Global());
+}
+
+DllPublic const char* CDecl GetV8Version() { return v8::V8::GetVersion(); }
+
+// -------------------------------------------------------------------------
+// Debug
+DllPublic void CDecl SetJSDebugMessageHandler(JSContext* context, void* data, JSDebugMessageHandler messageHandler)
+{
+	V8Scope scope(context);
+	static void* debugHandlerData;
+	static JSDebugMessageHandler debugMessageHandler;
+	if (messageHandler == nullptr)
 	{
-		HandleScriptException(e);
+		v8::Debug::SetMessageHandler(nullptr);
+	}
+	else
+	{
+		debugHandlerData = data;
+		debugMessageHandler = messageHandler;
+		v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
+		{
+			auto isolate = message.GetIsolate();
+			v8::HandleScope handleScope(isolate);
+			debugMessageHandler(debugHandlerData, new JSString(isolate, message.GetJSON()));
+		});
+	}
+}
+
+DllPublic void CDecl SendJSDebugCommand(JSContext* context, const uint16_t* command, int length)
+{
+	V8Scope scope(context);
+	v8::Debug::SendCommand(context->Isolate, command, length);
+}
+
+DllPublic void CDecl ProcessJSDebugMessages(JSContext* context)
+{
+	V8Scope scope(context);
+	v8::Debug::ProcessDebugMessages();
+}
+
+// -------------------------------------------------------------------------
+// Value
+DllPublic JSType CDecl GetJSValueType(JSValue* value) { return value == nullptr ? JSType::Null : value->Type(); }
+DllPublic void CDecl RetainJSValue(JSContext* context, JSValue* value)
+{
+	if (value != nullptr)
+	{
+		v8::Locker(context->Isolate);
+		value->Retain();
+	}
+}
+DllPublic void CDecl ReleaseJSValue(JSContext* context, JSValue* value)
+{
+	if (value != nullptr)
+	{
+		v8::Locker(context->Isolate);
+		value->Release();
+	}
+}
+
+DllPublic int CDecl JSValueAsInt(JSValue* value, JSRuntimeError* outError)
+{
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::Int)
+	{
+		*outError = JSRuntimeError::InvalidCast;
+		return 0;
+	}
+	return static_cast<JSInt*>(value)->Value;
+}
+
+DllPublic double CDecl JSValueAsDouble(JSValue* value, JSRuntimeError* outError)
+{
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::Double)
+	{
+		*outError = JSRuntimeError::InvalidCast;
+		return 0.0;
+	}
+	return static_cast<JSDouble*>(value)->Value;
+}
+
+DllPublic JSString* CDecl JSValueAsString(JSValue* value, JSRuntimeError* outError)
+{
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::String)
+	{
+		*outError = JSRuntimeError::InvalidCast;
 		return nullptr;
 	}
-	catch (const std::runtime_error& e)
+	return static_cast<JSString*>(value);
+}
+
+DllPublic bool CDecl JSValueAsBool(JSValue* value, JSRuntimeError* outError)
+{
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::Bool)
 	{
-		HandleRuntimeException(e.what());
+		*outError = JSRuntimeError::InvalidCast;
+		return false;
+	}
+	return static_cast<JSBool*>(value)->Value;
+}
+
+DllPublic JSObject* CDecl JSValueAsObject(JSValue* value, JSRuntimeError* outError)
+{
+	*outError = JSRuntimeError::NoError;
+	auto type = GetJSValueType(value);
+	if (type != JSType::Object && type != JSType::Null)
+	{
+		*outError = JSRuntimeError::InvalidCast;
 		return nullptr;
 	}
+	return static_cast<JSObject*>(value);
 }
 
-Object* Context::GlobalObject()
+DllPublic JSArray* CDecl JSValueAsArray(JSValue* value, JSRuntimeError* outError)
 {
-	V8Scope scope;
-
-	return new Object(V8Context()->Global());
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::Array)
+	{
+		*outError = JSRuntimeError::InvalidCast;
+		return nullptr;
+	}
+	return static_cast<JSArray*>(value);
 }
 
-Object* Context::NewExternalArrayBuffer(void* data, int byteLength)
+DllPublic JSFunction* CDecl JSValueAsFunction(JSValue* value, JSRuntimeError* outError)
 {
-	V8Scope scope;
-
-	return new Object(v8::ArrayBuffer::New(Context::Isolate(), data, (size_t)byteLength));
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::Function)
+	{
+		*outError = JSRuntimeError::InvalidCast;
+		return nullptr;
+	}
+	return static_cast<JSFunction*>(value);
 }
 
-bool Context::IdleNotificationDeadline(double deadline_in_seconds)
+DllPublic JSExternal* CDecl JSValueAsExternal(JSValue* value, JSRuntimeError* outError)
 {
-	// _isolate->RequestGarbageCollectionForTesting(v8::Isolate::kFullGarbageCollection);
-	return _isolate->IdleNotificationDeadline(deadline_in_seconds);
+	*outError = JSRuntimeError::NoError;
+	if (GetJSValueType(value) != JSType::External)
+	{
+		*outError = JSRuntimeError::InvalidCast;
+		return nullptr;
+	}
+	return static_cast<JSExternal*>(value);
 }
 
-Value* Context::ThrowException(Value* exception)
+DllPublic bool CDecl JSValueStrictEquals(JSContext* context, JSValue* obj1, JSValue* obj2)
 {
-	V8Scope scope;
-
-	v8::Local<v8::Value> unwrappedException = Value::Unwrap(exception);
-
-	auto result = Isolate()->ThrowException(unwrappedException);
-
-	return Value::Wrap(result);
+	V8Scope scope(context);
+	return Unwrap(context->Isolate, obj1)->StrictEquals(Unwrap(context->Isolate, obj2));
 }
 
-void Context::Delete()
+// --------------------------------------------------------------------------
+// Primitives
+DllPublic JSValue* CDecl JSNull() { return nullptr; }
+DllPublic JSValue* CDecl CreateJSInt(int value) { return new JSInt(value); }
+DllPublic JSValue* CDecl CreateJSDouble(double value) { return new JSDouble(value); }
+DllPublic JSValue* CDecl CreateJSBool(bool value) { return new JSBool(value); }
+
+DllPublic JSObject* CDecl CreateExternalJSArrayBuffer(JSContext* context, void* data, int byteLength)
 {
-	delete this;
+	V8Scope scope(context);
+	return new JSObject(context->Isolate, v8::ArrayBuffer::New(context->Isolate, data, (size_t)byteLength));
 }
 
-v8::Local<v8::Context> Context::V8Context() const
+DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSCallback callback, JSScriptException** outError)
 {
-	return _context->Get(Isolate());
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		struct Closure
+		{
+			JSContext* context;
+			v8::Persistent<v8::External> finalizer;
+			void* data;
+			JSCallback callback;
+		};
+		auto closure = new Closure{context, {}, data, callback};
+		context->Retain();
+
+		auto localClosure = v8::External::New(context->Isolate, closure);
+		closure->finalizer.Reset(context->Isolate, localClosure);
+
+		closure->finalizer.SetWeak(
+			closure,
+			[] (const v8::WeakCallbackInfo<Closure>& data)
+			{
+				auto closure = data.GetParameter();
+				closure->context->CallbackFinalizer(closure->data);
+				closure->context->Release();
+				closure->finalizer.ClearWeak();
+				delete closure;
+			},
+			v8::WeakCallbackType::kParameter);
+
+		struct AutoReleaser
+		{
+			const std::vector<JSValue*>& _values;
+
+			~AutoReleaser()
+			{
+				for (auto v : _values)
+					v->Release();
+			}
+		};
+
+		return new JSFunction(context->Isolate,
+			FromJust(context, tryCatch, v8::Function::New(
+				context->LocalHandle(),
+				[] (const v8::FunctionCallbackInfo<v8::Value>& info)
+				{
+					auto isolate = info.GetIsolate();
+					v8::HandleScope handleScope(isolate);
+					Closure* closure =
+						static_cast<Closure*>(info.Data().
+							As<v8::External>()
+							->Value());
+
+					auto numArgs = info.Length();
+					std::vector<JSValue*> args(numArgs);
+					AutoReleaser autoRelease{args};
+
+					try
+					{
+						{
+							v8::TryCatch tryCatch;
+							for (int i = 0; i < numArgs; ++i)
+								args[i] = Wrap(closure->context, tryCatch, info[i]);
+						}
+
+						JSValue* error = nullptr;
+						JSValue* result = closure->callback(closure->context, closure->data, data_ptr(args), numArgs, &error);
+
+						info.GetReturnValue().Set(Unwrap(isolate, result));
+
+						if (error != nullptr)
+						{
+							auto unwrappedError = Unwrap(isolate, error);
+							error->Release();
+							isolate->ThrowException(unwrappedError);
+						}
+
+						if (result != nullptr)
+							result->Release();
+					}
+					catch (JSScriptException* error)
+					{
+						auto unwrappedError = Unwrap(isolate, error->Exception);
+						error->Release();
+						isolate->ThrowException(unwrappedError);
+					}
+				},
+				localClosure.As<v8::Value>())));
+	});
 }
 
-const char* Context::GetVersion()
+// --------------------------------------------------------------------------
+// String
+DllPublic JSString* CDecl CreateJSString(JSContext* context, const uint16_t* buffer, int length, JSRuntimeError* outError)
 {
-	return v8::V8::GetVersion();
+	*outError = JSRuntimeError::NoError;
+	V8Scope scope(context);
+	auto mstr = v8::String::NewFromTwoByte(context->Isolate, buffer, v8::NewStringType::kNormal, length);
+	if (mstr.IsEmpty())
+	{
+		*outError = JSRuntimeError::StringTooLong;
+		return nullptr;
+	}
+	return new JSString(context->Isolate, mstr.ToLocalChecked());
 }
 
-} // namespace V8Simple
+DllPublic int CDecl JSStringLength(JSContext* context, JSString* string)
+{
+	V8Scope scope(context);
+	return string->LocalHandle(context)->Length();
+}
+
+DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer)
+{
+	V8Scope scope(context);
+	string->LocalHandle(context)->Write(outBuffer, 0, -1, v8::String::NO_NULL_TERMINATION);
+}
+
+DllPublic JSValue* CDecl JSStringAsValue(JSString* string) { return static_cast<JSValue*>(string); }
+
+// -------------------------------------------------------------------------
+// Object
+DllPublic JSValue* CDecl CopyJSObjectProperty(JSContext* context, JSObject* obj, JSString* key, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		return WrapMaybe(
+			context,
+			tryCatch,
+			obj->LocalHandle(context)->Get(
+				context->LocalHandle(),
+				key->LocalHandle(context)));
+	});
+}
+
+DllPublic void CDecl SetJSObjectProperty(JSContext* context, JSObject* obj, JSString* key, JSValue* value, JSScriptException** outError)
+{
+	TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		FromJust(context, tryCatch, obj->LocalHandle(context)->Set(
+			context->LocalHandle(),
+			key->LocalHandle(context),
+			Unwrap(context->Isolate, value)));
+	});
+}
+
+DllPublic JSArray* CDecl CopyJSObjectOwnPropertyNames(JSContext* context, JSObject* obj, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		return new JSArray(
+			context->Isolate,
+			FromJust(
+				context,
+				tryCatch,
+				obj->LocalHandle(context)->GetOwnPropertyNames(context->LocalHandle())));
+	});
+}
+
+DllPublic bool CDecl JSObjectHasProperty(JSContext* context, JSObject* obj, JSString* key, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		return FromJust(
+			context,
+			tryCatch,
+			obj->LocalHandle(context)->Has(context->LocalHandle(), key->LocalHandle(context)));
+	});
+}
+
+DllPublic void* CDecl GetJSObjectArrayBufferData(JSContext* context, JSObject* obj, JSRuntimeError* outError)
+{
+	*outError = JSRuntimeError::NoError;
+	V8Scope scope(context);
+	auto localObj = obj->LocalHandle(context);
+	if (!localObj->IsArrayBuffer())
+	{
+		*outError = JSRuntimeError::TypeError;
+		return nullptr;
+	}
+	return localObj.As<v8::ArrayBuffer>()->GetContents().Data();
+}
+
+DllPublic JSValue* CDecl JSObjectAsValue(JSObject* obj) { return static_cast<JSValue*>(obj); }
+
+// -------------------------------------------------------------------------
+// Array
+DllPublic JSValue* CDecl CopyJSArrayPropertyAtIndex(JSContext* context, JSArray* arr, int index, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		return WrapMaybe(
+			context,
+			tryCatch,
+			arr->LocalHandle(context)->Get(context->LocalHandle(), index));
+	});
+}
+
+DllPublic void CDecl SetJSArrayPropertyAtIndex(JSContext* context, JSArray* arr, int index, JSValue* value, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		FromJust(
+			context,
+			tryCatch,
+			arr->LocalHandle(context)->Set(
+				context->LocalHandle(),
+				static_cast<uint32_t>(index),
+				Unwrap(context->Isolate, value)));
+	});
+}
+
+DllPublic int CDecl JSArrayLength(JSContext* context, JSArray* arr)
+{
+	V8Scope scope(context);
+	return static_cast<int>(arr->LocalHandle(context)->Length());
+}
+
+DllPublic JSValue* CDecl JSArrayAsValue(JSArray* arr) { return static_cast<JSValue*>(arr); }
+
+// -------------------------------------------------------------------------
+// Function
+DllPublic JSValue* CDecl CallJSFunctionCreate(JSContext* context, JSFunction* function, JSObject* thisObject, JSValue* const* args, int numArgs, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		std::vector<v8::Local<v8::Value>> unwrappedArgs(numArgs);
+
+		for (int i = 0; i < numArgs; ++i)
+			unwrappedArgs[i] = Unwrap(context->Isolate, args[i]);
+
+		return WrapMaybe(
+			context,
+			tryCatch,
+			function->LocalHandle(context)->Call(
+				context->LocalHandle(),
+				Unwrap(context->Isolate, thisObject),
+				numArgs,
+				&unwrappedArgs[0]));
+
+	});
+}
+
+DllPublic JSObject* CDecl ConstructJSFunctionCreate(JSContext* context, JSFunction* function, JSValue* const* args, int numArgs, JSScriptException** outError)
+{
+	return TryCatch(outError, context, [&] (v8::TryCatch& tryCatch)
+	{
+		std::vector<v8::Local<v8::Value>> unwrappedArgs(numArgs);
+
+		for (int i = 0; i < numArgs; ++i)
+			unwrappedArgs[i] = Unwrap(context->Isolate, args[i]);
+
+		return new JSObject(
+			context->Isolate,
+			FromJust(context, tryCatch, function->LocalHandle(context)->NewInstance(
+				context->LocalHandle(),
+				numArgs,
+				&unwrappedArgs[0])));
+	});
+}
+
+DllPublic JSValue* CDecl JSFunctionAsValue(JSFunction* fun) { return static_cast<JSValue*>(fun); }
+
+// -------------------------------------------------------------------------
+// External
+DllPublic JSExternal* CDecl CreateJSExternal(JSContext* context, void* value)
+{
+	V8Scope scope(context);
+
+	auto localExternal = v8::External::New(context->Isolate, value);
+
+	struct Closure
+	{
+		v8::Persistent<v8::External> finalizer;
+		JSExternalFinalizer externalFinalizer;
+		void* value;
+	};
+
+	auto closure = new Closure{{}, context->ExternalFinalizer, value};
+	closure->finalizer.Reset(context->Isolate, localExternal);
+
+	closure->finalizer.SetWeak(
+		closure,
+		[] (const v8::WeakCallbackInfo<Closure>& data)
+		{
+			auto closure = data.GetParameter();
+			if (closure->externalFinalizer != nullptr)
+				closure->externalFinalizer(closure->value);
+			closure->finalizer.ClearWeak();
+			delete closure;
+		},
+		v8::WeakCallbackType::kParameter);
+
+	return new JSExternal(context->Isolate, v8::External::New(context->Isolate, value));
+}
+
+DllPublic void* CDecl GetJSExternalValue(JSContext* context, JSExternal* external)
+{
+	V8Scope scope(context);
+	return external->LocalHandle(context)->Value();
+}
+
+DllPublic JSValue* CDecl JSExternalAsValue(JSExternal* external) { return static_cast<JSValue*>(external); }
+
+// -------------------------------------------------------------------------
+// Exceptions
+DllPublic void CDecl RetainJSScriptException(JSContext* context, JSScriptException* e)
+{
+	if (e != nullptr)
+	{
+		v8::Locker(context->Isolate);
+		e->Retain();
+	}
+}
+DllPublic void CDecl ReleaseJSScriptException(JSContext* context, JSScriptException* e)
+{
+	if (e != nullptr)
+	{
+		v8::Locker(context->Isolate);
+		e->Release();
+	}
+}
+DllPublic JSValue* CDecl GetJSScriptException(JSScriptException* e) { return e->Exception; }
+DllPublic JSString* CDecl GetJSScriptExceptionMessage(JSScriptException* e) { return e->ErrorMessage; }
+DllPublic JSString* CDecl GetJSScriptExceptionFileName(JSScriptException* e) { return e->FileName; }
+DllPublic int CDecl GetJSScriptExceptionLineNumber(JSScriptException* e) { return e->LineNumber; }
+DllPublic JSString* CDecl GetJSScriptExceptionStackTrace(JSScriptException* e) { return e->StackTrace; }
+DllPublic JSString* CDecl GetJSScriptExceptionSourceLine(JSScriptException* e) { return e->SourceLine; }
+/// }
