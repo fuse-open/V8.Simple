@@ -463,13 +463,13 @@ DllPublic void CDecl SetJSDebugMessageHandler(JSContext* context, void* data, JS
 	static JSDebugMessageHandler debugMessageHandler;
 	if (messageHandler == nullptr)
 	{
-		v8::Debug::SetMessageHandler(nullptr);
+		v8::Debug::SetMessageHandler(context->Isolate, nullptr);
 	}
 	else
 	{
 		debugHandlerData = data;
 		debugMessageHandler = messageHandler;
-		v8::Debug::SetMessageHandler([] (const v8::Debug::Message& message)
+		v8::Debug::SetMessageHandler(context->Isolate, [] (const v8::Debug::Message& message)
 		{
 			auto isolate = message.GetIsolate();
 			v8::HandleScope handleScope(isolate);
@@ -487,7 +487,7 @@ DllPublic void CDecl SendJSDebugCommand(JSContext* context, const uint16_t* comm
 DllPublic void CDecl ProcessJSDebugMessages(JSContext* context)
 {
 	V8Scope scope(context);
-	v8::Debug::ProcessDebugMessages();
+	v8::Debug::ProcessDebugMessages(context->Isolate);
 }
 
 // -------------------------------------------------------------------------
