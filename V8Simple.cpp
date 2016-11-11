@@ -4,10 +4,16 @@
 #include <include/libplatform/libplatform.h>
 #include <vector>
 #include <cstdlib>
+#include <atomic>
 
 struct RefCounted
 {
-	int _refCount = 1;
+	std::atomic_int _refCount;
+
+	RefCounted()
+		: _refCount(1)
+	{
+	}
 
 	void Retain()
 	{
@@ -16,8 +22,8 @@ struct RefCounted
 
 	void Release()
 	{
-		--_refCount;
-		if (_refCount == 0)
+		auto newRefCount = --_refCount;
+		if (newRefCount == 0)
 		{
 			delete this;
 		}
