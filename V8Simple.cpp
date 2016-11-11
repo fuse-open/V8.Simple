@@ -345,11 +345,11 @@ static JSValue* Wrap(JSContext* context, const v8::TryCatch& tryCatch, v8::Local
 		return nullptr;
 	if (value->IsInt32())
 		return new JSInt(FromJust(context, tryCatch, value->Int32Value(context->LocalHandle())));
-	if (value->IsNumber() || value->IsNumberObject())
+	if (value->IsNumber())
 		return new JSDouble(FromJust(context, tryCatch, value->NumberValue(context->LocalHandle())));
-	if (value->IsBoolean() || value->IsBooleanObject())
+	if (value->IsBoolean())
 		return new JSBool(FromJust(context, tryCatch, value->BooleanValue(context->LocalHandle())));
-	if (value->IsString() || value->IsStringObject())
+	if (value->IsString())
 		return new JSString(context->Isolate, FromJust(context, tryCatch, value->ToString(context->LocalHandle())));
 	if (value->IsArray())
 		return new JSArray(context->Isolate, FromJust(context, tryCatch, value->ToObject(context->LocalHandle())).As<v8::Array>());
