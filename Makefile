@@ -1,5 +1,5 @@
-LDFLAGS+= -fPIC -fno-rtti -dead_strip
-CXXFLAGS+= -Wall -std=c++11
+LDFLAGS+= -flto -fPIC -dead_strip
+CXXFLAGS+= -fexceptions -Wall -std=c++11
 
 FILE=V8Simple
 LIB_DIR=lib
@@ -14,11 +14,11 @@ $(OBJ_DIR)/%.o: %.cpp
 
 $(LIB_DIR)/$(LIB_FILE): $(OBJ_DIR)/$(FILE).o
 	@mkdir -p $(LIB_DIR)
-	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
 $(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o
 	@mkdir -p $(LIB_DIR)
-	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
 $(FILE).cs: $(FILE).h
 	./extract_pinvoke.sh $^ $@
