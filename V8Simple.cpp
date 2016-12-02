@@ -11,8 +11,8 @@ struct RefCounted
 	std::atomic_int _refCount;
 
 	RefCounted()
-		: _refCount(1)
 	{
+		_refCount = 1;
 	}
 
 	void Retain()
@@ -497,16 +497,30 @@ DllPublic void CDecl RetainJSValue(JSContext* context, JSValue* value)
 {
 	if (value != nullptr)
 	{
-		v8::Locker(context->Isolate);
-		value->Retain();
+		if (context != nullptr)
+		{
+			v8::Locker(context->Isolate);
+			value->Retain();
+		}
+		else
+		{
+			value->Retain();
+		}
 	}
 }
 DllPublic void CDecl ReleaseJSValue(JSContext* context, JSValue* value)
 {
 	if (value != nullptr)
 	{
-		v8::Locker(context->Isolate);
-		value->Release();
+		if (context != nullptr)
+		{
+			v8::Locker(context->Isolate);
+			value->Release();
+		}
+		else
+		{
+			value->Release();
+		}
 	}
 }
 
@@ -687,15 +701,15 @@ DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSC
 
 						info.GetReturnValue().Set(Unwrap(isolate, result));
 
+						if (result != nullptr)
+							result->Release();
+
 						if (error != nullptr)
 						{
 							auto unwrappedError = Unwrap(isolate, error);
 							error->Release();
 							isolate->ThrowException(unwrappedError);
 						}
-
-						if (result != nullptr)
-							result->Release();
 					}
 					catch (JSScriptException* error)
 					{
