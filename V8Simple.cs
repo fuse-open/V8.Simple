@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 namespace Fuse.Scripting.V8.Simple
 {
 // -------------------------------------------------------------------------
@@ -15,61 +16,53 @@ public enum JSType
 	Array,
 	Function,
 	External,
-};
+}
 public enum JSRuntimeError
 {
 	NoError,
 	InvalidCast,
 	StringTooLong,
 	TypeError,
-};
+}
 [StructLayout(LayoutKind.Sequential)]
 public struct JSContext
 {
 	readonly IntPtr _handle;
-	public JSContext(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSValue
 {
 	readonly IntPtr _handle;
-	public JSValue(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSString
 {
 	readonly IntPtr _handle;
-	public JSString(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSObject
 {
 	readonly IntPtr _handle;
-	public JSObject(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSArray
 {
 	readonly IntPtr _handle;
-	public JSArray(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSFunction
 {
 	readonly IntPtr _handle;
-	public JSFunction(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSExternal
 {
 	readonly IntPtr _handle;
-	public JSExternal(IntPtr handle) { _handle = handle; }
 }
 [StructLayout(LayoutKind.Sequential)]
 public struct JSScriptException
 {
 	readonly IntPtr _handle;
-	public JSScriptException(IntPtr handle) { _handle = handle; }
 	public override bool Equals(object that) { return that is JSScriptException ? this == (JSScriptException)that : false; }
 	public override int GetHashCode() { return _handle.GetHashCode(); }
 	public static bool operator ==(JSScriptException e1, JSScriptException e2) { return e1._handle == e2._handle; }
@@ -159,7 +152,7 @@ public static extern JSString CreateString(JSContext context, [MarshalAs(Unmanag
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringLength")]
 public static extern int Length(JSContext context, JSString str);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="WriteJSStringBuffer")]
-public static extern int Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPArray)]byte[] buffer);
+public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringAsValue")]
 public static extern JSValue AsValue(JSString str);
 // -------------------------------------------------------------------------

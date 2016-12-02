@@ -18,6 +18,7 @@
 
 /// using System;
 /// using System.Runtime.InteropServices;
+/// using System.Text;
 /// namespace Fuse.Scripting.V8.Simple
 /// {
 /// // -------------------------------------------------------------------------
@@ -33,7 +34,7 @@
 /// 	Array,
 /// 	Function,
 /// 	External,
-/// };
+/// }
 enum class JSType
 {
 	Null,
@@ -52,7 +53,7 @@ enum class JSType
 /// 	InvalidCast,
 /// 	StringTooLong,
 /// 	TypeError,
-/// };
+/// }
 enum class JSRuntimeError
 {
 	NoError,
@@ -64,56 +65,48 @@ enum class JSRuntimeError
 /// public struct JSContext
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSContext(IntPtr handle) { _handle = handle; }
 /// }
 struct JSContext;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSValue
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSValue(IntPtr handle) { _handle = handle; }
 /// }
 struct JSValue;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSString
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSString(IntPtr handle) { _handle = handle; }
 /// }
 struct JSString;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSObject
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSObject(IntPtr handle) { _handle = handle; }
 /// }
 struct JSObject;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSArray
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSArray(IntPtr handle) { _handle = handle; }
 /// }
 struct JSArray;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSFunction
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSFunction(IntPtr handle) { _handle = handle; }
 /// }
 struct JSFunction;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSExternal
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSExternal(IntPtr handle) { _handle = handle; }
 /// }
 struct JSExternal;
 /// [StructLayout(LayoutKind.Sequential)]
 /// public struct JSScriptException
 /// {
 /// 	readonly IntPtr _handle;
-/// 	public JSScriptException(IntPtr handle) { _handle = handle; }
 /// 	public override bool Equals(object that) { return that is JSScriptException ? this == (JSScriptException)that : false; }
 /// 	public override int GetHashCode() { return _handle.GetHashCode(); }
 /// 	public static bool operator ==(JSScriptException e1, JSScriptException e2) { return e1._handle == e2._handle; }
@@ -243,7 +236,7 @@ DllPublic JSString* CDecl CreateJSString(JSContext* context, const uint16_t* buf
 /// public static extern int Length(JSContext context, JSString str);
 DllPublic int CDecl JSStringLength(JSContext* context, JSString* string);
 /// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="WriteJSStringBuffer")]
-/// public static extern int Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPArray)]byte[] buffer);
+/// public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer);
 DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer);
 /// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringAsValue")]
 /// public static extern JSValue AsValue(JSString str);

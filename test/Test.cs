@@ -43,9 +43,9 @@ public class V8SimpleTests
 		JSRuntimeError err;
 		var jsStr = Value.AsString(val, out err);
 		CheckError(err);
-		var bytes = new byte[sizeof(char) * Value.Length(context, jsStr)];
-		Value.Write(context, jsStr, bytes);
-		return Encoding.Unicode.GetString(bytes);
+		var builder = new StringBuilder(Value.Length(context, jsStr));
+		Value.Write(context, jsStr, builder);
+		return builder.ToString();
 	}
 
 	static int AsInt(JSValue val)
