@@ -58,11 +58,16 @@ struct JSContext : RefCounted
 	const JSExternalFinalizer ExternalFinalizer;
 	v8::Isolate* Isolate;
 	v8::Persistent<v8::Context> Handle;
+	JSDebugMessageHandler DebugMessageHandler;
+	void* DebugMessageHandlerData;
+
 	JSContext(
 		JSCallbackFinalizer callbackFinalizer,
 		JSExternalFinalizer externalFinalizer)
 		: CallbackFinalizer(callbackFinalizer)
 		, ExternalFinalizer(externalFinalizer)
+		, DebugMessageHandler(nullptr)
+		, DebugMessageHandlerData(nullptr)
 	{
 		if (_platform == nullptr)
 		{
@@ -89,6 +94,12 @@ struct JSContext : RefCounted
 
 	virtual ~JSContext() override
 	{
+		auto oldData = DebugMessageHandlerData;
+		DebugMessageHandler = nullptr;
+		DebugMessageHandlerData = nullptr;
+		if (ExternalFinalizer != nullptr && oldData != nullptr)
+			ExternalFinalizer(oldData);
+
 		Isolate->Dispose();
 		Isolate = nullptr;
 	}
@@ -402,6 +413,14 @@ inline static T const* data_ptr(const std::vector<T>& v)
 		: nullptr;
 }
 
+template<typename T>
+inline static T* data_ptr(std::vector<T>& v)
+{
+	return v.size() > 0
+		? &*v.begin()
+		: nullptr;
+}
+
 // -------------------------------------------------------------------------
 // Context
 DllPublic void CDecl RetainJSContext(JSContext* context)
@@ -458,29 +477,37 @@ DllPublic const char* CDecl GetV8Version() { return v8::V8::GetVersion(); }
 // Debug
 DllPublic void CDecl SetJSDebugMessageHandler(JSContext* context, void* data, JSDebugMessageHandler messageHandler)
 {
-	V8Scope scope(context);
-	static void* debugHandlerData;
-	static JSDebugMessageHandler debugMessageHandler;
-	if (messageHandler == nullptr)
+	static JSContext* debugContext;
+	debugContext = context;
+	if (context->DebugMessageHandlerData != data || context->DebugMessageHandler != messageHandler)
 	{
-		v8::Debug::SetMessageHandler(context->Isolate, nullptr);
-	}
-	else
-	{
-		debugHandlerData = data;
-		debugMessageHandler = messageHandler;
-		v8::Debug::SetMessageHandler(context->Isolate, [] (const v8::Debug::Message& message)
+		V8Scope scope(context);
+		auto oldData = context->DebugMessageHandlerData;
+
+		if (messageHandler == nullptr)
 		{
-			auto isolate = message.GetIsolate();
-			v8::HandleScope handleScope(isolate);
-			debugMessageHandler(debugHandlerData, new JSString(isolate, message.GetJSON()));
-		});
+			context->DebugMessageHandler = nullptr;
+			context->DebugMessageHandlerData = nullptr;
+			v8::Debug::SetMessageHandler(context->Isolate, nullptr);
+		}
+		else
+		{
+			context->DebugMessageHandlerData = data;
+			context->DebugMessageHandler = messageHandler;
+			v8::Debug::SetMessageHandler(context->Isolate, [] (const v8::Debug::Message& message)
+			{
+				auto isolate = message.GetIsolate();
+				v8::HandleScope handleScope(isolate);
+				debugContext->DebugMessageHandler(debugContext->DebugMessageHandlerData, new JSString(isolate, message.GetJSON()));
+			});
+		}
+		if (context->ExternalFinalizer != nullptr && oldData != nullptr)
+			context->ExternalFinalizer(oldData);
 	}
 }
 
 DllPublic void CDecl SendJSDebugCommand(JSContext* context, const uint16_t* command, int length)
 {
-	V8Scope scope(context);
 	v8::Debug::SendCommand(context->Isolate, command, length);
 }
 
@@ -644,7 +671,6 @@ DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSC
 			JSCallback callback;
 		};
 		auto closure = new Closure{context, {}, data, callback};
-		context->Retain();
 
 		auto localClosure = v8::External::New(context->Isolate, closure);
 		closure->finalizer.Reset(context->Isolate, localClosure);
@@ -655,8 +681,7 @@ DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSC
 			{
 				auto closure = data.GetParameter();
 				closure->context->CallbackFinalizer(closure->data);
-				closure->context->Release();
-				closure->finalizer.ClearWeak();
+				closure->finalizer.Reset();
 				delete closure;
 			},
 			v8::WeakCallbackType::kParameter);
@@ -869,7 +894,7 @@ DllPublic JSValue* CDecl CallJSFunctionCreate(JSContext* context, JSFunction* fu
 				context->LocalHandle(),
 				Unwrap(context->Isolate, thisObject),
 				numArgs,
-				&unwrappedArgs[0]));
+				data_ptr(unwrappedArgs)));
 
 	});
 }
@@ -888,7 +913,7 @@ DllPublic JSObject* CDecl ConstructJSFunctionCreate(JSContext* context, JSFuncti
 			FromJust(context, tryCatch, function->LocalHandle(context)->NewInstance(
 				context->LocalHandle(),
 				numArgs,
-				&unwrappedArgs[0])));
+				data_ptr(unwrappedArgs))));
 	});
 }
 
@@ -917,9 +942,7 @@ DllPublic JSExternal* CDecl CreateJSExternal(JSContext* context, void* value)
 		[] (const v8::WeakCallbackInfo<Closure>& data)
 		{
 			auto closure = data.GetParameter();
-			if (closure->externalFinalizer != nullptr)
-				closure->externalFinalizer(closure->value);
-			closure->finalizer.ClearWeak();
+			closure->finalizer.Reset();
 			delete closure;
 		},
 		v8::WeakCallbackType::kParameter);

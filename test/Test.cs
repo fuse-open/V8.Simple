@@ -444,14 +444,17 @@ public class V8SimpleTests
 		Context.Release(context);
 	}
 
+	static JSDebugMessageHandler _messageHandler;
+
 	[Test]
 	public void Debugger()
 	{
+		_messageHandler = (data, message) => { return; };
 		var context = Context.Create(null, null);
 		Debug.SetMessageHandler(context, IntPtr.Zero, null);
 		Debug.ProcessMessages(context);
 
-		Debug.SetMessageHandler(context, IntPtr.Zero, (data, message) => { return; });
+		Debug.SetMessageHandler(context, IntPtr.Zero, _messageHandler);
 		Debug.SendCommand(context, "{}", 2);
 		Debug.ProcessMessages(context);
 
