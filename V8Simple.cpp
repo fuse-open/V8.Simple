@@ -693,7 +693,10 @@ DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSC
 			~AutoReleaser()
 			{
 				for (auto v : _values)
-					v->Release();
+				{
+					if (v != nullptr)
+						v->Release();
+				}
 			}
 		};
 

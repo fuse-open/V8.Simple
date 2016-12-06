@@ -153,6 +153,12 @@ public static extern JSString CreateString(JSContext context, [MarshalAs(Unmanag
 public static extern int Length(JSContext context, JSString str);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="WriteJSStringBuffer")]
 public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer);
+public static string ToString(JSContext context, JSString str)
+{
+	var sb = new StringBuilder(Length(context, str));
+	Write(context, str, sb);
+	return sb.ToString();
+}
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringAsValue")]
 public static extern JSValue AsValue(JSString str);
 // -------------------------------------------------------------------------
