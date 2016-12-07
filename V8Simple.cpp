@@ -672,7 +672,9 @@ DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSC
 			[] (const v8::WeakCallbackInfo<Closure>& data)
 			{
 				auto closure = data.GetParameter();
-				closure->context->CallbackFinalizer(closure->data);
+				auto f = closure->context->CallbackFinalizer;
+				if (f != nullptr)
+					f(closure->data);
 				closure->finalizer.Reset();
 				delete closure;
 			},
@@ -937,6 +939,8 @@ DllPublic JSExternal* CDecl CreateJSExternal(JSContext* context, void* value)
 		[] (const v8::WeakCallbackInfo<Closure>& data)
 		{
 			auto closure = data.GetParameter();
+			if (closure->externalFinalizer != nullptr)
+				closure->externalFinalizer(closure->value);
 			closure->finalizer.Reset();
 			delete closure;
 		},
