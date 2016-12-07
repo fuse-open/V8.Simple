@@ -52,12 +52,17 @@ struct ArrayBufferAllocator: v8::ArrayBuffer::Allocator
 
 v8::Platform* _platform = nullptr;
 
+// Using this and not plain v8::Persistents ensures that the references are
+// reset in the destructor.
+template<class T>
+using ResettingPersistent = v8::Persistent<T, v8::CopyablePersistentTraits<T>>;
+
 struct JSContext : RefCounted
 {
 	const JSCallbackFinalizer CallbackFinalizer;
 	const JSExternalFinalizer ExternalFinalizer;
 	v8::Isolate* Isolate;
-	v8::Persistent<v8::Context> Handle;
+	ResettingPersistent<v8::Context> Handle;
 	JSDebugMessageHandler DebugMessageHandler;
 	void* DebugMessageHandlerData;
 
@@ -99,6 +104,7 @@ struct JSContext : RefCounted
 		DebugMessageHandlerData = nullptr;
 		if (ExternalFinalizer != nullptr && oldData != nullptr)
 			ExternalFinalizer(oldData);
+		Handle.Reset();
 
 		Isolate->Dispose();
 		Isolate = nullptr;
@@ -109,7 +115,7 @@ struct JSContext : RefCounted
 
 struct V8Scope
 {
-	V8Scope(v8::Isolate* isolate, const v8::Persistent<v8::Context>& context)
+	V8Scope(v8::Isolate* isolate, const ResettingPersistent<v8::Context>& context)
 		: Locker(isolate)
 		, IsolateScope(isolate)
 		, HandleScope(isolate)
@@ -148,7 +154,7 @@ struct JSDouble : JSValue
 struct JSString : JSValue
 {
 	virtual JSType Type() const override { return JSType::String; }
-	const v8::Persistent<v8::String> Handle;
+	const ResettingPersistent<v8::String> Handle;
 	JSString(v8::Isolate* isolate, const v8::Local<v8::String>& handle)
 		: Handle(isolate, handle)
 	{
@@ -167,7 +173,7 @@ struct JSBool : JSValue
 struct JSObject : JSValue
 {
 	virtual JSType Type() const override { return JSType::Object; }
-	const v8::Persistent<v8::Object> Handle;
+	const ResettingPersistent<v8::Object> Handle;
 	JSObject(v8::Isolate* isolate, const v8::Local<v8::Object>& handle)
 		: Handle(isolate, handle)
 	{
@@ -179,7 +185,7 @@ struct JSObject : JSValue
 struct JSArray : JSValue
 {
 	virtual JSType Type() const override { return JSType::Array; }
-	v8::Persistent<v8::Array> Handle;
+	ResettingPersistent<v8::Array> Handle;
 	JSArray(v8::Isolate* isolate, const v8::Local<v8::Array>& handle)
 		: Handle(isolate, handle)
 	{
@@ -191,7 +197,7 @@ struct JSArray : JSValue
 struct JSFunction : JSValue
 {
 	virtual JSType Type() const override { return JSType::Function; }
-	v8::Persistent<v8::Function> Handle;
+	ResettingPersistent<v8::Function> Handle;
 	JSFunction(v8::Isolate* isolate, const v8::Local<v8::Function>& handle)
 		: Handle(isolate, handle)
 	{
@@ -203,7 +209,7 @@ struct JSFunction : JSValue
 struct JSExternal : JSValue
 {
 	virtual JSType Type() const override { return JSType::External; }
-	v8::Persistent<v8::External> Handle;
+	ResettingPersistent<v8::External> Handle;
 	JSExternal(v8::Isolate* isolate, const v8::Local<v8::External>& handle)
 		: Handle(isolate, handle)
 	{
@@ -652,7 +658,7 @@ DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSC
 		struct Closure
 		{
 			JSContext* context;
-			v8::Persistent<v8::External> finalizer;
+			ResettingPersistent<v8::External> finalizer;
 			void* data;
 			JSCallback callback;
 		};
@@ -918,7 +924,7 @@ DllPublic JSExternal* CDecl CreateJSExternal(JSContext* context, void* value)
 
 	struct Closure
 	{
-		v8::Persistent<v8::External> finalizer;
+		ResettingPersistent<v8::External> finalizer;
 		JSExternalFinalizer externalFinalizer;
 		void* value;
 	};
