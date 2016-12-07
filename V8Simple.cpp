@@ -427,7 +427,6 @@ DllPublic void CDecl RetainJSContext(JSContext* context)
 {
 	if (context != nullptr)
 	{
-		v8::Locker(context->Isolate);
 		context->Retain();
 	}
 }
@@ -523,31 +522,18 @@ DllPublic JSType CDecl GetJSValueType(JSValue* value) { return value == nullptr 
 DllPublic void CDecl RetainJSValue(JSContext* context, JSValue* value)
 {
 	if (value != nullptr)
-	{
-		if (context != nullptr)
-		{
-			v8::Locker(context->Isolate);
-			value->Retain();
-		}
-		else
-		{
-			value->Retain();
-		}
-	}
+		value->Retain();
 }
 DllPublic void CDecl ReleaseJSValue(JSContext* context, JSValue* value)
 {
-	if (value != nullptr)
+	if (value != nullptr && context != nullptr)
 	{
-		if (context != nullptr)
-		{
-			v8::Locker(context->Isolate);
-			value->Release();
-		}
-		else
-		{
-			value->Release();
-		}
+		v8::Locker(context->Isolate);
+		value->Release();
+	}
+	else
+	{
+		// Leak
 	}
 }
 
