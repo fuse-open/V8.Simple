@@ -771,10 +771,10 @@ DllPublic int CDecl JSStringLength(JSContext* context, JSString* string)
 	return string->LocalHandle(context)->Length();
 }
 
-DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer)
+DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer, bool nullTerminate)
 {
 	V8Scope scope(context);
-	string->LocalHandle(context)->Write(outBuffer, 0, -1, v8::String::NO_NULL_TERMINATION);
+	string->LocalHandle(context)->Write(outBuffer, 0, -1, nullTerminate ? v8::String::NO_OPTIONS : v8::String::NO_NULL_TERMINATION);
 }
 
 DllPublic JSValue* CDecl JSStringAsValue(JSString* string) { return static_cast<JSValue*>(string); }

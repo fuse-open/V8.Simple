@@ -236,12 +236,12 @@ DllPublic JSString* CDecl CreateJSString(JSContext* context, const uint16_t* buf
 /// public static extern int Length(JSContext context, JSString str);
 DllPublic int CDecl JSStringLength(JSContext* context, JSString* string);
 /// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="WriteJSStringBuffer")]
-/// public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer);
-DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer);
+/// public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer, [MarshalAs(UnmanagedType.Bool)]bool nullTerminate);
+DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer, bool nullTerminate);
 /// public static string ToString(JSContext context, JSString str)
 /// {
-/// 	var sb = new StringBuilder(Length(context, str));
-/// 	Write(context, str, sb);
+/// 	var sb = new StringBuilder(Length(context, str) + 1);
+/// 	Write(context, str, sb, true);
 /// 	return sb.ToString();
 /// }
 
