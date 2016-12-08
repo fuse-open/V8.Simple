@@ -1,31 +1,43 @@
 #pragma once
-#include <include/v8.h>
-#include <stdexcept>
-#include <vector>
 
-// Note: All public functions that return a Value* (or derived class), require
-// that the caller takes ownership of and deletes the pointer when appropriate.
-// The Values should be deallocated with the Delete functions (for maximum
-// portability).
+#include <stdint.h>
 
 #ifdef _MSC_VER
-#define DllExport __declspec(dllexport)
+#  ifdef BUILDING_DLL
+#    define DllPublic extern "C" __declspec(dllexport)
+#  else
+#    define DllPublic extern "C" __declspec(dllimport)
+#  endif
+#  define StdCall __stdcall
+#  define CDecl __cdecl
 #else
-#define DllExport
+#  define DllPublic extern "C" __attribute__((visibility ("default")))
+#  define StdCall
+#  define CDecl
 #endif
 
-namespace V8Simple
+/// using System;
+/// using System.Runtime.InteropServices;
+/// using System.Text;
+/// namespace Fuse.Scripting.V8.Simple
+/// {
+/// // -------------------------------------------------------------------------
+/// // Types
+/// public enum JSType
+/// {
+/// 	Null,
+/// 	Int,
+/// 	Double,
+/// 	String,
+/// 	Bool,
+/// 	Object,
+/// 	Array,
+/// 	Function,
+/// 	External,
+/// }
+enum class JSType
 {
-
-struct V8Scope;
-class Object;
-class Context;
-class String;
-
-void Throw(const V8Scope& scope);
-
-enum class DllExport Type
-{
+	Null,
 	Int,
 	Double,
 	String,
@@ -33,277 +45,300 @@ enum class DllExport Type
 	Object,
 	Array,
 	Function,
-	Callback,
 	External,
 };
-
-template<class T> struct TypeTag { };
-
-class DllExport Value
+/// public enum JSRuntimeError
+/// {
+/// 	NoError,
+/// 	InvalidCast,
+/// 	StringTooLong,
+/// 	TypeError,
+/// }
+enum class JSRuntimeError
 {
-public:
-	virtual Type GetValueType() const = 0;
-	virtual ~Value()
-	{
-	}
-	virtual void Delete();
-protected:
-	static Value* Wrap(
-		v8::Local<v8::Value> value);
-	static Value* Wrap(
-		const v8::TryCatch& tryCatch,
-		v8::Local<v8::Value> value);
-	static Value* WrapMaybe(
-		const v8::TryCatch& tryCatch,
-		v8::MaybeLocal<v8::Value> value);
-	static v8::Local<v8::Value> Unwrap(Value* value);
-	std::vector<v8::Local<v8::Value>> UnwrapVector(const std::vector<Value*>& values);
-	static v8::Local<v8::String> ToV8String(const v8::TryCatch& tryCatch, const String& str);
-	static v8::Local<v8::String> ToV8String(const String& str);
-	friend class Context;
-	friend void Throw(const v8::TryCatch& tryCatch);
+	NoError,
+	InvalidCast,
+	StringTooLong,
+	TypeError,
 };
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSContext
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSContext;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSValue
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSValue;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSString
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSString;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSObject
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSObject;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSArray
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSArray;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSFunction
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSFunction;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSExternal
+/// {
+/// 	readonly IntPtr _handle;
+/// }
+struct JSExternal;
+/// [StructLayout(LayoutKind.Sequential)]
+/// public struct JSScriptException
+/// {
+/// 	readonly IntPtr _handle;
+/// 	public override bool Equals(object that) { return that is JSScriptException ? this == (JSScriptException)that : false; }
+/// 	public override int GetHashCode() { return _handle.GetHashCode(); }
+/// 	public static bool operator ==(JSScriptException e1, JSScriptException e2) { return e1._handle == e2._handle; }
+/// 	public static bool operator !=(JSScriptException e1, JSScriptException e2) { return e1._handle != e2._handle; }
+/// }
+struct JSScriptException;
+/// public delegate JSValue JSCallback(JSContext context, IntPtr data, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)]JSValue[] args, int numArgs, out JSValue error);
+typedef JSValue* (StdCall *JSCallback)(JSContext* context, void* data, JSValue* const* args, int numArgs, JSValue** outError);
+/// public delegate void JSExternalFinalizer(IntPtr external);
+typedef void (StdCall *JSExternalFinalizer)(void* external);
+/// public delegate void JSCallbackFinalizer(IntPtr data);
+typedef void (StdCall *JSCallbackFinalizer)(void* data);
+/// public delegate void JSDebugMessageHandler(IntPtr data, JSString message);
+typedef void (StdCall *JSDebugMessageHandler)(void* data, JSString* message);
 
-class DllExport String: public Value
-{
-public:
-	static String* New(const uint16_t* buffer, int bufferLength);
-	String(const uint16_t* buffer, int bufferLength);
-	String(const String& str);
-	String& operator=(const String& str);
-	virtual Type GetValueType() const override final;
-	const uint16_t* GetValue() const;
-	void GetBuffer(uint16_t* outBuffer) const;
-	int GetBufferLength() const;
-	virtual ~String();
-	String* Copy() const;
-private:
-	String(const v8::Local<v8::String>& v);
-	uint16_t* _value;
-	int _length;
-	friend class Object;
-	friend class Value;
-	friend struct ScriptException;
-	friend class Context;
-};
+/// // -------------------------------------------------------------------------
+/// // Context
+/// public static class Context
+/// {
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="RetainJSContext")]
+/// public static extern void Retain(JSContext context);
+DllPublic void CDecl RetainJSContext(JSContext* context);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="ReleaseJSContext")]
+/// public static extern void Release(JSContext context);
+DllPublic void CDecl ReleaseJSContext(JSContext* context);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSContext")]
+/// public static extern JSContext Create([MarshalAs(UnmanagedType.FunctionPtr)]JSCallbackFinalizer callbackFinalizer, [MarshalAs(UnmanagedType.FunctionPtr)]JSExternalFinalizer externalFinalizer);
+DllPublic JSContext* CDecl CreateJSContext(JSCallbackFinalizer callbackFinalizer, JSExternalFinalizer externalFinalizer);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSContextEvaluateCreate")]
+/// public static extern JSValue EvaluateCreate(JSContext context, JSString fileName, JSString code, out JSScriptException error);
+DllPublic JSValue* CDecl JSContextEvaluateCreate(JSContext* context, JSString* fileName, JSString* code, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSContextCopyGlobalObject")]
+/// public static extern JSObject CopyGlobalObject(JSContext context);
+DllPublic JSObject* CDecl JSContextCopyGlobalObject(JSContext* context);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetV8Version")]
+/// public static extern IntPtr GetV8VersionPtr();
+/// public static string GetV8Version() { return Marshal.PtrToStringAnsi(GetV8VersionPtr()); }
+DllPublic const char* CDecl GetV8Version();
+/// }
 
-class DllExport Function: public Value
-{
-public:
-	virtual Type GetValueType() const override final;
-	Value* Call(const std::vector<Value*>& args);
-	Value* Call(Value** args, int numArgs);
-	Object* Construct(const std::vector<Value*>& args);
-	Object* Construct(Value** args, int numArgs);
-	bool StrictEquals(const Function* f);
+/// // -------------------------------------------------------------------------
+/// // Debug
+/// public static class Debug
+/// {
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="SetJSDebugMessageHandler")]
+/// public static extern void SetMessageHandler(JSContext context, IntPtr data, [MarshalAs(UnmanagedType.FunctionPtr)]JSDebugMessageHandler messageHandler);
+DllPublic void CDecl SetJSDebugMessageHandler(JSContext* context, void* data, JSDebugMessageHandler messageHandler);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="SendJSDebugCommand")]
+/// public static extern void SendCommand(JSContext context, [MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 2)]string command, int length);
+DllPublic void CDecl SendJSDebugCommand(JSContext* context, const uint16_t* command, int length);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="ProcessJSDebugMessages")]
+/// public static extern void ProcessMessages(JSContext context);
+DllPublic void CDecl ProcessJSDebugMessages(JSContext* context);
+/// }
 
-	virtual ~Function();
-private:
-	Function(v8::Local<v8::Function> function);
-	v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>>* _function;
-	friend class Value;
-};
+/// // -------------------------------------------------------------------------
+/// // Value
+/// public static class Value
+/// {
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSValueType")]
+/// public static extern JSType GetType(JSValue value);
+DllPublic JSType CDecl GetJSValueType(JSValue* value);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="RetainJSValue")]
+/// public static extern void Retain(JSContext context, JSValue value);
+DllPublic void CDecl RetainJSValue(JSContext* context, JSValue* value);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="ReleaseJSValue")]
+/// public static extern void Release(JSContext context, JSValue value);
+DllPublic void CDecl ReleaseJSValue(JSContext* context, JSValue* value);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsInt")]
+/// public static extern int AsInt(JSValue value, out JSRuntimeError error);
+DllPublic int CDecl JSValueAsInt(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsDouble")]
+/// public static extern double AsDouble(JSValue value, out JSRuntimeError error);
+DllPublic double CDecl JSValueAsDouble(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsString")]
+/// public static extern JSString AsString(JSValue value, out JSRuntimeError error);
+DllPublic JSString* CDecl JSValueAsString(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsBool")]
+/// [return: MarshalAs(UnmanagedType.Bool)]
+/// public static extern bool AsBool(JSValue value, out JSRuntimeError error);
+DllPublic bool CDecl JSValueAsBool(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsObject")]
+/// public static extern JSObject AsObject(JSValue value, out JSRuntimeError error);
+DllPublic JSObject* CDecl JSValueAsObject(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsArray")]
+/// public static extern JSArray AsArray(JSValue value, out JSRuntimeError error);
+DllPublic JSArray* CDecl JSValueAsArray(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsFunction")]
+/// public static extern JSFunction AsFunction(JSValue value, out JSRuntimeError error);
+DllPublic JSFunction* CDecl JSValueAsFunction(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsExternal")]
+/// public static extern JSExternal AsExternal(JSValue value, out JSRuntimeError error);
+DllPublic JSExternal* CDecl JSValueAsExternal(JSValue* value, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueStrictEquals")]
+/// [return: MarshalAs(UnmanagedType.Bool)]
+/// public static extern bool StrictEquals(JSContext context, JSValue obj1, JSValue obj2);
+DllPublic bool CDecl JSValueStrictEquals(JSContext* context, JSValue* obj1, JSValue* obj2);
 
-class DllExport UniqueValueVector
-{
-public:
-	int Length();
-	Value* Get(int index);
-	~UniqueValueVector();
-	void Delete();
-private:
-	UniqueValueVector(const std::vector<Value*>&& values);
-	std::vector<Value*>* _values;
-	friend class Value;
-	friend class Object;
-};
+/// // --------------------------------------------------------------------------
+/// // Primitives
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSNull")]
+/// public static extern JSValue JSNull();
+DllPublic JSValue* CDecl JSNull();
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSInt")]
+/// public static extern JSValue CreateInt(int value);
+DllPublic JSValue* CDecl CreateJSInt(int value);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSDouble")]
+/// public static extern JSValue CreateDouble(double value);
+DllPublic JSValue* CDecl CreateJSDouble(double value);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSBool")]
+/// public static extern JSValue CreateBool([MarshalAs(UnmanagedType.Bool)]bool value);
+DllPublic JSValue* CDecl CreateJSBool(bool value);
+///// Not memory managed; add an External property if data needs to be retained
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateExternalJSArrayBuffer")]
+/// public static extern JSObject CreateExternalArrayBuffer(JSContext context, IntPtr data, int byteLength);
+DllPublic JSObject* CDecl CreateExternalJSArrayBuffer(JSContext* context, void* data, int byteLength);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSCallback")]
+/// public static extern JSFunction CreateCallback(JSContext context, IntPtr data, [MarshalAs(UnmanagedType.FunctionPtr)]JSCallback callback, out JSScriptException error);
+DllPublic JSFunction* CDecl CreateJSCallback(JSContext* context, void* data, JSCallback callback, JSScriptException** outError);
 
-class DllExport Object: public Value
-{
-public:
-	virtual Type GetValueType() const override final;
-	Value* Get(const String* key);
-	void Set(const String* key, Value* value);
-	UniqueValueVector* Keys();
-	bool InstanceOf(Function* type);
-	Value* CallMethod(const String* name, const std::vector<Value*>& args);
-	Value* CallMethod(const String* name, Value** args, int numArgs);
-	bool ContainsKey(const String* key);
-	void* GetArrayBufferData();
-	bool StrictEquals(const Object* object);
+/// // --------------------------------------------------------------------------
+/// // String
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSString")]
+/// public static extern JSString CreateString(JSContext context, [MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 2)]string buffer, int length, out JSRuntimeError error);
+DllPublic JSString* CDecl CreateJSString(JSContext* context, const uint16_t* buffer, int length, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringLength")]
+/// public static extern int Length(JSContext context, JSString str);
+DllPublic int CDecl JSStringLength(JSContext* context, JSString* string);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="WriteJSStringBuffer")]
+/// public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer, [MarshalAs(UnmanagedType.Bool)]bool nullTerminate);
+DllPublic void CDecl WriteJSStringBuffer(JSContext* context, JSString* string, uint16_t* outBuffer, bool nullTerminate);
+/// public static string ToString(JSContext context, JSString str)
+/// {
+/// 	var sb = new StringBuilder(Length(context, str) + 1);
+/// 	Write(context, str, sb, true);
+/// 	return sb.ToString();
+/// }
 
-	virtual ~Object();
-private:
-	Object(v8::Local<v8::Object> object);
-	v8::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object> >* _object;
-	friend class Context;
-	friend class Value;
-	friend class Function;
-};
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringAsValue")]
+/// public static extern JSValue AsValue(JSString str);
+DllPublic JSValue* CDecl JSStringAsValue(JSString* string);
 
-class DllExport Array: public Value
-{
-public:
-	virtual Type GetValueType() const override final;
-	Value* Get(int index);
-	void Set(int index, Value* value);
-	int Length();
-	bool StrictEquals(const Array* array);
+/// // -------------------------------------------------------------------------
+/// // Object
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CopyJSObjectProperty")]
+/// public static extern JSValue CopyProperty(JSContext context, JSObject obj, JSString key, out JSScriptException error);
+DllPublic JSValue* CDecl CopyJSObjectProperty(JSContext* context, JSObject* obj, JSString* key, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="SetJSObjectProperty")]
+/// public static extern void SetProperty(JSContext context, JSObject obj, JSString key, JSValue value, out JSScriptException error);
+DllPublic void CDecl SetJSObjectProperty(JSContext* context, JSObject* obj, JSString* key, JSValue* value, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CopyJSObjectOwnPropertyNames")]
+/// public static extern JSArray CopyOwnPropertyNames(JSContext context, JSObject obj, out JSScriptException error);
+DllPublic JSArray* CDecl CopyJSObjectOwnPropertyNames(JSContext* context, JSObject* obj, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSObjectHasProperty")]
+/// [return: MarshalAs(UnmanagedType.Bool)]
+/// public static extern bool HasProperty(JSContext context, JSObject obj, JSString key, out JSScriptException error);
+DllPublic bool CDecl JSObjectHasProperty(JSContext* context, JSObject* obj, JSString* key, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSObjectArrayBufferData")]
+/// public static extern IntPtr GetArrayBufferData(JSContext context, JSObject obj, out JSRuntimeError outError);
+DllPublic void* CDecl GetJSObjectArrayBufferData(JSContext* context, JSObject* obj, JSRuntimeError* outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSObjectAsValue")]
+/// public static extern JSValue AsValue(JSObject obj);
+DllPublic JSValue* CDecl JSObjectAsValue(JSObject* obj);
 
-	virtual ~Array();
-private:
-	Array(v8::Local<v8::Array> array);
-	v8::Persistent<v8::Array, v8::CopyablePersistentTraits<v8::Array> >* _array;
-	friend class Value;
-};
+/// // -------------------------------------------------------------------------
+/// // Array
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CopyJSArrayPropertyAtIndex")]
+/// public static extern JSValue CopyProperty(JSContext context, JSArray arr, int index, out JSScriptException error);
+DllPublic JSValue* CDecl CopyJSArrayPropertyAtIndex(JSContext* context, JSArray* arr, int index, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="SetJSArrayPropertyAtIndex")]
+/// public static extern void SetProperty(JSContext context, JSArray arr, int index, JSValue value, out JSScriptException error);
+DllPublic void CDecl SetJSArrayPropertyAtIndex(JSContext* context, JSArray* arr, int index, JSValue* value, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSArrayLength")]
+/// public static extern int Length(JSContext context, JSArray arr);
+DllPublic int CDecl JSArrayLength(JSContext* context, JSArray* arr);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSArrayAsValue")]
+/// public static extern JSValue AsValue(JSArray arr);
+DllPublic JSValue* CDecl JSArrayAsValue(JSArray* arr);
 
-class DllExport Callback: public Value
-{
-public:
-	Callback();
-	virtual Type GetValueType() const override /* final */;
-	virtual Value* Call(UniqueValueVector* args);
-	virtual void Retain() { }
-	virtual void Release() { }
-};
+/// // -------------------------------------------------------------------------
+/// // Function
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CallJSFunctionCreate")]
+/// public static extern JSValue CallCreate(JSContext context, JSFunction function, JSObject thisObject, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]JSValue[] args, int numArgs, out JSScriptException error);
+DllPublic JSValue* CDecl CallJSFunctionCreate(JSContext* context, JSFunction* function, JSObject* thisObject, JSValue* const* args, int numArgs, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="ConstructJSFunctionCreate")]
+/// public static extern JSObject ConstructCreate(JSContext context, JSFunction function, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)]JSValue[] args, int numArgs, out JSScriptException error);
+DllPublic JSObject* CDecl ConstructJSFunctionCreate(JSContext* context, JSFunction* function, JSValue* const* args, int numArgs, JSScriptException** outError);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSFunctionAsValue")]
+/// public static extern JSValue AsValue(JSFunction fun);
+DllPublic JSValue* CDecl JSFunctionAsValue(JSFunction* fun);
 
-class DllExport External: public Value
-{
-public:
-	External(void* value);
-	static External* New(void* value);
-	virtual Type GetValueType() const override;
-	void* GetValue();
+/// // -------------------------------------------------------------------------
+/// // External
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSExternal")]
+/// public static extern JSExternal CreateExternal(JSContext context, IntPtr value);
+DllPublic JSExternal* CDecl CreateJSExternal(JSContext* context, void* value);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSExternalValue")]
+/// public static extern IntPtr GetExternalValue(JSContext context, JSExternal external);
+DllPublic void* CDecl GetJSExternalValue(JSContext* context, JSExternal* external);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSExternalAsValue")]
+/// public static extern JSValue AsValue(JSExternal external);
+DllPublic JSValue* CDecl JSExternalAsValue(JSExternal* external);
+/// }
 
-	virtual ~External();
-private:
-	External(v8::Local<v8::External> external);
-	v8::Persistent<v8::External, v8::CopyablePersistentTraits<v8::External> >* _external;
-	friend class Value;
-};
+/// // -------------------------------------------------------------------------
+/// // Exceptions
+/// public static class ScriptException
+/// {
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="RetainJSScriptException")]
+/// public static extern void Retain(JSContext context, JSScriptException e);
+DllPublic void CDecl RetainJSScriptException(JSContext* context, JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="ReleaseJSScriptException")]
+/// public static extern void Release(JSContext context, JSScriptException e);
+DllPublic void CDecl ReleaseJSScriptException(JSContext* context, JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSScriptException")]
+/// public static extern JSValue GetException(JSScriptException e);
+DllPublic JSValue* CDecl GetJSScriptException(JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSScriptExceptionMessage")]
+/// public static extern JSString GetMessage(JSScriptException e);
+DllPublic JSString* CDecl GetJSScriptExceptionMessage(JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSScriptExceptionFileName")]
+/// public static extern JSString GetFileName(JSScriptException e);
+DllPublic JSString* CDecl GetJSScriptExceptionFileName(JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSScriptExceptionLineNumber")]
+/// public static extern int GetLineNumber(JSScriptException e);
+DllPublic int CDecl GetJSScriptExceptionLineNumber(JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSScriptExceptionStackTrace")]
+/// public static extern JSString GetStackTrace(JSScriptException e);
+DllPublic JSString* CDecl GetJSScriptExceptionStackTrace(JSScriptException* e);
+/// [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSScriptExceptionSourceLine")]
+/// public static extern JSString GetSourceLine(JSScriptException e);
+DllPublic JSString* CDecl GetJSScriptExceptionSourceLine(JSScriptException* e);
+/// }
 
-template<class T>
-class DllExport Primitive: public Value
-{
-public:
-	Primitive(const T& value) : _value(value) { }
-	static Primitive<T>* New(const T& value)
-	{
-		return new Primitive<T>(value);
-	}
-	virtual Type GetValueType() const override final { return TypeTag<Primitive<T>>::Tag; }
-	T GetValue() const { return _value; }
-private:
-	const T _value;
-};
-
-typedef Primitive<int> Int;
-typedef Primitive<double> Double;
-typedef Primitive<bool> Bool;
-
-template<> struct TypeTag<Object> { static const Type Tag = Type::Object; };
-template<> struct TypeTag<Array> { static const Type Tag = Type::Array; };
-template<> struct TypeTag<Function> { static const Type Tag = Type::Function; };
-template<> struct TypeTag<Callback> { static const Type Tag = Type::Callback; };
-template<> struct TypeTag<External> { static const Type Tag = Type::External; };
-template<> struct TypeTag<Int> { static const Type Tag = Type::Int; };
-template<> struct TypeTag<Double> { static const Type Tag = Type::Double; };
-template<> struct TypeTag<String> { static const Type Tag = Type::String; };
-template<> struct TypeTag<Bool> { static const Type Tag = Type::Bool; };
-
-struct DllExport ScriptException
-{
-	Value* GetException() { auto result = _exception; _exception = nullptr; return result; }
-	String* GetErrorMessage() { return _errorMessage.Copy(); }
-	String* GetFileName() { return _fileName.Copy(); }
-	int GetLineNumber() { return _lineNumber; }
-	String* GetStackTrace() { return _stackTrace.Copy(); }
-	String* GetSourceLine() { return _sourceLine.Copy(); }
-	ScriptException* Copy();
-	~ScriptException();
-	void Delete();
-private:
-	Value* _exception;
-	const String _errorMessage, _fileName, _stackTrace, _sourceLine;
-	int _lineNumber;
-
-	ScriptException(
-		Value* exception,
-		const v8::Local<v8::String>& errorMessage,
-		const v8::Local<v8::String>& fileName,
-		int lineNumber,
-		const v8::Local<v8::String>& stackTrace,
-		const v8::Local<v8::String>& sourceLine);
-	friend void Throw(const v8::TryCatch& tryCatch);
-	friend class Value;
-};
-
-struct DllExport MessageHandler
-{
-	virtual void Handle(const String* message) { }
-	virtual ~MessageHandler() { }
-};
-
-struct DllExport ScriptExceptionHandler
-{
-	virtual void Handle(ScriptException& e) { }
-	virtual ~ScriptExceptionHandler() { }
-};
-
-struct DllExport ExternalFreer
-{
-	virtual void Free(void* external) { }
-	virtual ~ExternalFreer() { }
-};
-
-class DllExport Context
-{
-public:
-	Context(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler, ExternalFreer* externalFreer);
-	static Context* New(ScriptExceptionHandler* scriptExceptionHandler, MessageHandler* runtimeExceptionHandler, ExternalFreer* externalFreer);
-	Value* Evaluate(const String* fileName, const String* code);
-	Object* GlobalObject();
-	bool IdleNotificationDeadline(double deadlineInSeconds);
-	~Context();
-	void Delete();
-
-	static Object* NewExternalArrayBuffer(void* data, int byteLength);
-
-	static const char* GetVersion();
-	static Value* ThrowException(Value* exception);
-
-	static void SetDebugMessageHandler(MessageHandler* debugMessageHandler);
-	static void SendDebugCommand(const String* command);
-	static void ProcessDebugMessages();
-private:
-	static v8::Platform* _platform;
-	static v8::Isolate* _isolate;
-	static v8::Isolate* _conversionIsolate;
-	static Context* _globalContext;
-
-	static MessageHandler* _debugMessageHandler;
-	v8::Persistent<v8::Context, v8::CopyablePersistentTraits<v8::Context> >* _context;
-	Function* _instanceOf;
-	ScriptExceptionHandler* _scriptExceptionHandler;
-	MessageHandler* _runtimeExceptionHandler;
-	ExternalFreer* _externalFreer;
-
-	String* NewStringFromUtf8(const char* str) const;
-
-	void HandleScriptException(ScriptException& e) const;
-	void HandleRuntimeException(const char* messageBuffer) const;
-
-	v8::Local<v8::Context> V8Context() const;
-
-	static Context* Global();
-	static v8::Isolate* Isolate();
-	friend struct V8Scope;
-	friend class Value;
-	friend class Array;
-	friend class Function;
-	friend class Object;
-	friend class External;
-	friend void Throw(const v8::TryCatch& tryCatch);
-};
-
-} // namespace V8Simple
+/// }

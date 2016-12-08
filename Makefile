@@ -1,5 +1,5 @@
-LDFLAGS+= -fPIC -fno-rtti -dead_strip
-CXXFLAGS+= -Wall -std=c++11
+LDFLAGS+= -flto -fPIC -dead_strip
+CXXFLAGS+= -fexceptions -Wall -std=c++11
 
 FILE=V8Simple
 LIB_DIR=lib
@@ -12,20 +12,16 @@ $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-$(OBJ_DIR)/%.o: %.cxx
-	@mkdir -p $(OBJ_DIR)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(LIB_DIR)/$(LIB_FILE): $(OBJ_DIR)/$(FILE).o $(OBJ_DIR)/$(FILE)_wrap.o
+$(LIB_DIR)/$(LIB_FILE): $(OBJ_DIR)/$(FILE).o
 	@mkdir -p $(LIB_DIR)
-	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
-$(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o $(OBJ_DIR)/$(FILE)_wrap.o
+$(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o
 	@mkdir -p $(LIB_DIR)
-	$(CXX) -shared $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
-$(FILE).cs $(FILE)_wrap.cxx: $(FILE).i $(FILE).h
-	swig -csharp -dllimport $(FILE).dll -namespace Fuse.Scripting.V8.Simple -c++ -outfile $(FILE).cs $<
+$(FILE).cs: $(FILE).h
+	./extract_pinvoke.sh $^ $@
 
 $(LIB_DIR)/$(FILE).net.dll: $(FILE).cs DllDirectory.cs
 	@mkdir -p $(LIB_DIR)
@@ -40,6 +36,5 @@ check: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).net.dll
 	nunit-console -labels test/Test.dll
 
 clean:
-	$(RM) $(FILE)_wrap.cxx
 	$(RM)  -r lib
 	$(RM) -r obj
