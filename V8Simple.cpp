@@ -946,7 +946,7 @@ DllPublic JSExternal* CDecl CreateJSExternal(JSContext* context, void* value)
 		},
 		v8::WeakCallbackType::kParameter);
 
-	return new JSExternal(context->Isolate, v8::External::New(context->Isolate, value));
+	return new JSExternal(context->Isolate, localExternal);
 }
 
 DllPublic void* CDecl GetJSExternalValue(JSContext* context, JSExternal* external)
