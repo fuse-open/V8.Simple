@@ -118,7 +118,7 @@ public static extern double AsDouble(JSValue value, out JSRuntimeError error);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsString")]
 public static extern JSString AsString(JSValue value, out JSRuntimeError error);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsBool")]
-[return: MarshalAs(UnmanagedType.Bool)]
+[return: MarshalAs(UnmanagedType.I1)]
 public static extern bool AsBool(JSValue value, out JSRuntimeError error);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsObject")]
 public static extern JSObject AsObject(JSValue value, out JSRuntimeError error);
@@ -129,7 +129,7 @@ public static extern JSFunction AsFunction(JSValue value, out JSRuntimeError err
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueAsExternal")]
 public static extern JSExternal AsExternal(JSValue value, out JSRuntimeError error);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSValueStrictEquals")]
-[return: MarshalAs(UnmanagedType.Bool)]
+[return: MarshalAs(UnmanagedType.I1)]
 public static extern bool StrictEquals(JSContext context, JSValue obj1, JSValue obj2);
 // --------------------------------------------------------------------------
 // Primitives
@@ -140,7 +140,7 @@ public static extern JSValue CreateInt(int value);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSDouble")]
 public static extern JSValue CreateDouble(double value);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSBool")]
-public static extern JSValue CreateBool([MarshalAs(UnmanagedType.Bool)]bool value);
+public static extern JSValue CreateBool([MarshalAs(UnmanagedType.I1)]bool value);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateExternalJSArrayBuffer")]
 public static extern JSObject CreateExternalArrayBuffer(JSContext context, IntPtr data, int byteLength);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CreateJSCallback")]
@@ -152,7 +152,7 @@ public static extern JSString CreateString(JSContext context, [MarshalAs(Unmanag
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSStringLength")]
 public static extern int Length(JSContext context, JSString str);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="WriteJSStringBuffer")]
-public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer, [MarshalAs(UnmanagedType.Bool)]bool nullTerminate);
+public static extern void Write(JSContext context, JSString str, [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder buffer, [MarshalAs(UnmanagedType.I1)]bool nullTerminate);
 public static string ToString(JSContext context, JSString str)
 {
 	var sb = new StringBuilder(Length(context, str) + 1);
@@ -170,7 +170,7 @@ public static extern void SetProperty(JSContext context, JSObject obj, JSString 
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="CopyJSObjectOwnPropertyNames")]
 public static extern JSArray CopyOwnPropertyNames(JSContext context, JSObject obj, out JSScriptException error);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="JSObjectHasProperty")]
-[return: MarshalAs(UnmanagedType.Bool)]
+[return: MarshalAs(UnmanagedType.I1)]
 public static extern bool HasProperty(JSContext context, JSObject obj, JSString key, out JSScriptException error);
 [DllImport("V8Simple.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint="GetJSObjectArrayBufferData")]
 public static extern IntPtr GetArrayBufferData(JSContext context, JSObject obj, out JSRuntimeError outError);
