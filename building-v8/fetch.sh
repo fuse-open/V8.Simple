@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=5.5
+VERSION=6.1
 
 # Get depot_tools
 if [ ! -d "depot_tools" ]; then
@@ -21,4 +21,6 @@ fi
 echo "Checkout the $VERSION branch"
 pushd v8
 git checkout remotes/branch-heads/$VERSION
+ulimit -S -n 2048 # Workaround for 'Too many open files in system' on macOS
+gclient sync
 popd
