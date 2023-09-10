@@ -23,18 +23,18 @@ $(LIB_DIR)/$(ANDROID_LIB_FILE): $(OBJ_DIR)/$(FILE).o
 $(FILE).cs: $(FILE).h
 	./extract_pinvoke.sh $^ $@
 
-$(LIB_DIR)/$(FILE).net.dll: $(FILE).cs DllDirectory.cs
+$(LIB_DIR)/$(FILE).net.dll: $(FILE).net.csproj $(FILE).cs Metadata.cs
 	@mkdir -p $(LIB_DIR)
-	mcs -t:library $^ -out:$@
+	dotnet build $< -c Release -p OutputPath=$(LIB_DIR)
 
 .PHONY: clean check
 
 check: $(LIB_DIR)/$(LIB_FILE) $(LIB_DIR)/$(FILE).net.dll
 	cp $(LIB_DIR)/$(LIB_FILE) test
 	cp $(LIB_DIR)/$(FILE).net.dll test
-	mcs -t:library -lib:lib -r:V8Simple.net.dll,nunit.framework test/Test.cs
+	dotnet build test/Test.csproj -p OutputPath=.
 	nunit-console -labels test/Test.dll
 
 clean:
-	$(RM)  -r lib
+	$(RM) -r lib
 	$(RM) -r obj
